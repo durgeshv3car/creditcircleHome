@@ -10,7 +10,7 @@ export const loginUser = async (data: any) => {
 
   try {
     const res = await signIn("credentials", {
-      username: data.username,
+      email: data.email,
       password: data.password,
       redirect: false, 
     });

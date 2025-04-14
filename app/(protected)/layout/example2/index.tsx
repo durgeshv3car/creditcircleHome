@@ -49,7 +49,7 @@ const modalMap = {
     create: dynamic(() => import("../home-section/slider/components/Create"), {
       ssr: false,
     }),
-    edit: dynamic(() => import("../home-section/slider/[id]/page"), {
+    edit: dynamic(() => import("../home-section/slider/components/EditModal"), {
       ssr: false,
     }),
   },
@@ -58,7 +58,7 @@ const modalMap = {
       () => import("../home-section/money-smart/components/Create"),
       { ssr: false }
     ),
-    edit: dynamic(() => import("../home-section/money-smart/[id]/page"), {
+    edit: dynamic(() => import("../home-section/money-smart/components/EditModal"), {
       ssr: false,
     }),
   },
@@ -66,7 +66,7 @@ const modalMap = {
     create: dynamic(() => import("../home-section/logo/components/Create"), {
       ssr: false,
     }),
-    edit: dynamic(() => import("../home-section/logo/[id]/page"), {
+    edit: dynamic(() => import("../home-section/logo/components/EditModal"), {
       ssr: false,
     }),
   },
@@ -75,7 +75,7 @@ const modalMap = {
       () => import("../home-section/refer-earn/components/Create"),
       { ssr: false }
     ),
-    edit: dynamic(() => import("../home-section/refer-earn/[id]/page"), {
+    edit: dynamic(() => import("../home-section/refer-earn/components/EditModal"), {
       ssr: false,
     }),
   },
@@ -84,7 +84,7 @@ const modalMap = {
       () => import("../home-section/offer/components/Create"),
       { ssr: false }
     ),
-    edit: dynamic(() => import("../home-section/offer/[id]/page"), {
+    edit: dynamic(() => import("../home-section/offer/components/EditModal"), {
       ssr: false,
     }),
   },
@@ -93,7 +93,7 @@ const modalMap = {
       () => import("../home-section/category/components/Create"),
       { ssr: false }
     ),
-    edit: dynamic(() => import("../home-section/category/[id]/page"), {
+    edit: dynamic(() => import("../home-section/category/components/EditModal"), {
       ssr: false,
     }),
   },
@@ -232,10 +232,10 @@ const ExampleTwo = ({
 
           {/* Input for Filtering */}
           <Input
-            placeholder="Filter Name..."
+            placeholder="Filter Title..."
             value={table.getColumn("title")?.getFilterValue() ?? ""}
             onChange={(event) =>
-              table.getColumn("name")?.setFilterValue(event.target.value)
+              table.getColumn("title")?.setFilterValue(event.target.value)
             }
             className="max-w-sm"
           />

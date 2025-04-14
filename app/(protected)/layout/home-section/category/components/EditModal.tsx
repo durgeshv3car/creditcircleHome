@@ -13,7 +13,7 @@ interface TableRow {
 }
 
 interface EditModalProps {
-  id?: string;
+  id: string;
   onClose: () => void;
   tableData: TableRow[];
   setRefresh: React.Dispatch<React.SetStateAction<boolean>>;
@@ -24,7 +24,7 @@ const EditModal: React.FC<EditModalProps> = ({
   onClose,
   tableData,
   setRefresh,
-}) => {
+}: EditModalProps) => {
   const router = useRouter();
   const [editedData, setEditedData] = useState<Record<string, any>>({});
   const [selectedRow, setSelectedRow] = useState<TableRow | null>(null);

@@ -6,6 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import ActiveToggleCell from "./ActiveToggleCell";
 
 
 import { SquarePen, Trash2, CalendarClock } from "lucide-react";
@@ -18,7 +19,7 @@ import axios from "axios";
 import { Switch } from "@/components/ui/switch";
 import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { scheduleDeleteSliderImage,toggleSliderImageStatus,deleteSliderImage } from "@/app/(protected)/services/sliders/api";
+import { scheduleDeleteSliderImage,deleteSliderImage } from "@/app/(protected)/services/sliders/api";
 
 
 
@@ -58,11 +59,11 @@ export const columnsSlider = (refreshData,router,setSelectedDate,selectedDate,op
     enableSorting: false,
   },
   {
-    accessorKey: "name",
-    header: "Name",
+    accessorKey: "title",
+    header: "Title",
     cell: ({ row }) => (
       <div className="flex gap-3 items-center">
-        <span className="text-sm">{row.original.name}</span>
+        <span className="text-sm">{row.original.title}</span>
       </div>
     ),
   },
@@ -131,31 +132,7 @@ export const columnsSlider = (refreshData,router,setSelectedDate,selectedDate,op
   {
     accessorKey: "active",
     header: "isActive",
-    cell: ({ row }) => {
-      const isActive = row.getValue("active"); // Get the active value (true/false)
-  
-      const handleToggle = async (value: boolean) => {
-        try {
-          const result = await toggleSliderImageStatus(row.original.id, value);
-      
-          if (result.success) {
-            toast.success(`Slider ${value ? "activated" : "deactivated"} successfully`);
-            row.original.active = value; // Update UI immediately
-          } else {
-            toast.error("Failed to update status");
-          }
-        } catch (error) {
-          console.error("Error updating isActive:", error);
-          toast.error("Failed to update status");
-        }
-      };
-  
-      return (
-        <div className="flex gap-3 items-center">
-          <Switch  onCheckedChange={handleToggle} />
-        </div>
-      );
-    },
+    cell: ({ row }) => <ActiveToggleCell row={row} />,
   },
   
   

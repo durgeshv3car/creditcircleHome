@@ -54,9 +54,7 @@ const Login = ({ params: { locale } }: { params: { locale: string } }) => {
                     Or continue with
                   </div>
                 </div>
-                <div className="max-w-[242px] mx-auto mt-8 w-full">
-                  <Social locale={locale} />
-                </div>
+           
                 <div className="md:max-w-[345px] mx-auto font-normal text-default-500 mt-12 uppercase text-sm">
                   Don’t have an account?{" "}
                   <Link

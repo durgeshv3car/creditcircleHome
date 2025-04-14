@@ -9,7 +9,7 @@ import { MenuTwoColumn } from './menu-two-column';
 import { MenuDragAble } from './menu-dragable';
 import { useMediaQuery } from '@/hooks/use-media-query';
 
-export function Menu() {
+export function Menu({role}) {
 
     const [config, setConfig] = useConfig()
     const isDesktop = useMediaQuery('(min-width: 1280px)')
@@ -25,6 +25,6 @@ export function Menu() {
 
 
     return (
-        <MenuClassic />
+        <MenuClassic role={role}/>
     );
 }

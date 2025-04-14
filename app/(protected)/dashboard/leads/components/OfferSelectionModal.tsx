@@ -5,17 +5,36 @@ import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useRouter,useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-const OfferSelectionModal = ({ isOpen, onClose, onSelectOffer,selectedRowsData }) => {
-  const [offers, setOffers] = useState([]);
-  const [selectedOffer, setSelectedOffer] = useState(null);
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+// Define types for props
+interface Offer {
+  id: string;
+  title: string;
+  isActive: boolean;
+}
+
+interface SelectedRowData {
+  id: string | number;
+}
+
+interface OfferSelectionModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSelectOffer: (offer: Offer) => void;
+  selectedRowsData: SelectedRowData[];
+}
+
+const OfferSelectionModal: React.FC<OfferSelectionModalProps> = ({ isOpen, onClose, onSelectOffer, selectedRowsData }) => {
+  const [offers, setOffers] = useState<Offer[]>([]);
+  const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
+  const [open, setOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const type = searchParams.get("type"); 
- 
+  const type = searchParams?.get("type") || null;
+
+
 
   console.log("Type:", type);
 
@@ -34,8 +53,9 @@ const OfferSelectionModal = ({ isOpen, onClose, onSelectOffer,selectedRowsData }
 
         const data = await response.json();
         console.log("Offers fetched successfully:", data);
-        setOffers(data.offers);
-      } catch (error) {
+        const offers = data.offers.filter((offer: Offer) => offer.isActive === true);
+        setOffers(offers);
+      } catch (error: any) {
         console.error("Error fetching offers:", error.message);
       }
     };
@@ -44,25 +64,25 @@ const OfferSelectionModal = ({ isOpen, onClose, onSelectOffer,selectedRowsData }
   }, [isOpen]);
 
   // Handle offer selection (Dropdown stays open)
-  const handleSelectOffer = (offer) => {
+  const handleSelectOffer = (offer: Offer) => {
     setSelectedOffer(offer);
   };
 
   // Submit the selected offer
   const handleSubmit = async () => {
     if (!selectedOffer || !selectedRowsData.length) return;
-  
+
     try {
       setLoading(true);
       console.log("Submitting selected offer:", selectedOffer);
       console.log("Selected rows:", selectedRowsData);
-      let sending;
-      if (type=="Notification"){
-        sending="Application"
-      }else{
-        sending=type
+      let sending: string;
+      if (type === "Notification") {
+        sending = "Application";
+      } else {
+        sending = type || "";
       }
-  
+
       const response = await fetch("http://localhost:5000/api/notifications", {
         method: "POST",
         headers: {
@@ -70,41 +90,38 @@ const OfferSelectionModal = ({ isOpen, onClose, onSelectOffer,selectedRowsData }
         },
         body: JSON.stringify({
           offerIds: [selectedOffer.id], // Array format
-          userIds: selectedRowsData.map(row => String(row.id)), // Array of row IDs
-          type:`${sending}_create`
+          userIds: selectedRowsData.map((row) => String(row.id)), // Array of row IDs
+          type: `${sending}_create`,
         }),
       });
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-  
+
       const result = await response.json();
       console.log("Offer submitted successfully:", result);
-      if (type=="Email"){
+      if (type === "Email") {
         router.push("/messageCenter/email");
-      }else if (type=="Notification"){
+      } else if (type === "Notification") {
         router.push("/messageCenter/application");
-      }else if (type=="Sms"){
+      } else if (type === "Sms") {
         router.push("/messageCenter/sms");
-      }else if (type=="Whatsapp"){
+      } else if (type === "Whatsapp") {
         router.push("/messageCenter/whatsapp");
       }
-      
-     
-  
+
       // Notify parent component
       onSelectOffer(selectedOffer);
-  
+
       // Close modal only after submitting
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting offer:", error.message);
     } finally {
       setLoading(false);
     }
   };
-  
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

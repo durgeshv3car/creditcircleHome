@@ -49,13 +49,11 @@ s lg:w-1/2"
                   Or continue with
                 </div>
               </div>
-              <div className="max-w-[242px] mx-auto mt-8 w-full">
-                <Social locale="en" />
-              </div>
+           
               <div className="mx-auto font-normal text-default-500  2xl:mt-12 mt-6 uppercase text-sm text-center">
                 Already registered?
                 <Link
-                  href="/"
+                  href="/auth/login"
                   className="text-default-900 font-medium hover:underline"
                 >
                   Sign In

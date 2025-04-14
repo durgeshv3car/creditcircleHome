@@ -17,10 +17,11 @@ import { useRouter } from "@/components/navigation";
 
 const schema = z.object({
   // email: z.string().email({ message: "Your email is invalid." }),
-  username: z.string().min(4),
+  email: z.string().min(4),
   password: z.string().min(4),
 });
 const LoginForm = () => {
+  
   const [isPending, startTransition] = React.useTransition();
   const [token,setToken] = React.useState(null);
   const router = useRouter();
@@ -42,8 +43,8 @@ const LoginForm = () => {
     resolver: zodResolver(schema),
     mode: "all",
     defaultValues: {
-      username: 'emilys',
-      password: 'emilyspass',
+      email: 'rahul@v3cars.com',
+      password: 'Rsaini777@',
     },
   });
   const [isVisible, setIsVisible] = React.useState(false);
@@ -71,26 +72,27 @@ const LoginForm = () => {
     });
   };
 
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="mt-5 2xl:mt-7 space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="username" className=" font-medium text-default-600">
-          Username{" "}
+        <Label htmlFor="email" className=" font-medium text-default-600">
+          email{" "}
         </Label>
         <Input
           size="lg"
           disabled={isPending}
-          {...register("username")}
-          type="username"
-          id="username"
+          {...register("email")}
+          type="email"
+          id="email"
           className={cn("", {
-            "border-destructive ": errors.username,
+            "border-destructive ": errors.email,
           })}
         />
       </div>
-      {errors.username && (
+      {errors.email && (
         <div className=" text-destructive mt-2 text-sm">
-          {errors.username.message}
+          {errors.email.message}
         </div>
       )}
 

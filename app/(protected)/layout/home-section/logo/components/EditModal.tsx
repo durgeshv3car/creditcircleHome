@@ -8,7 +8,7 @@ import ImageUpload from "../../../components/ImageUpload";
 import { toast } from "sonner";
 import axios from "axios";
 import { Switch } from "@/components/ui/switch";
-import { updateSliderImage } from "@/app/(protected)/services/sliders/api";
+import { updateLogoImage } from "@/app/(protected)/services/logos/api";
 
 interface FileWithPreview extends File {
   preview: string;
@@ -17,7 +17,7 @@ interface FileWithPreview extends File {
 
 interface TableRow {
   id: string;
-  name?: string;
+  title?: string;
   imageUrl?: string;
   [key: string]: any;
 }
@@ -52,7 +52,7 @@ const EditModal: React.FC<EditModalProps> = ({
 
   const handleClose = () => {
     onClose();
-    router.push("/layout/home-section/slider", { scroll: false });
+    router.push("/layout/home-section/logo", { scroll: false });
   };
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,22 +60,20 @@ const EditModal: React.FC<EditModalProps> = ({
   };
 
   const refreshData = () => setRefresh((prev) => !prev);
-  const type = "slider";
-
+  const type = "logo";
   const handleUpdate = async () => {
-    if (!id) return;
-  
-    const result = await updateSliderImage(id, type, editedData, mobileFile?.file, webFile?.file);
-  
-    if (result.success) {
-      refreshData();
-      handleClose();
-      toast.success("Slider data updated");
-    } else {
-      toast.error("Slider data not updated");
-    }
-  };
-
+     if (!id) return;
+   
+     const result = await updateLogoImage(id, type, editedData, mobileFile?.file, webFile?.file);
+   
+     if (result.success) {
+       refreshData();
+       handleClose();
+       toast.success("Slider data updated");
+     } else {
+       toast.error("Slider data not updated");
+     }
+   };
   if (!selectedRow) return null;
 
   return (

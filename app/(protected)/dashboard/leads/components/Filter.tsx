@@ -7,11 +7,17 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { Command, CommandList, CommandInput, CommandItem } from "@/components/ui/command";
 import { Check, ChevronsUpDown } from "lucide-react";
 
-export default function Filter({ selectedValues, setSelectedValues, data }) {
-  const [openFilter, setOpenFilter] = useState(null);
-  const [dropdownOptions, setDropdownOptions] = useState({});
+interface FilterProps {
+  selectedValues: Record<string, string>;
+  setSelectedValues: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  data: Array<Record<string, any>>;
+}
 
-  const fieldPaths = {
+export default function Filter({ selectedValues, setSelectedValues, data }: FilterProps) {
+  const [openFilter, setOpenFilter] = useState<string | null>(null);
+  const [dropdownOptions, setDropdownOptions] = useState<Record<string, string[]>>({});
+
+  const fieldPaths: Record<string, (item: Record<string, any>) => string | undefined> = {
     firstName: (item) => item?.firstName,
     email: (item) => item?.email,
     phone: (item) => item?.phoneNumber,
@@ -31,20 +37,20 @@ export default function Filter({ selectedValues, setSelectedValues, data }) {
   useEffect(() => {
     if (!data || data.length === 0) return;
 
-    const newDropdowns = {};
+    const newDropdowns: Record<string, string[]> = {};
     for (const field in selectedValues) {
-      const values = data.map(fieldPaths[field]).filter(Boolean);
+      const values = data.map(fieldPaths[field]).filter(Boolean) as string[];
       newDropdowns[field] = ["All", ...Array.from(new Set(values)).sort()];
     }
     setDropdownOptions(newDropdowns);
   }, [data]);
 
-  const handleChange = (field, value) => {
+  const handleChange = (field: string, value: string) => {
     setSelectedValues((prev) => ({ ...prev, [field]: value === "All" ? "" : value }));
     setOpenFilter(null);
   };
 
-  const handleOpenChange = (field, isOpen) => {
+  const handleOpenChange = (field: string, isOpen: boolean) => {
     setOpenFilter(isOpen ? field : null);
   };
 

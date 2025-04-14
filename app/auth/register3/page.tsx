@@ -57,7 +57,7 @@ s lg:w-1/2"
               <div className="max-w-[225px] mx-auto font-normal text-default-500  2xl:mt-12 mt-6 uppercase text-sm">
                 Already registered?
                 <Link
-                  href="/"
+                  href="/auth/login"
                   className="text-default-900  font-medium hover:underline"
                 >
                   Sign In

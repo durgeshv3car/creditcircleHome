@@ -1,13 +1,39 @@
 "use client";
-import { useState, useEffect } from "react";
-import SiteBreadcrumb from "@/components/site-breadcrumb";
-import { Card, CardContent } from "@/components/ui/card";
-import ExampleTwo from "./table";
-import { columns } from "./table/columns";
+import React, { useState, useEffect, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { fetchUsers } from "../../services/users/api";
+import { ColumnDef } from "@tanstack/react-table"; // ✅ Import proper type
+import { DataProps } from "./table/columns"; // ✅ Import type from columns
 
-const LeadPage = () => {
-  const [selectedValues, setSelectedValues] = useState({
+interface SelectedValues {
+  firstName: string | null;
+  email: string | null;
+  phone: string | null;
+  dob: string | null;
+  pan: string | null;
+  pinCode: string | null;
+  city: string | null;
+  state: string | null;
+  houseNo: string | null;
+  streetAddress: string | null;
+  landmark: string | null;
+  gender: string | null;
+  education: string | null;
+  maritalStatus: string | null;
+}
+
+const ExampleTwo = dynamic<{
+  selectedValues: SelectedValues;
+  setSelectedValues: React.Dispatch<React.SetStateAction<SelectedValues>>;
+  tableData: DataProps[];
+  tableColumns: ColumnDef<DataProps>[]; // ✅ Updated here
+}>(() => import("./table"), {
+  loading: () => <p>Loading table...</p>,
+  ssr: false,
+});
+
+const LeadPage: React.FC = () => {
+  const [selectedValues, setSelectedValues] = useState<SelectedValues>({
     firstName: null,
     email: null,
     phone: null,
@@ -24,36 +50,40 @@ const LeadPage = () => {
     maritalStatus: null,
   });
 
+  const [columns, setColumns] = useState<ColumnDef<DataProps>[]>([]); // ✅ Updated type
   const [data, setData] = useState<DataProps[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refresh, setRefresh] = useState<boolean>(false);
-  const fetchData = async () => {
+
+  const fetchData = useCallback(async (): Promise<void> => {
     try {
       const result = await fetchUsers();
-
       if (!result || result.status === 404) {
         setData([]);
-        return;
+      } else {
+        setData(Array.isArray(result) ? result : [result]);
       }
-
-     
-      setData(Array.isArray(result) ? result : [result]);
-
     } catch (error) {
       console.error("Error fetching data:", error);
-      setData([]); // Ensure state is always an array
+      setData([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchData();
-  }, [refresh]);
+  }, [fetchData, refresh]);
 
-  const filteredData = data.filter((item) => {
-    const user = item 
-  
+  useEffect(() => {
+    const loadColumns = async (): Promise<void> => {
+      const mod = await import("./table/columns");
+      setColumns(mod.columns(fetchData)); // ✅ Now fully type-safe
+    };
+    loadColumns();
+  }, [fetchData]);
+
+  const filteredData = data.filter((user) => {
     return (
       (!selectedValues.firstName?.trim() ||
         user.firstName?.toLowerCase().includes(selectedValues.firstName.toLowerCase())) &&
@@ -61,8 +91,7 @@ const LeadPage = () => {
         user.email?.toLowerCase().includes(selectedValues.email.toLowerCase())) &&
       (!selectedValues.phone?.trim() ||
         user.phoneNumber?.includes(selectedValues.phone)) &&
-      (!selectedValues.dob?.trim() ||
-        user.dob?.includes(selectedValues.dob)) &&
+      (!selectedValues.dob?.trim() || user.dob?.includes(selectedValues.dob)) &&
       (!selectedValues.pan?.trim() ||
         user.pan?.toLowerCase().includes(selectedValues.pan.toLowerCase())) &&
       (!selectedValues.pinCode?.trim() ||
@@ -85,20 +114,18 @@ const LeadPage = () => {
         user.maritalStatus?.toLowerCase().includes(selectedValues.maritalStatus.toLowerCase()))
     );
   });
-  
+
+  if (loading) return <p className="p-4 text-gray-600">Loading users...</p>;
 
   return (
-    <>
-      <SiteBreadcrumb />
-      <div className="">
-        <ExampleTwo
-          selectedValues={selectedValues}
-          setSelectedValues={setSelectedValues}
-          tableData={filteredData}
-          tableColumns={columns}
-        />
-      </div>
-    </>
+    <div>
+      <ExampleTwo
+        selectedValues={selectedValues}
+        setSelectedValues={setSelectedValues}
+        tableData={filteredData}
+        tableColumns={columns}
+      />
+    </div>
   );
 };
 

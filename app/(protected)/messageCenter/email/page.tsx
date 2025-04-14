@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import SiteBreadcrumb from "@/components/site-breadcrumb";
-import { Card, CardContent } from "@/components/ui/card";
+
 import ExampleTwo from "./table";
 import { columns } from "./table/columns";
 import { fetchNotifications } from "../../services/notifications/email/api";
@@ -25,7 +24,7 @@ const NotificationCenterPage = () => {
         setData([]);
         return;
       }
-       console.log("result", result);
+      console.log("result", result);
       setData(result);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -40,31 +39,36 @@ const NotificationCenterPage = () => {
 
   const filteredData = data.filter((item) => {
     return (
-      (!selectedValues.title || item.title.toLowerCase().includes(selectedValues.title.toLowerCase())) &&
-      (!selectedValues.category || (item.offer?.category && item.offer.category.toLowerCase().includes(selectedValues.category.toLowerCase()))) &&
-      (!selectedValues.user || (item.user?.firstName && item.user.firstName === selectedValues.user)) &&
-      (!selectedValues.phone || (item.user?.phoneNumber && item.user.phoneNumber.includes(selectedValues.phone)))
+      (!selectedValues.title ||
+        item.title
+          .toLowerCase()
+          .includes(selectedValues.title.toLowerCase())) &&
+      (!selectedValues.category ||
+        (item.offer?.category &&
+          item.offer.category
+            .toLowerCase()
+            .includes(selectedValues.category.toLowerCase()))) &&
+      (!selectedValues.user ||
+        (item.user?.firstName &&
+          item.user.firstName === selectedValues.user)) &&
+      (!selectedValues.phone ||
+        (item.user?.phoneNumber &&
+          item.user.phoneNumber.includes(selectedValues.phone)))
     );
   });
 
   return (
-    <div className="bg-white p-5 shadow rounded-md">
-      <SiteBreadcrumb />
-
+    <>
       <div className="mt-6  space-y-6">
-        <Card>
-          <CardContent>
-            <ExampleTwo
-              selectedValues={selectedValues}
-              setSelectedValues={setSelectedValues}
-              tableData={filteredData}
-              tableColumns={columns}
-              setRefresh={setRefresh}
-            />
-          </CardContent>
-        </Card>
+        <ExampleTwo
+          selectedValues={selectedValues}
+          setSelectedValues={setSelectedValues}
+          tableData={filteredData}
+          tableColumns={columns}
+          setRefresh={setRefresh}
+        />
       </div>
-    </div>
+    </>
   );
 };
 

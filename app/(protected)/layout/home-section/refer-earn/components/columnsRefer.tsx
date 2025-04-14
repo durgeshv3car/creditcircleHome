@@ -6,6 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import ActiveToggleCell from "./ActiveToggleCell";
 
 
 import { SquarePen, Trash2, CalendarClock } from "lucide-react";
@@ -55,11 +56,11 @@ export const columnsRefer = (refreshData,router,setSelectedDate,selectedDate,ope
     enableSorting: false,
   },
   {
-    accessorKey: "name",
-    header: "Name",
+    accessorKey: "title",
+    header: "Title",
     cell: ({ row }) => (
       <div className="flex gap-3 items-center">
-        <span className="text-sm">{row.original.name}</span>
+        <span className="text-sm">{row.original.title}</span>
       </div>
     ),
   },
@@ -134,30 +135,7 @@ export const columnsRefer = (refreshData,router,setSelectedDate,selectedDate,ope
   {
     accessorKey: "active",
     header: "isActive",
-    cell: ({ row }) => {
-      const isActive = row.getValue("active"); // Get the active value (true/false)
-
-     const handleToggle = async (value: boolean) => {
-            try {
-              const result = await toggleReferImageStatus(row.original.id, value);
-          
-              if (result.success) {
-                toast.success(`Slider ${value ? "activated" : "deactivated"} successfully`);
-                row.original.active = value; // Update UI immediately
-              } else {
-                toast.error("Failed to update status");
-              }
-            } catch (error) {
-              console.error("Error updating isActive:", error);
-              toast.error("Failed to update status");
-            }
-          };
-      return (
-        <div className="flex gap-3 items-center">
-          <Switch onCheckedChange={handleToggle} />
-        </div>
-      );
-    },
+    cell: ({ row }) => <ActiveToggleCell row={row} />,
   },
 
   {

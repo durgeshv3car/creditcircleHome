@@ -6,6 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import ActiveToggleCell from "./ActiveToggleCell";
 
 
 import { SquarePen, Trash2, CalendarClock, Timer } from "lucide-react";
@@ -57,18 +58,10 @@ export const columnsMoney = (refreshData,router,setSelectedDate,selectedDate,ope
     cell: ({ row }) => <span>{row.index + 1}</span>,
     enableSorting: false,
   },
+
   {
-    accessorKey: "category name",
-    header: "Category Name",
-    cell: ({ row }) => (
-      <div className="flex gap-3 items-center">
-        <span className="text-sm">{row.original.category}</span>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "money title",
-    header: "Money title",
+    accessorKey: "title",
+    header: "Title",
     cell: ({ row }) => (
       <div className="flex gap-3 items-center">
         <span className="text-sm">{row.original.title}</span>
@@ -76,8 +69,8 @@ export const columnsMoney = (refreshData,router,setSelectedDate,selectedDate,ope
     ),
   },
   {
-    accessorKey: "money description",
-    header: "Money description",
+    accessorKey: "description",
+    header: "Description",
     cell: ({ row }) => (
       <div className="flex gap-3 items-center">
         <span className="text-sm">{row.original?.description}</span>
@@ -157,28 +150,8 @@ export const columnsMoney = (refreshData,router,setSelectedDate,selectedDate,ope
   {
     accessorKey: "active",
     header: "isActive",
-    cell: ({ row }) => {
-      const isActive = row.getValue("active"); // Get the active value (true/false)
-
-      const handleToggle = async (value) => {
-        const result = await toggleMoneyStatus(row.original.id, value);
-
-        if (result.success) {
-          toast.success(result.message);
-          row.original.active = value;
-        } else {
-          toast.error(result.message);
-        }
-      };
-
-      return (
-        <div className="flex gap-3 items-center">
-          <Switch onCheckedChange={handleToggle} />
-        </div>
-      );
-    },
+    cell: ({ row }) => <ActiveToggleCell row={row} />,
   },
-
   {
     id: "actions",
     header: "Action",
@@ -242,22 +215,7 @@ export const columnsMoney = (refreshData,router,setSelectedDate,selectedDate,ope
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="w-7 h-7 border-default-200 dark:border-default-300 text-default-400"
-                >
-                  <Timer className="w-3 h-3" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="top">
-                <p>Send Reminder</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+       
         </div>
       );
     },

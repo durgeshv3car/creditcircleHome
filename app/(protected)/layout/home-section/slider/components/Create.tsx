@@ -56,7 +56,7 @@ const CreateModal: React.FC<CreateModalProps> = ({
     try {
       const result = await uploadSliderImage({
         type,
-        name: formData.Name,
+        title: formData.Title,
         mobileFile: mobileFile?.file || null,
         webFile: webFile?.file || null,
         companyUrl: formData["Company URL"],

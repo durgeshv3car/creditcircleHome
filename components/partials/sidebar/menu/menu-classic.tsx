@@ -21,15 +21,16 @@ import SearchBar from "@/components/partials/sidebar/common/search-bar";
 import TeamSwitcher from "../common/team-switcher";
 
 import { useParams } from "next/navigation";
+
 import { getLangDir } from "rtl-detect";
 import Logo from "@/components/logo";
 import SidebarHoverToggle from "@/components/partials/sidebar/sidebar-hover-toggle";
 import { useMenuHoverConfig } from "@/hooks/use-menu-hover";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
-export function MenuClassic({}) {
-  // translate
-  const role = "admin";
+
+
+export function MenuClassic({role}) {
   const pathname = usePathname();
   const params = useParams<{ locale: string }>();
   const direction = getLangDir(params?.locale ?? "");
@@ -76,7 +77,7 @@ export function MenuClassic({}) {
               "text-center": collapsed || !hovered,
             })}
           >
-            <SearchBar />
+            {/* <SearchBar /> */}
           </div>
         )}
 

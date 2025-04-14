@@ -29,9 +29,7 @@ const Login2 = () => {
                     Or continue with
                   </div>
                 </div>
-                <div className="max-w-[242px] mx-auto mt-8 w-full">
-                  <Social locale="en" />
-                </div>
+               
                 <div className="md:max-w-[345px] mt-6 mx-auto font-normal text-default-500 md:mt-12 uppercase text-sm">
                   Don’t have an account?{" "}
                   <Link

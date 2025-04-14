@@ -13,11 +13,9 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { columns } from "./columns";
-import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -47,13 +45,30 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import dynamic from "next/dynamic";
 
-import TablePagination from "./table-pagination";
-import Filter from "../components/Filter";
-import OfferSelectionModal from "../components/OfferSelectionModal";
+const OfferSelectionModal = dynamic(
+  () => import("../components/OfferSelectionModal"),
+  {
+    ssr: false,
+    loading: () => <p>Loading modal...</p>,
+  }
+);
+const Filter = dynamic(() => import("../components/Filter"), {
+  ssr: false,
+});
+const TablePagination = dynamic(() => import("./table-pagination"), {
+  ssr: false,
+});
+
 import { useSearchParams } from "next/navigation";
 
-const ExampleTwo = ({ selectedValues, setSelectedValues,tableData,tableColumns }) => {
+const ExampleTwo = ({
+  selectedValues,
+  setSelectedValues,
+  tableData,
+  tableColumns,
+}) => {
   const searchParams = useSearchParams();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -74,8 +89,8 @@ const ExampleTwo = ({ selectedValues, setSelectedValues,tableData,tableColumns }
 
   const [type, setType] = React.useState(null);
   const table = useReactTable({
-    data:tableData,
-    columns:tableColumns,
+    data: tableData,
+    columns: tableColumns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -99,10 +114,9 @@ const ExampleTwo = ({ selectedValues, setSelectedValues,tableData,tableColumns }
     setSelectedRowsData(selectedData);
   }, [rowSelection]);
 
-
   React.useEffect(() => {
     const creatingNotification = searchParams.get("createnotification");
-    setType( searchParams.get("type")); 
+    setType(searchParams.get("type"));
 
     if (creatingNotification === "true") {
       console.log("creatingNotification detected");
@@ -128,7 +142,7 @@ const ExampleTwo = ({ selectedValues, setSelectedValues,tableData,tableColumns }
 
       <div className="py-4 px-5 bg-whit rounded-md">
         <div className="flex items-center justify-between">
-          <div className="text-xl font-medium text-default-900">Leads Data</div>
+          <div className="text-xl font-medium text-default-900">Users Data</div>
           <div className="flex items-center gap-4">
             {/* Select for Rows per Page */}
             <label className="text-sm text-gray-600">Rows per page:</label>

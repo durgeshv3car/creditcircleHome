@@ -7,7 +7,7 @@ const API_BASE_URL =
 
   export const uploadLogoImage = async (formData: {
     type: string;
-    name?: string;
+    title?: string;
     mobileFile?: File | null;
     webFile?: File | null;
     companyUrl: string;
@@ -15,7 +15,7 @@ const API_BASE_URL =
     try {
       const formDataSend = new FormData();
       formDataSend.append("type", formData.type);
-      formDataSend.append("name", formData.name || "");
+      formDataSend.append("title", formData.title || "");
   
       if (formData.mobileFile) {
         formDataSend.append("mobile", formData.mobileFile);
@@ -76,7 +76,7 @@ export const deleteLogoImage = async (id: string) => {
 export const updateLogoImage = async (
     id: string,
     type: string,
-    editedData: { name?: string; companyUrl?: string; active?: boolean },
+    editedData: { title?: string; companyUrl?: string; active?: boolean },
     mobileFile?: File | null,
     webFile?: File | null
   ) => {
@@ -85,7 +85,7 @@ export const updateLogoImage = async (
       formDataSend.append("id", id);
       formDataSend.append("type", type);
   
-      if (editedData.name) formDataSend.append("name", editedData.name);
+      if (editedData.title) formDataSend.append("title", editedData.title);
       if (mobileFile) formDataSend.append("mobile", mobileFile);
       if (webFile) formDataSend.append("web", webFile);
       if (editedData.companyUrl) formDataSend.append("companyUrl", editedData.companyUrl);

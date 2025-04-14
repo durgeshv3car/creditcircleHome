@@ -1,81 +1,163 @@
-"use client"
-import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-
-const dummyData = {
-  daily: [
-    { date: "Mon", leads: 5 },
-    { date: "Tue", leads: 8 },
-    { date: "Wed", leads: 6 },
-    { date: "Thu", leads: 10 },
-    { date: "Fri", leads: 7 },
-    { date: "Sat", leads: 12 },
-    { date: "Sun", leads: 9 },
-  ],
-  weekly: [
-    { date: "Week 1", leads: 45 },
-    { date: "Week 2", leads: 58 },
-    { date: "Week 3", leads: 49 },
-    { date: "Week 4", leads: 62 },
-  ],
-  monthly: [
-    { date: "Jan", leads: 180 },
-    { date: "Feb", leads: 200 },
-    { date: "Mar", leads: 190 },
-    { date: "Apr", leads: 210 },
-  ],
-};
-
+import Image from "next/image";
+import { StatisticsBlock } from "@/components/blocks/statistics-block";
+import { BlockBadge, WelcomeBlock } from "@/components/blocks/welcome-block";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import RevinueBarChart from "@/components/revenue-bar-chart";
+import DashboardDropdown from "@/components/dashboard-dropdown";
+import OverviewChart from "./components/overview-chart";
+import CompanyTable from "./components/company-table";
+import RecentActivity from "./components/recent-activity";
+import MostSales from "./components/most-sales";
+import OverviewRadialChart from "./components/overview-radial";
+import { useTranslations } from "next-intl";
 const DashboardPage = () => {
-  const [filter, setFilter] = useState("daily");
 
-  return (
-    <div className="space-y-5 p-6">
-      <h1 className="text-2xl font-semibold">Leads Dashboard</h1>
-      <Tabs defaultValue="daily" onValueChange={(val) => setFilter(val)}>
-        <TabsList>
-          <TabsTrigger value="daily">Daily</TabsTrigger>
-          <TabsTrigger value="weekly">Weekly</TabsTrigger>
-          <TabsTrigger value="monthly">Monthly</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value={filter}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    return (
+      <div>
+        <div className="grid grid-cols-12 items-center gap-5 mb-5">
+          <div className="2xl:col-span-3 lg:col-span-4 col-span-12">
+            <WelcomeBlock>
+              <div className="max-w-[180px] relative z-10">
+                <div className="text-xl font-medium text-default-900 dark:text-default-100 mb-2">
+                  {("CreditCircle")}
+                </div>
+                <p className="text-sm text-default-800 dark:text-default-100">
+                  {("Leads Report For Users")}
+                </p>
+              </div>
+              <Image
+                src="/images/all-img/widget-bg-1.png"
+                width={400}
+                height={150}
+                priority
+                alt="Description of the image"
+                className="absolute top-0 start-0 w-full h-full object-cover rounded-md"
+              />
+            </WelcomeBlock>
+          </div>
+          <div className="2xl:col-span-9 lg:col-span-8 col-span-12">
             <Card>
               <CardContent className="p-4">
-                <p className="text-sm text-gray-500">Total {filter} leads</p>
-                <p className="text-xl font-bold">
-                  {dummyData[filter].reduce((acc, item) => acc + item.leads, 0)}
-                </p>
+                <div className="grid md:grid-cols-3   gap-4">
+                  <StatisticsBlock
+                    title={("revenue_chart_title")}
+                    total="3,564"
+                    className="bg-info/10 border-none shadow-none"
+                  />
+                  <StatisticsBlock
+                    title={("sold_chart_title")}
+                    total="564"
+                    className="bg-warning/10 border-none shadow-none"
+                    chartColor="#FB8F65"
+                  />
+                  <StatisticsBlock
+                    title={("growth_chart_title")}
+                    total="+5.0%"
+                    className="bg-primary/10 border-none shadow-none"
+                    chartColor="#2563eb"
+                  />
+                </div>
               </CardContent>
             </Card>
+          </div>
+        </div>
+        <div className="grid grid-cols-12 gap-5">
+          <div className="lg:col-span-8 col-span-12">
             <Card>
-              <CardContent className="p-4">Lead Source 1</CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">Lead Source 2</CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">Lead Source 3</CardContent>
+              <CardContent className="p-4">
+                <RevinueBarChart/>
+              </CardContent>
             </Card>
           </div>
+          <div className="lg:col-span-4 col-span-12">
+            <Card>
+              <CardHeader className="flex flex-row items-center">
+                <CardTitle className="flex-1">
+                  {("overview_circle_chart_title")}
+                </CardTitle>
+                <DashboardDropdown />
+              </CardHeader>
+              <CardContent>
+                <OverviewChart />
+              </CardContent>
+            </Card>
+          </div>
+          <div className="lg:col-span-8 col-span-12">
+            <Card>
+              <CardHeader className="flex flex-row items-center">
+                <CardTitle className="flex-1">
+                  {("company_table_title")}
+                </CardTitle>
+                <DashboardDropdown />
+              </CardHeader>
+              <CardContent className="p-0">
+                <CompanyTable />
+              </CardContent>
+            </Card>
+          </div>
+          <div className="lg:col-span-4 col-span-12">
+            <Card>
+              <CardHeader className="flex flex-row items-center">
+                <CardTitle className="flex-1">
+                  {("recent_activity_table_title")}
+                </CardTitle>
+                <DashboardDropdown />
+              </CardHeader>
+              <CardContent>
+                <RecentActivity />
+              </CardContent>
+            </Card>
+          </div>
+          <div className="lg:col-span-8 col-span-12">
+            <MostSales />
+          </div>
+          <div className="lg:col-span-4 col-span-12">
+            <Card>
+              <CardHeader className="flex flex-row items-center">
+                <CardTitle className="flex-1">
+                  {("overview_circle_chart_title")}
+                </CardTitle>
+                <DashboardDropdown />
+              </CardHeader>
+              <CardContent>
+                <OverviewRadialChart />
+                <div className="bg-default-50 rounded p-4 mt-8 flex justify-between flex-wrap">
+                  <div className="space-y-1">
+                    <h4 className="text-default-600  text-xs font-normal">
+                     {("invested_amount")}
+                    </h4>
+                    <div className="text-sm font-medium text-default-900">
+                      $8264.35
+                    </div>
+                    <div className="text-default-500  text-xs font-normal">
+                      +0.001.23 (0.2%)
+                    </div>
+                  </div>
 
-          <div className="mt-6 h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={dummyData[filter]}>
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="leads" stroke="#3b82f6" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
+                  <div className="space-y-1">
+                    <h4 className="text-default-600  text-xs font-normal">
+                     {("invested_amount")}
+                    </h4>
+                    <div className="text-sm font-medium text-default-900">
+                      $8264.35
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <h4 className="text-default-600  text-xs font-normal">
+                     {("invested_amount")}
+                    </h4>
+                    <div className="text-sm font-medium text-default-900">
+                      $8264.35
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
-};
+        </div>
+      </div>
+    );
+}
 
 export default DashboardPage;

@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+
 import ExampleTwo from "../example2";
-import SiteBreadcrumb from "@/components/site-breadcrumb";
+
 import { notFound } from "next/navigation";
 import { useRouter } from "next/navigation";
 
@@ -44,22 +44,17 @@ function Category() {
 
   if (loading) return <p>Loading...</p>;
   return (
-    <div>
-      <SiteBreadcrumb />
+    <>
       <div className="space-y-6">
-        <Card>
-          <CardContent className="p-0">
-            <ExampleTwo
-              tableHeading="Policy List"
-              tableData={data}
-              tableColumns={columnsCategory(fetchData,router)}
-              setRefresh={setRefresh}
-              type={type}
-            />
-          </CardContent>
-        </Card>
+        <ExampleTwo
+          tableHeading="Policy List"
+          tableData={data}
+          tableColumns={columnsCategory(fetchData, router)}
+          setRefresh={setRefresh}
+          type={type}
+        />
       </div>
-    </div>
+    </>
   );
 }
 

@@ -24,7 +24,7 @@ interface FileWithPreview extends File {
 
 interface TableRow {
   id: string;
-  name?: string;
+  title?: string;
   imageUrl?: string;
   [key: string]: any;
 }

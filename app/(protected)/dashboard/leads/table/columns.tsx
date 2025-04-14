@@ -5,6 +5,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { toast } from "sonner";
+import { deleteUser } from "@/app/(protected)/services/users/api";
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Eye, SquarePen, Trash2 } from "lucide-react";
@@ -51,7 +53,6 @@ const fields = [
   "rewardInterests",
   "exploreIndiaFrequency",
   "travelAbroadFrequency",
-
 ];
 
 export type DataProps = {
@@ -59,12 +60,15 @@ export type DataProps = {
 };
 
 // Define columns dynamically
-export const columns: ColumnDef<DataProps>[] = [
+export const columns =(fetchData)=> [
   {
     id: "select",
     header: ({ table }) => (
       <Checkbox
-        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
       />
@@ -93,47 +97,65 @@ export const columns: ColumnDef<DataProps>[] = [
     id: "actions",
     header: "Action",
     enableHiding: false,
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="outline" size="icon" className="w-7 h-7 text-default-400">
-                <Eye className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="top">
-              <p>View</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+    cell: ({ row }) => {
+      const handleDelete = async (id: string) => {
+        try {
+          const result = await deleteUser(id);
+          if (result.success) {
+            toast.success("User data deleted");
+            fetchData()
+            
+          } else {
+            toast.error("User data not deleted");
+          }
+        } catch (error) {
+          console.error("Error deleting category:", error);
+        }
+      };
 
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="outline" size="icon" className="w-7 h-7 text-default-400">
-                <SquarePen className="w-3 h-3" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="top">
-              <p>Edit</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+      return (
+        <div className="flex items-center gap-2">
+         
 
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="outline" size="icon" className="w-7 h-7 text-default-400">
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="top" className="bg-destructive text-destructive-foreground">
-              <p>Delete</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-    ),
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="w-7 h-7 text-default-400"
+                >
+                  <SquarePen className="w-3 h-3" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                <p>Edit</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="w-7 h-7 text-default-400"
+                  onClick={() => handleDelete(row.original.id)}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent
+                side="top"
+                className="bg-destructive text-destructive-foreground"
+              >
+                <p>Delete</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      );
+    },
   },
 ];

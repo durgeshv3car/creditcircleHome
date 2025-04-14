@@ -7,7 +7,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-
 import { SquarePen, Trash2, CalendarClock, Timer } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -15,11 +14,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
+import ActiveToggleCell from "./ActiveToggleCell";
+import  HomeToggleCell  from "./HomeToggleCell";
 import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import {
   toggleOfferStatus,
   deleteOffer,
+  toggleHomeStatus,
 } from "@/app/(protected)/services/offers/api";
 
 interface RowData {
@@ -34,7 +36,10 @@ interface RowData {
   active: boolean;
 }
 
-export const columnsRecommend = (setRefresh: React.Dispatch<React.SetStateAction<boolean>>,router) => [
+export const columnsRecommend = (
+  setRefresh: React.Dispatch<React.SetStateAction<boolean>>,
+  router
+) => [
   {
     id: "select",
     header: ({ table }: { table: any }) => (
@@ -86,8 +91,8 @@ export const columnsRecommend = (setRefresh: React.Dispatch<React.SetStateAction
     ),
   },
   {
-    accessorKey: "offer title",
-    header: "Offer title",
+    accessorKey: "title",
+    header: "Title",
     cell: ({ row }: { row: { original: RowData } }) => (
       <div className="flex gap-3 items-center">
         <span className="text-sm">{row.original.title}</span>
@@ -95,8 +100,8 @@ export const columnsRecommend = (setRefresh: React.Dispatch<React.SetStateAction
     ),
   },
   {
-    accessorKey: "offer description",
-    header: "Offer description",
+    accessorKey: "description",
+    header: "Description",
     cell: ({ row }: { row: { original: RowData } }) => (
       <div className="flex gap-3 items-center">
         <span className="text-sm">{row.original?.description}</span>
@@ -227,37 +232,18 @@ export const columnsRecommend = (setRefresh: React.Dispatch<React.SetStateAction
   {
     accessorKey: "active",
     header: "isActive",
-    cell: ({ row }: { row: { original: RowData; getValue: (key: string) => boolean } }) => {
-      const isActive = row.getValue("active");
-
-      const handleToggle = async (value: boolean) => {
-        const result = await toggleOfferStatus(row.original.id, value);
-
-        if (result.success) {
-          toast.success(result.message);
-          row.original.active = value;
-          setRefresh((prev) => !prev); // Trigger refresh
-        } else {
-          toast.error(result.message);
-        }
-      };
-
-      return (
-        <div className="flex gap-3 items-center">
-          <Switch
-            checked={isActive}
-            onCheckedChange={(value) => handleToggle(value)}
-          />
-        </div>
-      );
-    },
+    cell: ({ row }) => <ActiveToggleCell row={row} />,
+  },
+  {
+    accessorKey: "home",
+    header: "isHome",
+    cell: ({ row }) => <HomeToggleCell row={row} />,
   },
   {
     id: "actions",
     header: "Action",
     enableHiding: false,
     cell: ({ row }: { row: { original: RowData } }) => {
- 
       const handleDelete = async (id: string) => {
         try {
           const result = await deleteOffer(id);

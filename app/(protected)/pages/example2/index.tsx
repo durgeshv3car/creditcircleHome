@@ -51,7 +51,7 @@ const modalMap = {
       () => import("../faq/components/Create"),
       { ssr: false }
     ),
-    edit: dynamic(() => import("../faq/[id]/page"), {
+    edit: dynamic(() => import("../faq/components/EditModal"), {
       ssr: false,
     }),
   },
@@ -60,7 +60,7 @@ const modalMap = {
       () => import("../policy/components/Create"),
       { ssr: false }
     ),
-    edit: dynamic(() => import("../faq/[id]/page"), {
+    edit: dynamic(() => import("../faq/components/EditModal"), {
       ssr: false,
     }),
   },

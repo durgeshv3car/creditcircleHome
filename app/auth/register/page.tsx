@@ -1,10 +1,24 @@
-import { Link } from '@/i18n/routing';
+import { Link } from "@/i18n/routing";
 import RegForm from "@/components/partials/auth/reg-form";
 import Image from "next/image";
 import Copyright from "@/components/partials/auth/copyright";
 import Logo from "@/components/partials/auth/logo";
-import Social from "@/components/partials/auth/social";
-const Register = () => {
+import { notFound } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { jwtDecode } from "jwt-decode";
+
+const Register = async() => {
+  const session = await auth();
+  let role = "";
+  if (session?.user?.token) {
+    const decoded = jwtDecode(session.user.token);
+    role = decoded.role;
+  }
+
+  const allowed = ["Super Admin", "Admin"];
+  if (role && !allowed.includes(role)) {
+    notFound();
+  }
   return (
     <>
       <div className="flex w-full items-center overflow-hidden min-h-dvh h-dvh basis-full">
@@ -55,13 +69,11 @@ const Register = () => {
                     Or continue with
                   </div>
                 </div>
-                <div className="max-w-[242px] mx-auto mt-8 w-full">
-                  <Social locale={""} />
-                </div>
+
                 <div className="max-w-[225px] mx-auto font-normal text-default-500  2xl:mt-12 mt-6 uppercase text-sm">
                   Already registered?
                   <Link
-                    href="/login"
+                    href="/auth/login"
                     className="text-default-900  font-medium hover:underline"
                   >
                     Sign In

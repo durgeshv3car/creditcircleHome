@@ -100,9 +100,9 @@ export const toggleOfferStatus = async (id: string, value: boolean) => {
     const formDataSend = new FormData();
     formDataSend.append("id", id);
     formDataSend.append("type", "offer");
-    formDataSend.append("active", value.toString());
+    formDataSend.append("isActive", String(value));
 
-    await axios.put(`${API_BASE_URL}/offers/${id}/toggle`, formDataSend, {
+    await axios.put(`${API_BASE_URL}/offers`, formDataSend, {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
@@ -115,6 +115,27 @@ export const toggleOfferStatus = async (id: string, value: boolean) => {
     return { success: false, message: "Failed to update status" };
   }
 };
+export const toggleHomeStatus = async (id: string, value: boolean) => {
+  try {
+    const formDataSend = new FormData();
+    formDataSend.append("id", id);
+    formDataSend.append("type", "offer");
+    formDataSend.append("isHome", String(value));
+
+    await axios.put(`${API_BASE_URL}/offers`, formDataSend, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    return {
+      success: true,
+      message: `Recommend ${value ? "activated" : "deactivated"} successfully`,
+    };
+  } catch (error) {
+    console.error("Error updating isActive:", error);
+    return { success: false, message: "Failed to update status" };
+  }
+};
+
 
 export const deleteOffer = async (id: string) => {
   try {

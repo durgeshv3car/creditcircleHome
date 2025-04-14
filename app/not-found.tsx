@@ -16,7 +16,7 @@ export default function NotFound() {
             </div>
             <div className="max-w-[300px] mx-auto w-full">
                 <Link
-                    href="/"
+                    href="/auth/login"
                     className="btn bg-white hover:bg-opacity-75 transition-all duration-150 block text-center"
                 >
                     Go to homepage

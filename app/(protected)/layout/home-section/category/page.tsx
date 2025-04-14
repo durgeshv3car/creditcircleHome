@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+
 import ExampleTwo from "../../example2";
-import SiteBreadcrumb from "@/components/site-breadcrumb";
+
 import { notFound } from "next/navigation";
 import { useRouter } from "next/navigation";
 
@@ -10,8 +10,8 @@ import { columnsCategory } from "./components/columnsCategory";
 import { fetchCategories } from "@/app/(protected)/services/categorys/api";
 
 function Category() {
-  const allowed = ["superadmin", "admin"];
-  const role = "admin";
+  const allowed = ["Super Admin", "Admin"];
+  const role = "Admin";
   if (!allowed.includes(role)) {
     notFound();
   }
@@ -41,22 +41,17 @@ function Category() {
 
   if (loading) return <p>Loading...</p>;
   return (
-    <div>
-      <SiteBreadcrumb />
+    <>
       <div className="space-y-6">
-        <Card>
-          <CardContent className="p-0">
-            <ExampleTwo
-              tableHeading="Category List"
-              tableData={data}
-              tableColumns={columnsCategory(fetchData,router)}
-              setRefresh={setRefresh}
-              type={type}
-            />
-          </CardContent>
-        </Card>
+        <ExampleTwo
+          tableHeading="Category List"
+          tableData={data}
+          tableColumns={columnsCategory(fetchData, router)}
+          setRefresh={setRefresh}
+          type={type}
+        />
       </div>
-    </div>
+    </>
   );
 }
 

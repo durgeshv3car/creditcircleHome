@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+
 import ExampleTwo from "../../example2";
-import SiteBreadcrumb from "@/components/site-breadcrumb";
+
 import { notFound } from "next/navigation";
 import { useRouter } from "next/navigation";
 
@@ -45,29 +45,24 @@ function Users() {
 
   if (loading) return <p>Loading...</p>;
   return (
-    <div>
-      <SiteBreadcrumb />
+    <>
       <div className="space-y-6">
-        <Card>
-          <CardContent className="p-0">
-            <ExampleTwo
-              tableHeading="Money List"
-              tableData={data}
-              tableColumns={columnsMoney(
-                fetchData,
-                router,
-                setSelectedDate,
-                selectedDate,
-                open,
-                setOpen
-              )}
-              setRefresh={setRefresh}
-              type={type}
-            />
-          </CardContent>
-        </Card>
+        <ExampleTwo
+          tableHeading="Money List"
+          tableData={data}
+          tableColumns={columnsMoney(
+            fetchData,
+            router,
+            setSelectedDate,
+            selectedDate,
+            open,
+            setOpen
+          )}
+          setRefresh={setRefresh}
+          type={type}
+        />
       </div>
-    </div>
+    </>
   );
 }
 

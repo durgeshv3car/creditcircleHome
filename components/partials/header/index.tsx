@@ -1,33 +1,41 @@
+
+
 import React from "react";
 import HeaderContent from "./header-content";
-import HeaderSearch from "./header-search";
 import ProfileInfo from "./profile-info";
-import Notifications from "./notifications";
-
 import ThemeSwitcher from "./theme-switcher";
 import { SidebarToggle } from "@/components/partials/sidebar/sidebar-toggle";
 import { SheetMenu } from "@/components/partials/sidebar/menu/sheet-menu";
-
 import HeaderLogo from "./header-logo";
+import { auth } from "@/lib/auth";
+import { jwtDecode } from "jwt-decode";
+import HeaderGreet from "./header-greet";
 
-const DashCodeHeader = async () => {
+
+const DashCodeHeader = async() => {
+
+   const session = await auth();
+     let role = "";
+    
+      if (session?.user?.token) {
+        const decoded = jwtDecode(session.user.token);
+        role = decoded.role;
+      }
+
   return (
-    <>
-      <HeaderContent>
-        <div className=" flex gap-3 items-center">
-          <HeaderLogo />
-          <SidebarToggle />
-          <HeaderSearch />
-        </div>
-        <div className="nav-tools flex items-center  md:gap-4 gap-3">
-          <ThemeSwitcher />
-
-          <Notifications />
-          <ProfileInfo />
-          <SheetMenu />
-        </div>
-      </HeaderContent>
-    </>
+    <HeaderContent>
+      <div className="flex gap-3 items-center">
+        <HeaderLogo />
+        {/* <SidebarToggle /> */}
+        <HeaderGreet admin={role} />
+       
+      </div>
+      <div className="nav-tools flex items-center md:gap-4 gap-3">
+        <ThemeSwitcher />
+        <ProfileInfo />
+        <SheetMenu />
+      </div>
+    </HeaderContent>
   );
 };
 
