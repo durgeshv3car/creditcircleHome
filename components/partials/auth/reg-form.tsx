@@ -112,12 +112,12 @@ const RegForm = () => {
                 <SelectValue placeholder="Select your role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="super-admin">Super Admin</SelectItem>
-                <SelectItem value="admin">Admin</SelectItem>
-                <SelectItem value="employee">Employee</SelectItem>
-                <SelectItem value="partner">Partner</SelectItem>
-                <SelectItem value="developer">Developer</SelectItem>
-                <SelectItem value="custom">Custom</SelectItem>
+                <SelectItem value="Super Admin">Super Admin</SelectItem>
+                <SelectItem value="Admin">Admin</SelectItem>
+                <SelectItem value="Employee">Employee</SelectItem>
+                <SelectItem value="Partner">Partner</SelectItem>
+                <SelectItem value="Developer">Developer</SelectItem>
+                <SelectItem value="Custom">Custom</SelectItem>
               </SelectContent>
             </Select>
           )}
