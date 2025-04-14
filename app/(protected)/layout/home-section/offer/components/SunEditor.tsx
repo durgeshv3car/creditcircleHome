@@ -51,6 +51,8 @@ const TextEditor = ({
           ["align", "list", "lineHeight"],
           ["outdent", "indent"],
           ["table", "horizontalRule"],
+          ["codeView"], // HTML Code View Button
+
         ],
         font: sortedFontOptions,
       }}
