@@ -8,8 +8,8 @@ import { Command, CommandList, CommandInput, CommandItem } from "@/components/ui
 import { Check, ChevronsUpDown } from "lucide-react";
 
 interface FilterProps {
-  selectedValues: Record<string, string>;
-  setSelectedValues: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  selectedValues: Record<string, any>;
+  setSelectedValues: React.Dispatch<React.SetStateAction<Record<string, any>>>;
   data: Array<Record<string, any>>;
 }
 
@@ -27,8 +27,8 @@ export default function Filter({ selectedValues, setSelectedValues, data }: Filt
     education: (item) => item?.education,
     maritalStatus: (item) => item?.maritalStatus,
     hasCreditCard: (item) => String(item?.hasCreditCard),
-    ownsFourWheeler: (item) => String(item?.ownsFourWheeler),
-    ownsTwoWheeler: (item) => String(item?.ownsTwoWheeler),
+    ownsFourWheeler: (item) => String(item?.ownsFourWheelers), // Fixed to match actual property name
+    ownsTwoWheeler: (item) => String(item?.ownsTwoWheelers), // Fixed to match actual property name
     companyName: (item) => item?.companyName,
     insurancePlans: (item) => item?.insurancePlans,
     netMonthlyIncome: (item) => String(item?.netMonthlyIncome),
@@ -54,7 +54,9 @@ export default function Filter({ selectedValues, setSelectedValues, data }: Filt
       const extractor = fieldPaths[field];
       if (typeof extractor !== "function") continue;
 
-      if (field === "netMonthlyIncome") {
+      if (["hasCreditCard", "ownsFourWheeler", "ownsTwoWheeler"].includes(field)) {
+        newDropdowns[field] = ["All", "true", "false"];
+      } else if (field === "netMonthlyIncome") {
         const incomeGroups = new Set<string>();
         for (const item of data) {
           const incomeStr = extractor(item);
@@ -89,13 +91,24 @@ export default function Filter({ selectedValues, setSelectedValues, data }: Filt
   const handleChange = (field: string, value: string) => {
     setSelectedValues((prev) => ({
       ...prev,
-      [field]: value === "All" ? "" : value,
+      [field]: value === "All" 
+        ? null 
+        : (["hasCreditCard", "ownsFourWheeler", "ownsTwoWheeler"].includes(field) && ["true", "false"].includes(value))
+          ? value === "true" 
+          : value,
     }));
     setOpenFilter(null);
   };
 
   const handleOpenChange = (field: string, isOpen: boolean) => {
     setOpenFilter(isOpen ? field : null);
+  };
+
+  // Helper function to display selected values correctly
+  const displayValue = (field: string, value: any): string => {
+    if (value === null) return `Select ${field}`;
+    if (typeof value === "boolean") return value ? "true" : "false";
+    return value;
   };
 
   return (
@@ -108,7 +121,7 @@ export default function Filter({ selectedValues, setSelectedValues, data }: Filt
         >
           <PopoverTrigger asChild>
             <Button variant="outline" className="w-[200px] justify-between capitalize">
-              {selectedValues[field] || `Select ${field}`}
+              {displayValue(field, selectedValues[field])}
               <ChevronsUpDown className="opacity-50" />
             </Button>
           </PopoverTrigger>
@@ -120,7 +133,11 @@ export default function Filter({ selectedValues, setSelectedValues, data }: Filt
                   <CommandItem key={option} onSelect={() => handleChange(field, option)}>
                     {option}
                     <Check
-                      className={`ml-auto ${selectedValues[field] === option ? "opacity-100" : "opacity-0"}`}
+                      className={`ml-auto ${
+                        selectedValues[field] === (option === "true" ? true : option === "false" ? false : option) 
+                        ? "opacity-100" 
+                        : "opacity-0"
+                      }`}
                     />
                   </CommandItem>
                 ))}

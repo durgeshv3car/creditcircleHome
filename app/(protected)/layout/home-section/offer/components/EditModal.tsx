@@ -48,11 +48,10 @@ const EditModal: React.FC<EditModalProps> = ({
   const [selectedRow, setSelectedRow] = useState<TableRow | null>(null);
   const [mobileFile, setMobileFile] = useState<FileWithPreview | null>(null);
   const [webFile, setWebFile] = useState<FileWithPreview | null>(null);
-  const [brandWebFile, setBrandWebFile] = useState<FileWithPreview | null>(
+  const [brandLogoFile, setBrandLogoFile] = useState<FileWithPreview | null>(
     null
   );
-  const [brandMobileFile, setBrandMobileFile] =
-    useState<FileWithPreview | null>(null);
+ 
   const [categories, setCategories] = useState([]);
 
   const buttonsType = [
@@ -186,25 +185,15 @@ const EditModal: React.FC<EditModalProps> = ({
                   <div className="space-y-3">
                     <div>
                       <label className="block text-sm font-medium">
-                        Brand Web
+                        Brand Logo
                       </label>
                       <ImageUpload
-                        files={brandWebFile ? [brandWebFile] : []}
-                        setFiles={(files) => setBrandWebFile(files[0] || null)}
+                        files={brandLogoFile ? [brandLogoFile] : []}
+                        setFiles={(files) => setBrandLogoFile(files[0] || null)}
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium">
-                        Brand Mobile
-                      </label>
-                      <ImageUpload
-                        files={brandMobileFile ? [brandMobileFile] : []}
-                        setFiles={(files) =>
-                          setBrandMobileFile(files[0] || null)
-                        }
-                      />
-                    </div>
+                   
                   </div>
                 ) : key === "category" ? (
                   /* Category Selection */
@@ -243,7 +232,14 @@ const EditModal: React.FC<EditModalProps> = ({
                       ))}
                     </SelectContent>
                   </Select>
-                ) : key === "isActive" ? (
+                ): key === "isHome" ? (
+                  <Switch
+                    checked={Boolean(editedData[key])}
+                    onCheckedChange={(value) =>
+                      setEditedData((prev) => ({ ...prev, [key]: value }))
+                    }
+                  />
+                )  : key === "isActive" ? (
                   <Switch
                     checked={Boolean(editedData[key])}
                     onCheckedChange={(value) =>

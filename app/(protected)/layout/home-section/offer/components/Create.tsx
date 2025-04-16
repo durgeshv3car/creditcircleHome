@@ -38,9 +38,7 @@ const CreateModal: React.FC<CreateModalProps> = ({
   const [fieldDescription, setFieldDescription] = useState<string>("");
   const [mobileFile, setMobileFile] = useState<FileWithPreview | null>(null);
   const [webFile, setWebFile] = useState<FileWithPreview | null>(null);
-  const [brandMobileFile, setBrandMobileFile] =
-    useState<FileWithPreview | null>(null);
-  const [brandWebFile, setBrandWebFile] = useState<FileWithPreview | null>(
+  const [brandLogoFile, setBrandLogoFile] = useState<FileWithPreview | null>(
     null
   );
 
@@ -83,7 +81,7 @@ const CreateModal: React.FC<CreateModalProps> = ({
           console.error("Error fetching categories:", error);
         }
       });
-  }, [categories]);
+  }, []);
 
   const handleClose = () => {
     onClose();
@@ -101,23 +99,22 @@ const CreateModal: React.FC<CreateModalProps> = ({
       { ...formData, fieldDescription: fieldDescription },
       mobileFile?.file,
       webFile?.file,
-      brandMobileFile?.file,
-      brandWebFile?.file
+      brandLogoFile?.file,
+      
     );
 
     if (result.success) {
       toast.success(result.message);
       setMobileFile(null);
       setWebFile(null);
-      setBrandMobileFile(null);
-      setBrandWebFile(null);
+      setBrandLogoFile(null);
       refreshData();
       handleClose();
     } else {
       toast.error(result.message);
     }
   };
-  const excludedFields = ["schedulexpire", "isactive"];
+  const excludedFields = ["schedulexpire", "isactive","isHome"];
   return (
     <>
       <div
@@ -200,15 +197,10 @@ const CreateModal: React.FC<CreateModalProps> = ({
                     files={mobileFile ? [mobileFile] : []}
                     setFiles={(files) => setMobileFile(files[0] || null)}
                   />
-                ) : key.toLowerCase() === "brand web" ? (
+                ) : key.toLowerCase() === "brand logo" ? (
                   <ImageUpload
-                    files={brandWebFile ? [brandWebFile] : []}
-                    setFiles={(files) => setBrandWebFile(files[0] || null)}
-                  />
-                ) : key.toLowerCase() === "brand mobile" ? (
-                  <ImageUpload
-                    files={brandMobileFile ? [brandMobileFile] : []}
-                    setFiles={(files) => setBrandMobileFile(files[0] || null)}
+                    files={brandLogoFile ? [brandLogoFile] : []}
+                    setFiles={(files) => setBrandLogoFile(files[0] || null)}
                   />
                 ) : (
                   <Input

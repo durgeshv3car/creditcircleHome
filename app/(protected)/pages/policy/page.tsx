@@ -7,7 +7,7 @@ import { notFound } from "next/navigation";
 import { useRouter } from "next/navigation";
 
 import { columnsCategory } from "./components/columnsCategory";
-import { fetchCategories } from "@/app/(protected)/services/categorys/api";
+import { fetchpolicy } from "@/app/(protected)/services/policys/api";
 
 function Category() {
   const allowed = ["superadmin", "admin"];
@@ -24,7 +24,7 @@ function Category() {
 
   const fetchData = async () => {
     try {
-      const result = await fetchCategories();
+      const result = await fetchpolicy();
       if (result.status == 404) {
         setData([]);
         return;

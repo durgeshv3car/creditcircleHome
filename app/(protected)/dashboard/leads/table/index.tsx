@@ -13,6 +13,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { columns } from "./columns";
+import {ImportExportButtons} from "../components/Download";
 
 import { Button } from "@/components/ui/button";
 import EditModal from "../components/EditModal";
@@ -63,6 +64,7 @@ const TablePagination = dynamic(() => import("./table-pagination"), {
 });
 
 import { useSearchParams } from "next/navigation";
+import { Download } from "lucide-react";
 
 const ExampleTwo = ({
   selectedValues,
@@ -155,6 +157,7 @@ const ExampleTwo = ({
           <div className="text-xl font-medium text-default-900">Users Data</div>
           <div className="flex items-center gap-4">
             {/* Select for Rows per Page */}
+            <ImportExportButtons setRefresh={setRefresh} filteredData={tableData} columns={tableColumns}/>
             <label className="text-sm text-gray-600">Rows per page:</label>
             <Select
               onValueChange={(value) => setPageSize(Number(value))}
@@ -311,8 +314,8 @@ const ExampleTwo = ({
       {isModalOpenOffer && (
         <OfferSelectionModal
           selectedRowsData={selectedRowsData}
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          isOpen={isModalOpenOffer}
+          onClose={() => setIsModalOpenOffer(false)}
           onSelectOffer={(offer) => setSelectedOffer(offer)}
         />
       )}

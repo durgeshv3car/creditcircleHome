@@ -172,6 +172,72 @@ export function getMenuList(pathname: string, role: string): Group[] {
         },
       ],
     },
+    {
+      groupLabel: "",
+      id: "service",
+      menus: [
+        {
+          id: "service",
+          href: "",
+          label: "service",
+          active: pathname.includes("/service"),
+          icon: "heroicons-outline:wrench",
+          submenus: [
+            {
+              href: "/service/loan-section/creditCard",
+              label: "CreditCard",
+              active: pathname === "/service/loan-section/creditCard",
+              icon: "heroicons-outline:question-mark-circle",
+              children: [],
+            },
+            {
+              href: "/service/loan-section/carInsurance",
+              label: "CarInsurance",
+              active: pathname === "/service/loan-section/carInsurance",
+              icon: "heroicons-outline:question-mark-circle",
+              children: [],
+            },
+            {
+              href: "/service/loan-section/healthInsurance",
+              label: "HealthInsurance",
+              active: pathname === "/service/loan-section/healthInsurance",
+              icon: "heroicons-outline:question-mark-circle",
+              children: [],
+            },
+            {
+              href: "/service/loan-section/lifeInsurance",
+              label: "LifeInsurance",
+              active: pathname === "/service/loan-section/lifeInsurance",
+              icon: "heroicons-outline:question-mark-circle",
+              children: [],
+            },
+            {
+              href: "/service/loan-section/mutualFunds",
+              label: "MutualFunds",
+              active: pathname === "/service/loan-section/mutualFunds",
+              icon: "heroicons-outline:question-mark-circle",
+              children: [],
+            },
+            {
+              href: "/service/loan-section/stockMarket",
+              label: "StockMarket",
+              active: pathname === "/service/loan-section/stockMarket",
+              icon: "heroicons-outline:question-mark-circle",
+              children: [],
+            },
+            {
+              href: "/service/loan-section/incomePlan",
+              label: "IncomePlan",
+              active: pathname === "/service/loan-section/incomePlan",
+              icon: "heroicons-outline:question-mark-circle",
+              children: [],
+            },
+          
+          ],
+          
+        },
+      ],
+    },
     ...(role === "Super Admin" || role === "Admin"
       ? [
           {

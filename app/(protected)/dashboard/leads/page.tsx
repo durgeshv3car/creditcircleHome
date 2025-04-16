@@ -22,10 +22,7 @@ interface SelectedValues {
   gender: string | null;
   education: string | null;
   maritalStatus: string | null;
-  ageRange?: {
-    min: number | null;
-    max: number | null;
-  };
+ 
 }
 
 const ExampleTwo = dynamic<{
@@ -115,11 +112,11 @@ const LeadPage: React.FC = () => {
           ?.toLowerCase()
           .includes(selectedValues.maritalStatus.toLowerCase())) &&
       (selectedValues.hasCreditCard === null ||
-        user.hasCreditCard === selectedValues.hasCreditCard) &&
+        Boolean(user.hasCreditCard) === selectedValues.hasCreditCard) &&
       (selectedValues.ownsFourWheeler === null ||
-        user.ownsFourWheeler === selectedValues.ownsFourWheeler) &&
+        Boolean(user.ownsFourWheeler) === selectedValues.ownsFourWheeler) &&
       (selectedValues.ownsTwoWheeler === null ||
-        user.ownsTwoWheeler === selectedValues.ownsTwoWheeler) &&
+        Boolean(user.ownsTwoWheeler) === selectedValues.ownsTwoWheeler) &&
       (!selectedValues.companyName?.trim() ||
         user.companyName
           ?.toLowerCase()

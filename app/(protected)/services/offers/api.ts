@@ -24,8 +24,7 @@ export const updateOffer = async (
   editedData: any,
   mobileFile?: File,
   webFile?: File,
-  brandMobileImage?: File,
-  brandWebImage?: File
+  brandLogoImage?: File,
 ) => {
   if (!id) return { success: false, message: "ID is required" };
 
@@ -34,12 +33,14 @@ export const updateOffer = async (
     formDataSend.append("id", id);
     formDataSend.append("type", type);
 
-    if (editedData.name) formDataSend.append("name", editedData.name);
+    if (editedData.title) formDataSend.append("title", editedData.title);
+    if (editedData.description)
+      formDataSend.append("description", editedData.description);
     if (editedData.detailDescription) formDataSend.append("detailDescription", editedData.detailDescription);
     if (mobileFile) formDataSend.append("mobile", mobileFile);
     if (webFile) formDataSend.append("web", webFile);
-    if (brandMobileImage) formDataSend.append("brandMobile", brandMobileImage);
-    if (brandWebImage) formDataSend.append("brandWeb", brandWebImage);
+    if (brandLogoImage) formDataSend.append("brandLogo", brandLogoImage);
+   
     if (editedData.companyUrl)
       formDataSend.append("companyUrl", editedData.companyUrl);
     if (editedData.active !== undefined)
@@ -61,22 +62,23 @@ export const addOffer = async (
   formData: any,
   mobileFile?: File,
   webFile?: File,
-  brandMobileImage?: File,
-  brandWebImage?: File
+  brandLogoImage?: File,
 ) => {
   try {
+    
     const formDataSend = new FormData();
     formDataSend.append("type", type);
-    formDataSend.append("title", formData["Offer title"] || "");
-    formDataSend.append("description", formData["Offer description"] || "");
+    formDataSend.append("title", formData["Title"] || "");
+    formDataSend.append("description", formData["Description"] || "");
     formDataSend.append("category", formData["Category Name"] || "");
     formDataSend.append("buttonType", formData["Button Name"] || "");
     formDataSend.append("detailDescription", formData.fieldDescription || "");
+    formDataSend.append("brandName", formData["Brand Name"] || "");
 
     if (mobileFile) formDataSend.append("mobile", mobileFile);
     if (webFile) formDataSend.append("web", webFile);
-    if (brandMobileImage) formDataSend.append("brandMobile", brandMobileImage);
-    if (brandWebImage) formDataSend.append("brandWeb", brandWebImage);
+    if (brandLogoImage) formDataSend.append("brandLogo", brandLogoImage);
+   
 
     formDataSend.append("redirectUrl", formData["Company URL"] || "");
 

@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { updateCategory } from "@/app/(protected)/services/categorys/api";
+import { updatefaq } from "@/app/(protected)/services/faqs/api";
 
 interface TableRow {
   id: string;
@@ -40,7 +40,7 @@ const EditModal: React.FC<EditModalProps> = ({
 
   const handleClose = () => {
     onClose();
-    router.push("/layout/home-section/category", { scroll: false });
+    router.push("/pages/faq", { scroll: false });
   };
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,16 +56,16 @@ const EditModal: React.FC<EditModalProps> = ({
     if (!id) return;
   
     try {
-      const result = await updateCategory(id, editedData.title);
+      const result = await updatefaq(id, editedData.title,editedData.description);
       if (result.success) {
-        toast.success("Category data updated successfully.");
+        toast.success("Faq data updated successfully.");
         refreshData();
         handleClose();
       } else {
-        toast.error("Failed to update category data.");
+        toast.error("Failed to update faq data.");
       }
     } catch (error) {
-      console.error("Error updating category:", error);
+      console.error("Error updating faq:", error);
     }
   };
   

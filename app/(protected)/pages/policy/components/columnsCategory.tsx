@@ -13,7 +13,7 @@ import { SquarePen, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { deleteCategory } from "@/app/(protected)/services/categorys/api";
+import { deletepolicy } from "@/app/(protected)/services/policys/api";
 
 
 
@@ -80,12 +80,12 @@ export const columnsCategory = (refreshData,router) => [
       
       const handleDelete = async (id: string) => {
         try {
-          const result = await deleteCategory(id);
+          const result = await deletepolicy(id);
           if (result.success) {
-            toast.success("Category data deleted");
+            toast.success("Policy data deleted");
             refreshData();
           } else {
-            toast.error("Category data not deleted");
+            toast.error("Policy data not deleted");
           }
         } catch (error) {
           console.error("Error deleting category:", error);
@@ -102,7 +102,7 @@ export const columnsCategory = (refreshData,router) => [
                   size="icon"
                   className="w-7 h-7 border-default-200 dark:border-default-300 text-default-400"
                   onClick={() =>
-                    router.push(`/layout/home-section/category?id=${row.original.id}`)
+                    router.push(`/pages/policy?id=${row.original.id}`)
                   }
                 >
                   <SquarePen className="w-3 h-3" />

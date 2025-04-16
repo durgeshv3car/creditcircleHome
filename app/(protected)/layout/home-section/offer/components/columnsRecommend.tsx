@@ -132,30 +132,7 @@ export const columnsRecommend = (
       );
     },
   },
-  {
-    accessorKey: "brandthumbnail.web",
-    header: "Brand Web",
-    cell: ({ row }: { row: { original: RowData } }) => {
-      const brandThumbnailData = row.original.brandthumbnail;
-
-      const imageUrls =
-        brandThumbnailData && typeof brandThumbnailData === "string"
-          ? JSON.parse(brandThumbnailData)
-          : brandThumbnailData;
-
-      return (
-        <div className="flex gap-3 items-center">
-          <Avatar className="w-8 h-8 rounded-none bg-transparent shadow-none border-none">
-            {imageUrls?.web ? (
-              <AvatarImage src={imageUrls.web} className="rounded-none" />
-            ) : (
-              <AvatarFallback className="rounded-none">NA</AvatarFallback>
-            )}
-          </Avatar>
-        </div>
-      );
-    },
-  },
+ 
   {
     accessorKey: "thumbnail.mobile",
     header: "Mobile",
@@ -181,10 +158,10 @@ export const columnsRecommend = (
     },
   },
   {
-    accessorKey: "brandthumbnail.mobile",
-    header: "Brand Mobile",
+    accessorKey: "brandthumbnail.logo",
+    header: "Brand Logo",
     cell: ({ row }: { row: { original: RowData } }) => {
-      const brandThumbnailData = row.original.brandthumbnail;
+      const brandThumbnailData = row.original.thumbnail;
 
       const imageUrls =
         brandThumbnailData && typeof brandThumbnailData === "string"
@@ -194,8 +171,8 @@ export const columnsRecommend = (
       return (
         <div className="flex gap-3 items-center">
           <Avatar className="w-8 h-8 rounded-none bg-transparent shadow-none border-none">
-            {imageUrls?.mobile ? (
-              <AvatarImage src={imageUrls.mobile} className="rounded-none" />
+            {imageUrls?.brandLogo ? (
+              <AvatarImage src={imageUrls.brandLogo} className="rounded-none" />
             ) : (
               <AvatarFallback className="rounded-none">NA</AvatarFallback>
             )}
