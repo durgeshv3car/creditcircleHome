@@ -7,7 +7,7 @@ import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { jwtDecode } from "jwt-decode";
 
-const Register = async() => {
+const Register = async () => {
   const session = await auth();
   let role = "";
   if (session?.user?.token) {
@@ -16,7 +16,7 @@ const Register = async() => {
   }
 
   const allowed = ["Super Admin", "Admin"];
-  if (role && !allowed.includes(role)) {
+  if (!allowed.includes(role)) {
     notFound();
   }
   return (
@@ -63,7 +63,7 @@ const Register = async() => {
                     Create an account to start using Dashcode
                   </div>
                 </div>
-                <RegForm />
+                <RegForm roleType={role} />
                 <div className=" relative border-b-[#9AA2AF] border-opacity-[16%] border-b pt-6">
                   <div className=" absolute inline-block  bg-default-50 dark:bg-default-100 left-1/2 top-1/2 transform -translate-x-1/2 px-4 min-w-max text-sm  text-default-500  font-normal ">
                     Or continue with

@@ -131,7 +131,7 @@ const ProfileInfo = async () => {
               </DropdownMenuPortal>
             </DropdownMenuSub>
 
-            <DropdownMenuSub>
+            {/* <DropdownMenuSub>
               <DropdownMenuSubTrigger className="flex items-center gap-2 text-sm font-medium text-default-600 capitalize px-3 py-1.5 cursor-pointer">
                 <Icon icon="heroicons:phone" className="w-4 h-4" />
                 Support
@@ -157,7 +157,7 @@ const ProfileInfo = async () => {
                   ))}
                 </DropdownMenuSubContent>
               </DropdownMenuPortal>
-            </DropdownMenuSub>
+            </DropdownMenuSub> */}
           </DropdownMenuGroup>
           <DropdownMenuSeparator className="mb-0 dark:bg-background" />
           <DropdownMenuItem className="flex items-center gap-2 text-sm font-medium text-default-600 capitalize my-1 px-3 cursor-pointer">

@@ -1,9 +1,9 @@
-'use client'
-import Image from 'next/image';
+"use client";
+import Image from "next/image";
 import { useTheme } from "next-themes";
 
 const Logo = () => {
-    const { theme: mode } = useTheme();
+  const { theme: mode } = useTheme();
   return (
     <div>
       <Image
@@ -19,6 +19,6 @@ const Logo = () => {
       />
     </div>
   );
-}
+};
 
 export default Logo;

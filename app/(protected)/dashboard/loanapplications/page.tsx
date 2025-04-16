@@ -16,20 +16,11 @@ const LeadPage = () => {
     loanType: null,
     employmentStatus: null,
     netMonthlyIncome: null,
-    salaryMode: null,
     hasCreditCard: null,
-    salaryBank: null,
     companyName: null,
     employmentLevel: null,
-    officeLocation: null,
-    officeStreet: null,
-    officePinCode: null,
-    officeCity: null,
-    officeState: null,
     loanPurpose: null,
     hasGST: null,
-    gstNumber: null,
-    businessPAN: null,
     businessName: null,
     tradeName: null,
     PrincipalPlaceofBusiness: null,
@@ -37,19 +28,37 @@ const LeadPage = () => {
     natureOfBusiness: null,
     yearsInBusiness: null,
     businessTurnover: null,
-    GSTStatus: null,
     businessIncome: null,
     businessBank: null,
     profession: null,
-    registrationNumber: null,
     yearRegistration: null,
     studentIncome: null,
-    studentIncomeMode: null,
-    fatherName: null,
-    motherName: null,
     livesWithParents: null,
-    loanCompletion: null,
   });
+
+  const businessFields = [
+    "businessName",
+    "tradeName",
+    "PrincipalPlaceofBusiness",
+    "businessType",
+    "natureOfBusiness",
+    "yearsInBusiness",
+    "businessTurnover",
+    "businessIncome",
+    "businessBank",
+    "profession",
+    "yearRegistration",
+  ];
+
+  // Only include business fields if hasGST is "true"
+  const filteredSelectedValues = Object.fromEntries(
+    Object.entries(selectedValues).filter(([key]) => {
+      if (businessFields.includes(key)) {
+        return selectedValues.hasGST === "true";
+      }
+      return true;
+    })
+  );
 
   const [columns, setColumns] = useState<any[]>([]);
   const [data, setData] = useState<DataProps[]>([]);
@@ -81,7 +90,7 @@ const LeadPage = () => {
   }, [refresh]);
 
   const filteredData = data.filter((item) => {
-    return Object.entries(selectedValues).every(([key, value]) => {
+    return Object.entries(filteredSelectedValues).every(([key, value]) => {
       if (!value || !value.toString().trim()) return true;
       const fieldValue = item[key];
       if (typeof fieldValue === "string") {

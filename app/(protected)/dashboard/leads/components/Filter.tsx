@@ -18,35 +18,79 @@ export default function Filter({ selectedValues, setSelectedValues, data }: Filt
   const [dropdownOptions, setDropdownOptions] = useState<Record<string, string[]>>({});
 
   const fieldPaths: Record<string, (item: Record<string, any>) => string | undefined> = {
-    firstName: (item) => item?.firstName,
     email: (item) => item?.email,
     phone: (item) => item?.phoneNumber,
     dob: (item) => item?.dob,
-    pan: (item) => item?.pan,
-    pinCode: (item) => item?.pinCode,
     city: (item) => item?.city,
     state: (item) => item?.state,
-    houseNo: (item) => item?.houseNo,
-    streetAddress: (item) => item?.streetAddress,
-    landmark: (item) => item?.landmark,
     gender: (item) => item?.gender,
     education: (item) => item?.education,
     maritalStatus: (item) => item?.maritalStatus,
+    hasCreditCard: (item) => String(item?.hasCreditCard),
+    ownsFourWheeler: (item) => String(item?.ownsFourWheeler),
+    ownsTwoWheeler: (item) => String(item?.ownsTwoWheeler),
+    companyName: (item) => item?.companyName,
+    insurancePlans: (item) => item?.insurancePlans,
+    netMonthlyIncome: (item) => String(item?.netMonthlyIncome),
+  };
+
+  const calculateAge = (dobStr: string): number => {
+    const dob = new Date(dobStr);
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const m = today.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+      age--;
+    }
+    return age;
   };
 
   useEffect(() => {
     if (!data || data.length === 0) return;
 
     const newDropdowns: Record<string, string[]> = {};
+
     for (const field in selectedValues) {
-      const values = data.map(fieldPaths[field]).filter(Boolean) as string[];
-      newDropdowns[field] = ["All", ...Array.from(new Set(values)).sort()];
+      const extractor = fieldPaths[field];
+      if (typeof extractor !== "function") continue;
+
+      if (field === "netMonthlyIncome") {
+        const incomeGroups = new Set<string>();
+        for (const item of data) {
+          const incomeStr = extractor(item);
+          if (!incomeStr) continue;
+          const income = parseFloat(incomeStr);
+          if (income < 20000) incomeGroups.add("less than 20k");
+          else if (income <= 50000) incomeGroups.add("between 20k to 50k");
+          else if (income <= 100000) incomeGroups.add("between 50k to 1L");
+          else incomeGroups.add("greater than 1L");
+        }
+        newDropdowns[field] = ["All", ...Array.from(incomeGroups)];
+      } else if (field === "dob") {
+        const ageGroups = new Set<string>();
+        for (const item of data) {
+          const dobStr = extractor(item);
+          if (!dobStr) continue;
+          const age = calculateAge(dobStr);
+          if (age < 21) ageGroups.add("less than 21");
+          else if (age <= 50) ageGroups.add("between 21 to 50");
+          else ageGroups.add("greater than 50");
+        }
+        newDropdowns[field] = ["All", ...Array.from(ageGroups)];
+      } else {
+        const values = data.map(extractor).filter(Boolean) as string[];
+        newDropdowns[field] = ["All", ...Array.from(new Set(values)).sort()];
+      }
     }
+
     setDropdownOptions(newDropdowns);
-  }, [data]);
+  }, [data, Object.keys(selectedValues).join(",")]);
 
   const handleChange = (field: string, value: string) => {
-    setSelectedValues((prev) => ({ ...prev, [field]: value === "All" ? "" : value }));
+    setSelectedValues((prev) => ({
+      ...prev,
+      [field]: value === "All" ? "" : value,
+    }));
     setOpenFilter(null);
   };
 

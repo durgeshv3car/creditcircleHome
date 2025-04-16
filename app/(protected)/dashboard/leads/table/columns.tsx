@@ -36,7 +36,6 @@ const fields = [
   "ownsTwoWheeler",
   "companyName",
   "employmentLevel",
-  "isCompleted",
   "officeNo",
   "officeStreet",
   "officePinCode",
@@ -60,7 +59,7 @@ export type DataProps = {
 };
 
 // Define columns dynamically
-export const columns =(fetchData)=> [
+export const columns =(fetchData,router)=> [
   {
     id: "select",
     header: ({ table }) => (
@@ -124,6 +123,7 @@ export const columns =(fetchData)=> [
                   variant="outline"
                   size="icon"
                   className="w-7 h-7 text-default-400"
+                  onClick={() => router.push(`/dashboard/leads/?id=${row.original.id}`)}
                 >
                   <SquarePen className="w-3 h-3" />
                 </Button>

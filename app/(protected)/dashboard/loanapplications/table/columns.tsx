@@ -97,19 +97,7 @@ export const columns: ColumnDef<DataProps>[] = [
     enableHiding: false,
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="outline" size="icon" className="w-7 h-7 text-default-400">
-                <Eye className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="top">
-              <p>View</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-
+       
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>

@@ -21,6 +21,7 @@ const DashCodeHeader = async() => {
         const decoded = jwtDecode(session.user.token);
         role = decoded.role;
       }
+      console.log(role, "role");
 
   return (
     <HeaderContent>

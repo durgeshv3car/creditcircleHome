@@ -14,9 +14,9 @@ export const fetchUsers = async () => {
   }
 };
 
-export const updateUser = async (userId: string, data: object) => {
+export const updateUser = async (id: string, data: object) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/otp/get-all-profile/${userId}`, data);
+    const response = await axios.put(`${API_BASE_URL}/otp/update-profile/${id}`, data);
     return response.data;
   } catch (error) {
     console.error("Error updating user:", error);

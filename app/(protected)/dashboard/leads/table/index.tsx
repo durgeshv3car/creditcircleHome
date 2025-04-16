@@ -15,6 +15,7 @@ import {
 import { columns } from "./columns";
 
 import { Button } from "@/components/ui/button";
+import EditModal from "../components/EditModal";
 
 import {
   DropdownMenu,
@@ -68,6 +69,7 @@ const ExampleTwo = ({
   setSelectedValues,
   tableData,
   tableColumns,
+  setRefresh,
 }) => {
   const searchParams = useSearchParams();
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -80,12 +82,20 @@ const ExampleTwo = ({
     string | undefined
   >();
   const [rowSelection, setRowSelection] = React.useState({});
+  const [isModalOpenOffer, setIsModalOpenOffer] = React.useState(false);
   const [pageSize, setPageSize] = React.useState(20); // Default to 20 rows per page
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [selectedOffer, setSelectedOffer] = React.useState(null);
+
+  const leadId = searchParams.get("id") || "";
   const [selectedRowsData, setSelectedRowsData] = React.useState([]);
   const [isCreatingNotification, setIsCreatingNotification] =
     React.useState(false);
+  React.useEffect(() => {
+    setIsModalOpen(!!leadId);
+  }, [leadId]);
+
+  const closeModal = () => setIsModalOpen(false);
 
   const [type, setType] = React.useState(null);
   const table = useReactTable({
@@ -207,7 +217,7 @@ const ExampleTwo = ({
               <button
                 className="ml-auto bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-50"
                 disabled={Object.keys(rowSelection).length === 0}
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => setIsModalOpenOffer(true)}
               >
                 Send {type}
               </button>
@@ -298,12 +308,20 @@ const ExampleTwo = ({
 
       {/* Pagination Component */}
       <TablePagination table={table} />
-      {isModalOpen && (
+      {isModalOpenOffer && (
         <OfferSelectionModal
           selectedRowsData={selectedRowsData}
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onSelectOffer={(offer) => setSelectedOffer(offer)}
+        />
+      )}
+      {isModalOpen && (
+        <EditModal
+          id={leadId as string}
+          onClose={closeModal}
+          tableData={tableData}
+          setRefresh={setRefresh}
         />
       )}
     </div>

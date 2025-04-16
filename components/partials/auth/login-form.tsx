@@ -16,8 +16,7 @@ import { toast } from "sonner";
 import { useRouter } from "@/components/navigation";
 
 const schema = z.object({
-  // email: z.string().email({ message: "Your email is invalid." }),
-  email: z.string().min(4),
+  email: z.string().email({ message: "Your email is invalid." }),
   password: z.string().min(4),
 });
 const LoginForm = () => {
@@ -43,8 +42,8 @@ const LoginForm = () => {
     resolver: zodResolver(schema),
     mode: "all",
     defaultValues: {
-      email: 'rahul@v3cars.com',
-      password: 'Rsaini777@',
+      email: '',
+      password: '',
     },
   });
   const [isVisible, setIsVisible] = React.useState(false);

@@ -18,7 +18,7 @@ type Inputs = {
   role: string;
 };
 
-const RegForm = () => {
+const RegForm = ({roleType}) => {
   const {
     register,
     handleSubmit,
@@ -28,24 +28,21 @@ const RegForm = () => {
 
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  
-  
+ 
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/register", data); 
-      
+      const response = await axios.post("http://localhost:5000/api/auth/register", data);
+
       console.log("API response:", response.data);
       if (response.data.user.id) {
-
         toast.success("User created successfully");
         router.push("/auth/login");
       }
     } catch (error: any) {
       console.error("API Error:", error);
-  
     } finally {
       setLoading(false);
     }
@@ -112,12 +109,23 @@ const RegForm = () => {
                 <SelectValue placeholder="Select your role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Super Admin">Super Admin</SelectItem>
-                <SelectItem value="Admin">Admin</SelectItem>
-                <SelectItem value="Employee">Employee</SelectItem>
-                <SelectItem value="Partner">Partner</SelectItem>
-                <SelectItem value="Developer">Developer</SelectItem>
-                <SelectItem value="Custom">Custom</SelectItem>
+                {roleType === "Super Admin" && (
+                  <>
+                    <SelectItem value="Admin">Admin</SelectItem>
+                    <SelectItem value="Employee">Employee</SelectItem>
+                    <SelectItem value="Partner">Partner</SelectItem>
+                    <SelectItem value="Developer">Developer</SelectItem>
+                    <SelectItem value="Custom">Custom</SelectItem>
+                  </>
+                )}
+                {roleType === "Admin" && (
+                  <>
+                    <SelectItem value="Employee">Employee</SelectItem>
+                    <SelectItem value="Partner">Partner</SelectItem>
+                    <SelectItem value="Developer">Developer</SelectItem>
+                    <SelectItem value="Custom">Custom</SelectItem>
+                  </>
+                )}
               </SelectContent>
             </Select>
           )}
@@ -131,7 +139,6 @@ const RegForm = () => {
           You accept our Terms and Conditions and Privacy Policy
         </Label>
       </div>
-
 
       <Button type="submit" className="w-full" disabled={loading}>
         {loading ? "Creating..." : "Create An Account"}
