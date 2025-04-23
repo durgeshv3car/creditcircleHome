@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { updateCategory } from "@/app/(protected)/services/categorys/api";
 
 interface TableRow {
-  id?: string; // Ensure `id` is required and explicitly typed
+  id?: string; 
   title?: string;
 }
 
@@ -39,7 +39,7 @@ const EditModal: React.FC<EditModalProps> = ({
 
   const handleClose = () => {
     onClose();
-    router.push("/layout/home-section/category", { scroll: false });
+    router.push("/Advertisement/home-section/category", { scroll: false });
   };
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

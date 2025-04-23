@@ -1,23 +1,34 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
-
 import { SquarePen, Trash2 } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { deleteCategory } from "@/app/(protected)/services/categorys/api";
+import { NextRouter } from "next/router";
+import { ColumnDef } from "@tanstack/react-table";
 
+interface Category {
+  id: string;
+  title: string;
 
+}
 
-export const columnsCategory = (refreshData,router) => [
+interface ColumnsCategoryProps {
+  fetchData: () => void;
+  router: NextRouter;
+}
+
+export const columnsCategory = (
+  fetchData: ColumnsCategoryProps["fetchData"],
+  router: ColumnsCategoryProps["router"]
+): ColumnDef<Category>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -25,7 +36,7 @@ export const columnsCategory = (refreshData,router) => [
         <Checkbox
           checked={
             table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
+            (table.getIsSomePageRowsSelected() ? "indeterminate" : false)
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
@@ -34,7 +45,6 @@ export const columnsCategory = (refreshData,router) => [
     ),
     cell: ({ row }) => (
       <div className="flex items-center gap-2 xl:w-16">
-       
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
@@ -45,7 +55,6 @@ export const columnsCategory = (refreshData,router) => [
     enableSorting: false,
     enableHiding: false,
   },
-  
   {
     id: "serialNumber",
     header: "ID",
@@ -61,25 +70,23 @@ export const columnsCategory = (refreshData,router) => [
       </div>
     ),
   },
-
-
   {
     id: "actions",
     header: "Action",
     enableHiding: false,
     cell: ({ row }) => {
-      
       const handleDelete = async (id: string) => {
         try {
           const result = await deleteCategory(id);
           if (result.success) {
             toast.success("Category data deleted");
-            refreshData();
+            fetchData();
           } else {
             toast.error("Category data not deleted");
           }
         } catch (error) {
           console.error("Error deleting category:", error);
+          toast.error("Failed to delete category");
         }
       };
 
@@ -93,7 +100,7 @@ export const columnsCategory = (refreshData,router) => [
                   size="icon"
                   className="w-7 h-7 border-default-200 dark:border-default-300 text-default-400"
                   onClick={() =>
-                    router.push(`/layout/home-section/category?id=${row.original.id}`)
+                    router.push(`/Advertisement/home-section/category?id=${row.original.id}`)
                   }
                 >
                   <SquarePen className="w-3 h-3" />
@@ -128,7 +135,4 @@ export const columnsCategory = (refreshData,router) => [
       );
     },
   },
-    
-  
-
 ];

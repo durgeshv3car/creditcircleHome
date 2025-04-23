@@ -114,7 +114,7 @@ export function getMenuList(pathname: string, role: string): Group[] {
             },
             {
               href: "/Advertisement/home-section/logo",
-              label: "Lending Partner Logo",
+              label: "Landing Partner Logo",
               active: pathname === "/Advertisement/home-section/logo",
               icon: "heroicons-outline:bookmark",
               children: [],

@@ -88,7 +88,7 @@ const EditModal: React.FC<EditModalProps> = ({
 
   const handleClose = () => {
     onClose();
-    router.push("/layout/home-section/money-smart");
+    router.push("/Others/home-section/money-smart");
   };
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

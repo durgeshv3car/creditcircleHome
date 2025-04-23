@@ -183,7 +183,7 @@ export const columnsMoney = (refreshData,router,setSelectedDate,selectedDate,ope
                   className="w-7 h-7 border-default-200 dark:border-default-300 text-default-400"
                   onClick={() =>
                     router.push(
-                      `/layout/home-section/money-smart?id=${row.original.id}`
+                      `/Others/home-section/money-smart?id=${row.original.id}`
                     )
                   }
                 >

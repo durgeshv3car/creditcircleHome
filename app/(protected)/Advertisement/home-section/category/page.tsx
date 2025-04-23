@@ -4,10 +4,18 @@ import React, { useState, useEffect } from "react";
 import ExampleTwo from "../../HomeTable";
 
 import { notFound } from "next/navigation";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
+
+
 
 import { columnsCategory } from "./components/columnsCategory";
 import { fetchCategories } from "@/app/(protected)/services/categorys/api";
+interface DataProps {
+  id: string;
+  title: string;
+
+ 
+}
 
 function Category() {
   const allowed = ["Super Admin", "Admin"];
@@ -16,12 +24,10 @@ function Category() {
     notFound();
   }
   const router = useRouter();
-
   const [data, setData] = useState<DataProps[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refresh, setRefresh] = useState<boolean>(false);
   const type = "category";
-
   const fetchData = async () => {
     try {
       const result = await fetchCategories();
@@ -43,7 +49,7 @@ function Category() {
   return (
     <>
       <div className="space-y-6">
-        <ExampleTwo
+        <ExampleTwo<DataProps>
           tableHeading="Category List"
           tableData={data}
           tableColumns={columnsCategory(fetchData, router)}

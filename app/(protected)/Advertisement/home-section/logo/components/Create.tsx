@@ -7,8 +7,10 @@ import ImageUpload from "../../../components/ImageUpload";
 import { toast } from "sonner";
 import { uploadLogoImage } from "@/app/(protected)/services/logos/api";
 
-interface FileWithPreview extends File {
+interface FileWithPreview  {
   preview: string;
+  file: File;
+ 
 }
 
 interface CreateModalProps {
@@ -105,12 +107,12 @@ const CreateModal: React.FC<CreateModalProps> = ({
                 {key.toLowerCase() === "web" ? (
                   <ImageUpload
                     files={webFile ? [webFile] : []}
-                    setFiles={(files) => setWebFile(files[0] || null)}
+                    setFiles={(files: FileWithPreview[]) => setWebFile(files[0] || null)}
                   />
                 ) : key.toLowerCase() === "mobile" ? (
                   <ImageUpload
                     files={mobileFile ? [mobileFile] : []}
-                    setFiles={(files) => setMobileFile(files[0] || null)}
+                    setFiles={(files: FileWithPreview[]) => setMobileFile(files[0] || null)}
                   />
                 ) : (
                   <Input

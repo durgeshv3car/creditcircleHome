@@ -2,13 +2,17 @@
 
 import * as React from "react";
 import {
+  ColumnDef,
   flexRender,
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table";
+} from '@tanstack/react-table'
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -53,15 +57,7 @@ const modalMap = {
       ssr: false,
     }),
   },
-  money: {
-    create: dynamic(
-      () => import("../home-section/money-smart/components/Create"),
-      { ssr: false }
-    ),
-    edit: dynamic(() => import("../home-section/money-smart/components/EditModal"), {
-      ssr: false,
-    }),
-  },
+ 
   logo: {
     create: dynamic(() => import("../home-section/logo/components/Create"), {
       ssr: false,
@@ -70,15 +66,7 @@ const modalMap = {
       ssr: false,
     }),
   },
-  refer: {
-    create: dynamic(
-      () => import("../home-section/refer-earn/components/Create"),
-      { ssr: false }
-    ),
-    edit: dynamic(() => import("../home-section/refer-earn/components/EditModal"), {
-      ssr: false,
-    }),
-  },
+ 
   offer: {
     create: dynamic(
       () => import("../home-section/offer/components/Create"),
@@ -99,19 +87,33 @@ const modalMap = {
   },
 };
 
-const ExampleTwo = ({
+
+type ModalType = keyof typeof modalMap;
+
+
+
+interface TableProps<T> {
+  tableColumns: ColumnDef<T>[];
+  tableHeading: string;
+  tableData: T[];
+  setRefresh: React.Dispatch<React.SetStateAction<boolean>>;
+  type: ModalType;
+}
+
+
+const ExampleTwo = <T,>({
   tableHeading,
   tableData,
   tableColumns,
   setRefresh,
   type,
-}) => {
+}: TableProps<T>) => {
   console.log(tableData, `${type} Data`);
 
   const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [isCreateOpen, setIsCreateOpen] = React.useState(false);
-  const leadId = searchParams.get("id") || "";
+  const leadId = searchParams?.get("id") || "";
   console.log(typeof leadId, "leadId");
 
   React.useEffect(() => {
@@ -122,11 +124,11 @@ const ExampleTwo = ({
   const createPage = () => setIsCreateOpen(true);
   const closeCreateModal = () => setIsCreateOpen(false);
 
-  const [sorting, setSorting] = React.useState([]);
-  const [columnFilters, setColumnFilters] = React.useState([]);
-  const [columnVisibility, setColumnVisibility] = React.useState({});
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const [columnsField, setColumnsField] = React.useState([]);
+  const [columnsField, setColumnsField] = React.useState<string[]>([]);
   const [pageSize, setPageSize] = React.useState(20);
 
   const table = useReactTable({
@@ -155,7 +157,7 @@ const ExampleTwo = ({
     const headers = table
       .getHeaderGroups()
       .flatMap((headerGroup) =>
-        headerGroup.headers.map((header) => header.column.columnDef.header)
+        headerGroup.headers.map((header) => String(header.column.columnDef.header))
       );
 
     setColumnsField(headers);
@@ -164,9 +166,7 @@ const ExampleTwo = ({
   // Select modals based on the `type`
   const CreateModalComponent = modalMap[type]?.create;
   const EditModalComponent = modalMap[type]?.edit;
-  console.log(isCreateOpen, "isCreateOpen")
-  console.log(isModalOpen, "isModalOpen")
-  console.log(CreateModalComponent, "CreateModalComponent")
+
 
   return (
     <div className="w-full">
@@ -233,7 +233,7 @@ const ExampleTwo = ({
           {/* Input for Filtering */}
           <Input
             placeholder="Filter Title..."
-            value={table.getColumn("title")?.getFilterValue() ?? ""}
+            value={table.getColumn("title")?.getFilterValue() as string ?? ""}
             onChange={(event) =>
               table.getColumn("title")?.setFilterValue(event.target.value)
             }

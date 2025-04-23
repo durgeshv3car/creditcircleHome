@@ -209,7 +209,7 @@ export const columnsRecommend = (
                   className="w-7 h-7 border-default-200 dark:border-default-300 text-default-400"
                   onClick={() =>
                     router.push(
-                      `/service/loan-section/lifeInsurance?id=${row.original.id}`
+                      `/Advertisement/loan-section/lifeInsurance?id=${row.original.id}`
                     )
                   }
                 >

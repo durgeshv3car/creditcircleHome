@@ -52,7 +52,7 @@ const EditModal: React.FC<EditModalProps> = ({
 
   const handleClose = () => {
     onClose();
-    router.push("/layout/home-section/slider", { scroll: false });
+    router.push("/Advertisement/home-section/slider", { scroll: false });
   };
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

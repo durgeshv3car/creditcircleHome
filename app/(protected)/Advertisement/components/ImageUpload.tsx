@@ -14,7 +14,7 @@ interface FileWithPreview {
 
 interface ImageUploadProps {
   files: FileWithPreview[];
-  setFiles: React.Dispatch<React.SetStateAction<FileWithPreview[]>>;
+  setFiles: (files: FileWithPreview[]) => void;
 }
 
 const ImageUpload = ({ files, setFiles }: ImageUploadProps) => {
