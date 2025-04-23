@@ -8,34 +8,85 @@ export function getMenuList(pathname: string, role: string): Group[] {
           id: "dashboard",
           href: "/dashboard",
           label: "dashboard",
-          active: pathname.includes("/dashboard"),
           icon: "heroicons-outline:home",
+          submenus: [  
+          ],
+        },
+      ],
+    },
+    {
+      groupLabel: "",
+      id: "admin",
+      menus: [
+        {
+          id: "admin",
+          href: "",
+          label: "admin",
+          active: pathname.includes("/admin"),
+          icon: "heroicons-outline:academic-cap",
           submenus: [
             {
-              href: "/dashboard/leads",
-              label: "leads",
-              active: pathname === "/dashboard/leads",
+              href: "/Admin/admin-section/user-management",
+              label: "User Management",
+              active: pathname === "/Admin/admin-section/user-management",
               icon: "heroicons-outline:user-group", // leads icon
               children: [],
             },
             {
-              href: "/dashboard/offerleads",
-              label: "offerleads",
-              active: pathname === "/dashboard/offerleads",
+              href: "/Admin/admin-section/api-management",
+              label: "Api Management",
+              active: pathname === "/Admin/admin-section/api-management",
               icon: "heroicons-outline:gift", // offers icon
               children: [],
             },
             {
-              href: "/dashboard/loanapplications",
-              label: "loanapplications",
-              active: pathname === "/dashboard/loanapplications",
+              href: "/Admin/admin-section/user-logs",
+              label: "User Logs",
+              active: pathname === "/Admin/admin-section/user-logs",
+              icon: "heroicons-outline:user-group", // leads icon
+              children: [],
+            },
+            
+          ],
+        },
+      ],
+    },
+    {
+      groupLabel: "",
+      id: "lms",
+      menus: [
+        {
+          id: "lms",
+          href: "",
+          label: "Lms",
+          active: pathname.includes("/lms"),
+          icon: "heroicons-outline:user-group",
+          submenus: [
+            {
+              href: "/Lms/lms-section/leads",
+              label: "leads",
+              active: pathname === "/Lms/lms-section/leads",
               icon: "heroicons-outline:user-group", // leads icon
               children: [],
             },
             {
-              href: "/dashboard/loanstatus",
+              href: "/Lms/lms-section/offerleads",
+              label: "offerleads",
+              active: pathname === "/Lms/lms-section/offerleads",
+              icon: "heroicons-outline:gift", // offers icon
+              children: [],
+            },
+            {
+              href: "/Lms/lms-section/loanapplications",
+              label: "loanapplications",
+              active: pathname === "/Lms/lms-section/loanapplications",
+              icon: "heroicons-outline:user-group", // leads icon
+              children: [],
+            },
+            {
+              href: "/Lms/lms-section/loanstatus",
               label: "loanstatus",
-              active: pathname === "/dashboard/loanstatus",
+              active: pathname === "/Lms/lms-section/loanstatus",
               icon: "heroicons-outline:gift", // offers icon
               children: [],
             },
@@ -45,196 +96,211 @@ export function getMenuList(pathname: string, role: string): Group[] {
     },
     {
       groupLabel: "",
-      id: "layout",
+      id: "advertisment",
       menus: [
         {
-          id: "layout",
+          id: "advertisment",
           href: "",
-          label: "layout",
-          active: pathname.includes("/layout"),
-          icon: "heroicons-outline:rectangle-stack",
+          label: "Advertisment",
+          active: pathname.includes("/Advertisment"),
+          icon: "heroicons-outline:megaphone",
           submenus: [
             {
-              href: "/layout/home-section/slider",
-              label: "Sliders",
-              active: pathname === "/layout/home-section/slider",
-              icon: "heroicons-outline:arrows-right-left",
+              href: "/Advertisement/home-section/slider",
+              label: "Top Banner",
+              active: pathname === "/Advertisement/home-section/slider",
+              icon: "heroicons-outline:photo",
               children: [],
             },
             {
-              href: "/layout/home-section/logo",
-              label: "Logos",
-              active: pathname === "/layout/home-section/logo",
+              href: "/Advertisement/home-section/logo",
+              label: "Lending Partner Logo",
+              active: pathname === "/Advertisement/home-section/logo",
               icon: "heroicons-outline:bookmark",
               children: [],
             },
             {
-              href: "/layout/home-section/offer",
+              href: "/Advertisement/home-section/offer",
               label: "Offers",
-              active: pathname === "/layout/home-section/offer",
+              active: pathname === "/Advertisement/home-section/offer",
               icon: "heroicons-outline:tag",
               children: [],
             },
+           
             {
-              href: "/layout/home-section/refer-earn",
+              href: "/Advertisement/home-section/category",
+              label: "Category",
+              active: pathname === "/Advertisement/home-section/category",
+              icon: "heroicons-outline:folder",
+              children: [],
+            },
+            {
+              href: "/Advertisement/loan-section/creditCard",
+              label: "Credit Card Offers",
+              active: pathname === "/Advertisement/loan-section/creditCard",
+              icon: "heroicons-outline:question-mark-circle",
+              children: [],
+            },
+            {
+              href: "/Advertisement/loan-section/carInsurance",
+              label: "Car Insurance",
+              active: pathname === "/Advertisement/loan-section/carInsurance",
+              icon: "heroicons-outline:question-mark-circle",
+              children: [],
+            },
+            {
+              href: "/Advertisement/loan-section/healthInsurance",
+              label: "Health Insurance",
+              active: pathname === "/Advertisement/loan-section/healthInsurance",
+              icon: "heroicons-outline:question-mark-circle",
+              children: [],
+            },
+            {
+              href: "/Advertisement/loan-section/lifeInsurance",
+              label: "Life Insurance",
+              active: pathname === "/Advertisement/loan-section/lifeInsurance",
+              icon: "heroicons-outline:question-mark-circle",
+              children: [],
+            },
+            {
+              href: "/Advertisement/loan-section/mutualFunds",
+              label: "Mutual Funds",
+              active: pathname === "/Advertisement/loan-section/mutualFunds",
+              icon: "heroicons-outline:question-mark-circle",
+              children: [],
+            },
+            {
+              href: "/Advertisement/loan-section/stockMarket",
+              label: "Stock Market",
+              active: pathname === "/Advertisement/loan-section/stockMarket",
+              icon: "heroicons-outline:question-mark-circle",
+              children: [],
+            },
+            {
+              href: "/Advertisement/loan-section/incomePlan",
+              label: "Income Plans",
+              active: pathname === "/Advertisement/loan-section/incomePlan",
+              icon: "heroicons-outline:question-mark-circle",
+              children: [],
+            },
+           
+          ],
+        },
+      ],
+    },
+
+    {
+      groupLabel: "",
+      id: "tools",
+      menus: [
+        {
+          id: "tools",
+          href: "",
+          label: "tools",
+          active: pathname.includes("/tools"),
+          icon: "heroicons-outline:wrench",
+          submenus: [
+             {
+              href: "/Tools/messageCenter",
+              label: "messageCenter",
+              active: pathname === "/Tools/messageCenter",
+              icon: "heroicons-outline:hand-raised",
+              children: [
+                {
+                  href: "/Tools/messageCenter/application",
+                  label: "Application",
+                  active: pathname === "/Tools/messageCenter/application",
+                  icon: "heroicons-outline:document-text",
+                  children: [],
+                },
+                {
+                  href: "/Tools/messageCenter/whatsapp",
+                  label: "Whatsapp",
+                  active: pathname === "/Tools/messageCenter/whatsapp",
+                  icon: "heroicons-outline:chat-bubble-bottom-center-text",
+                  children: [],
+                },
+                {
+                  href: "/Tools/messageCenter/sms",
+                  label: "Sms",
+                  active: pathname === "/Tools/messageCenter/sms",
+                  icon: "heroicons-outline:chat-bubble-left",
+                  children: [],
+                },
+                {
+                  href: "/Tools/messageCenter/email",
+                  label: "Email",
+                  active: pathname === "/Tools/messageCenter/email",
+                  icon: "heroicons-outline:envelope",
+                  children: [],
+                },
+                {
+                  href: "/Tools/messageCenter/rcs",
+                  label: "Rcs",
+                  active: pathname === "/Tools/messageCenter/rcs",
+                  icon: "heroicons-outline:envelope",
+                  children: [],
+                },
+              ],
+            },
+            {
+              href: "/Tools/Analytics",
+              label: "Analytics",
+              active: pathname === "/Tools/Analytics",
+              icon: "heroicons-outline:question-mark-circle",
+              children: [],
+            },
+         
+          ],
+        },
+      ],
+    },
+    
+
+    
+    
+ 
+    
+    {
+      groupLabel: "",
+      id: "others",
+      menus: [
+        {
+          id: "others",
+          href: "",
+          label: "others",
+          active: pathname.includes("/others"),
+          icon: "heroicons-outline:exclamation-circle",
+          submenus: [
+             {
+              href: "/Others/home-section/refer-earn",
               label: "Refer&Earns",
-              active: pathname === "/layout/home-section/refer-earn",
+              active: pathname === "/Others/home-section/refer-earn",
               icon: "heroicons-outline:hand-raised",
               children: [],
             },
             {
-              href: "/layout/home-section/money-smart",
+              href: "/Others/home-section/money-smart",
               label: "MoneySmarts",
-              active: pathname === "/layout/home-section/money-smart",
+              active: pathname === "/Others/home-section/money-smart",
               icon: "heroicons-outline:banknotes",
               children: [],
             },
             {
-              href: "/layout/home-section/category",
-              label: "Category",
-              active: pathname === "/layout/home-section/category",
-              icon: "heroicons-outline:folder",
-              children: [],
-            },
-          ],
-        },
-      ],
-    },
-    {
-      groupLabel: "",
-      id: "messageCenter",
-      menus: [
-        {
-          id: "messageCenter",
-          href: "",
-          label: "messageCenter",
-          active: pathname.includes("/messageCenter"),
-          icon: "heroicons-outline:envelope-open",
-          submenus: [
-            {
-              href: "/messageCenter/application",
-              label: "Application",
-              active: pathname === "/messageCenter/application",
-              icon: "heroicons-outline:document-text",
-              children: [],
-            },
-            {
-              href: "/messageCenter/whatsapp",
-              label: "Whatsapp",
-              active: pathname === "/messageCenter/whatsapp",
-              icon: "heroicons-outline:chat-bubble-bottom-center-text",
-              children: [],
-            },
-            {
-              href: "/messageCenter/sms",
-              label: "Sms",
-              active: pathname === "/messageCenter/sms",
-              icon: "heroicons-outline:chat-bubble-left",
-              children: [],
-            },
-            {
-              href: "/messageCenter/email",
-              label: "Email",
-              active: pathname === "/messageCenter/email",
-              icon: "heroicons-outline:envelope",
-              children: [],
-            },
-          ],
-        },
-      ],
-    },
-    {
-      groupLabel: "",
-      id: "pages",
-      menus: [
-        {
-          id: "pages",
-          href: "",
-          label: "pages",
-          active: pathname.includes("/pages"),
-          icon: "heroicons-outline:document",
-          submenus: [
-            {
-              href: "/pages/faq",
+              href: "/Others/page-section/faq",
               label: "Faq",
-              active: pathname === "/pages/faq",
+              active: pathname === "/Others/page-section/faq",
               icon: "heroicons-outline:question-mark-circle",
               children: [],
             },
             {
-              href: "/pages/policy",
+              href: "/Others/page-section/policy",
               label: "Policy",
-              active: pathname === "/pages/policy",
+              active: pathname === "/Others/page-section/policy",
               icon: "heroicons-outline:shield-check",
               children: [],
             },
           ],
-        },
-      ],
-    },
-    {
-      groupLabel: "",
-      id: "service",
-      menus: [
-        {
-          id: "service",
-          href: "",
-          label: "service",
-          active: pathname.includes("/service"),
-          icon: "heroicons-outline:wrench",
-          submenus: [
-            {
-              href: "/service/loan-section/creditCard",
-              label: "CreditCard",
-              active: pathname === "/service/loan-section/creditCard",
-              icon: "heroicons-outline:question-mark-circle",
-              children: [],
-            },
-            {
-              href: "/service/loan-section/carInsurance",
-              label: "CarInsurance",
-              active: pathname === "/service/loan-section/carInsurance",
-              icon: "heroicons-outline:question-mark-circle",
-              children: [],
-            },
-            {
-              href: "/service/loan-section/healthInsurance",
-              label: "HealthInsurance",
-              active: pathname === "/service/loan-section/healthInsurance",
-              icon: "heroicons-outline:question-mark-circle",
-              children: [],
-            },
-            {
-              href: "/service/loan-section/lifeInsurance",
-              label: "LifeInsurance",
-              active: pathname === "/service/loan-section/lifeInsurance",
-              icon: "heroicons-outline:question-mark-circle",
-              children: [],
-            },
-            {
-              href: "/service/loan-section/mutualFunds",
-              label: "MutualFunds",
-              active: pathname === "/service/loan-section/mutualFunds",
-              icon: "heroicons-outline:question-mark-circle",
-              children: [],
-            },
-            {
-              href: "/service/loan-section/stockMarket",
-              label: "StockMarket",
-              active: pathname === "/service/loan-section/stockMarket",
-              icon: "heroicons-outline:question-mark-circle",
-              children: [],
-            },
-            {
-              href: "/service/loan-section/incomePlan",
-              label: "IncomePlan",
-              active: pathname === "/service/loan-section/incomePlan",
-              icon: "heroicons-outline:question-mark-circle",
-              children: [],
-            },
-          
-          ],
-          
         },
       ],
     },

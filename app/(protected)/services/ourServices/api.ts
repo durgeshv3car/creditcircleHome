@@ -40,7 +40,7 @@ export const updateService = async (
     if (editedData.companyUrl)
       formDataSend.append("companyUrl", editedData.companyUrl);
     if (editedData.annualFee)
-      formDataSend.append("companyUrl", editedData.annualFee);
+      formDataSend.append("annualFee", editedData.annualFee);
     if (editedData.active !== undefined)
       formDataSend.append("active", editedData.active);
 
@@ -69,11 +69,8 @@ export const addService = async (
     formDataSend.append("description", formData.fieldDescription || "");
     formDataSend.append("buttonType", formData["Button Name"] || "");
 
-
-
     if (mobileFile) formDataSend.append("mobile", mobileFile);
     if (webFile) formDataSend.append("web", webFile);
-
 
     formDataSend.append("companyUrl", formData["Company URL"] || "");
     formDataSend.append("annualFee", formData["Annual Fee"] || "");
@@ -93,19 +90,19 @@ export const addService = async (
   }
 };
 
-export const toggleServiceStatus = async (id: string,type:string, value: boolean) => {
+export const toggleServiceStatus = async (id: string, type: string, value: boolean) => {
   try {
     const formDataSend = new FormData();
     formDataSend.append("id", id);
     formDataSend.append("type", type);
-    formDataSend.append("isActive", String(value));
+    formDataSend.append("active", String(value));
 
-    await axios.put(`${API_BASE_URL}/service`, formDataSend, {
+    const response = await axios.put(`${API_BASE_URL}/service`, formDataSend, {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
     return {
-      success: true,
+      success: response.status === 200,
       message: `Recommend ${value ? "activated" : "deactivated"} successfully`,
     };
   } catch (error) {
@@ -113,9 +110,6 @@ export const toggleServiceStatus = async (id: string,type:string, value: boolean
     return { success: false, message: "Failed to update status" };
   }
 };
-
-
-
 
 export const deleteService = async (id: string) => {
   try {

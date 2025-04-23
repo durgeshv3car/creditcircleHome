@@ -1,9 +1,6 @@
 
 'use server'
-import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
 import { signIn} from "@/lib/auth";
-import { getSession } from "next-auth/react";
 
 export const loginUser = async (data: any) => {
  
