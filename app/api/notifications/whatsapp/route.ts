@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
     const token = await getToken();
     const res = await fetch(`${BASE_URL}/getallnotifications?type=whatsapp`, {
       headers: {
-        Authorization: token ? `Bearer ${token}` : "",
+        Authorization: token  || "",
       },
     });
     const data = await res.json();

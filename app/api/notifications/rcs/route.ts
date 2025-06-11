@@ -8,8 +8,8 @@ export async function GET(req: NextRequest) {
   try {
     const token = await getToken();
     const res = await fetch(`${BASE_URL}/getallnotifications?type=rcs`, {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
+       headers: {
+        Authorization: token  || "",
       },
     });
     const data = await res.json();

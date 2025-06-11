@@ -7,8 +7,8 @@ export async function GET() {
   try {
     const token = await getToken();
     const res = await fetch(`${BASE_URL}/logs`, {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
+       headers: {
+        Authorization: token || "",
       },
     });
     const data = await res.json();

@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     const token = await getToken();
     const res = await fetch(`${BASE_URL}/banner/images/${type}`, {
       headers: {
-        Authorization: token ? `Bearer ${token}` : "",
+        Authorization: token || "",
       },
     });
     if (!res.ok) {
@@ -32,6 +32,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const token = await getToken();
     const contentType = req.headers.get("content-type") || "";
     let res;
     if (contentType.includes("multipart/form-data")) {
@@ -39,6 +40,9 @@ export async function POST(req: NextRequest) {
       res = await fetch(`${BASE_URL}/banner/upload`, {
         method: "POST",
         body: formData,
+         headers: {
+        Authorization: token || "",
+      },
       });
     } else {
       const body = await req.json();
@@ -67,6 +71,7 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    const token = await getToken();
     const contentType = req.headers.get("content-type") || "";
     let res;
     if (contentType.includes("multipart/form-data")) {
@@ -74,6 +79,10 @@ export async function PUT(req: NextRequest) {
       res = await fetch(`${BASE_URL}/banner/image`, {
         method: "PUT",
         body: formData,
+         headers: {
+      
+        Authorization: token || "",
+      },
       });
     } else {
       const body = await req.json();
@@ -102,6 +111,7 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
+    const token = await getToken();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     if (!id) {
@@ -109,7 +119,10 @@ export async function DELETE(req: NextRequest) {
     }
     const res = await fetch(`${BASE_URL}/logo/image`, {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token || "",
+      },
       body: JSON.stringify({ id }),
     });
     if (!res.ok) {

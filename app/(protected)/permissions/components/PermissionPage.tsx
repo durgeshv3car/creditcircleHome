@@ -9,6 +9,7 @@ import { getMenuList } from "@/lib/menus";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import { toast } from "sonner";
+import { updateUser } from "../../services/adminUsers/api";
 
 export default function PermissionPage({
   role,
@@ -59,25 +60,17 @@ export default function PermissionPage({
     }
   };
 
-  const handleSubmit = async () => {
-    console.log("Selected permissions:", selectedPermissions);
-    const Api_url=process.env.NEXT_PUBLIC_API_BASE_URL
-    try {
-      const response = await axios.put(
-        `${Api_url}/auth/update/${leadId}`,
-        {
-          permissions: selectedPermissions,
-        }
-      );
 
-      if (response.data) {
-        toast.success("Permission created successfully");
-        router.push("/dashboard", { scroll: false });
-      }
-    } catch (error: any) {
-      console.error("API Error:", error);
-    }
-  };
+  const handleSubmit = async () => {
+  const res = await updateUser(leadId, undefined, undefined, undefined, selectedPermissions);
+  if (res.success) {
+    toast.success("Permission updated successfully");
+    router.push("/dashboard", { scroll: false });
+  } else {
+    console.error("Failed to update permissions", res.data);
+  }
+};
+
 
   const handleSelectAll = () => {
     if (selectedPermissions.length === allPermissions.length) {

@@ -8,14 +8,11 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type") || "";
     const token = await getToken();
-    const res = await fetch(
-      `${BASE_URL}/banner/images/${type}`,
-      {
-        headers: {
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-      }
-    );
+    const res = await fetch(`${BASE_URL}/banner/images/${type}`, {
+      headers: {
+        Authorization: token || "",
+      },
+    });
     if (!res.ok) {
       return NextResponse.json(
         { error: "Failed to fetch data" },
@@ -42,9 +39,9 @@ export async function POST(req: NextRequest) {
       const formData = await req.formData();
       res = await fetch(`${BASE_URL}/banner/upload`, {
         method: "POST",
-        headers: {
-          Authorization: token ? `Bearer ${token}` : "",
-        },
+         headers: {
+        Authorization: token  || "",
+      },
         body: formData,
       });
     } else {
@@ -53,7 +50,7 @@ export async function POST(req: NextRequest) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
+          Authorization: token || "",
         },
         body: JSON.stringify(body),
       });
@@ -85,8 +82,8 @@ export async function PUT(req: NextRequest) {
       res = await fetch(`${BASE_URL}/banner/image`, {
         method: "PUT",
         headers: {
-          Authorization: token ? `Bearer ${token}` : "",
-        },
+        Authorization: token  || "",
+      },
         body: formData,
       });
     } else {
@@ -95,7 +92,7 @@ export async function PUT(req: NextRequest) {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
+          Authorization: token || "",
         },
         body: JSON.stringify(body),
       });
@@ -129,7 +126,7 @@ export async function DELETE(req: NextRequest) {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
+        Authorization: token || "",
       },
       body: JSON.stringify({ id }),
     });

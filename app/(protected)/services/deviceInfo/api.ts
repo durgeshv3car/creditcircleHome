@@ -1,12 +1,4 @@
-import { auth } from "@/lib/auth";
 
-  const session = await auth();
-  let token = "";
-  if (session?.user && "token" in session.user) {
-   
-    token = (session.user as { token: string }).token;
-   
-  }
 
 export const deleteDevice = async (id: string) => {
   try {

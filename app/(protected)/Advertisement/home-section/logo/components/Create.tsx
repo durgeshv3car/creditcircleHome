@@ -127,7 +127,7 @@ const CreateModal: React.FC<CreateModalProps> = ({
                     setFiles={(files: FileWithPreview[]) =>
                       setMobileFile(files[0] || null)
                     }
-                    expectedDimensions={Logo_DIMENSIONS}
+           
                     label="Logo"
                   />
                 ) : (

@@ -7,8 +7,8 @@ export async function GET() {
   try {
     const token = await getToken();
     const res = await fetch(`${BASE_URL}/otp/get-all-profile`, {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
+       headers: {
+        Authorization: token || "",
       },
     });
     const data = await res.json();
@@ -35,7 +35,7 @@ export async function PUT(req: NextRequest) {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
+        Authorization: token || "",
       },
       body: JSON.stringify(body),
     });
@@ -61,7 +61,7 @@ export async function DELETE(req: NextRequest) {
     const res = await fetch(`${BASE_URL}/otp/delete-profile/${id}`, {
       method: "DELETE",
       headers: {
-        Authorization: token ? `Bearer ${token}` : "",
+        Authorization: token || "",
       },
     });
     const data = await res.json();

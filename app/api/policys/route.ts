@@ -8,7 +8,7 @@ export async function GET() {
     const token = await getToken();
     const res = await fetch(`${BASE_URL}/policy`, {
       headers: {
-        Authorization: token ? `Bearer ${token}` : "",
+        Authorization: token || "",
       },
     });
     const data = await res.json();
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
+        Authorization: token || "",
       },
       body: JSON.stringify(body),
     });
@@ -64,7 +64,7 @@ export async function PUT(req: NextRequest) {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
+        Authorization: token || "",
       },
       body: JSON.stringify(body),
     });
@@ -90,7 +90,7 @@ export async function DELETE(req: NextRequest) {
     const res = await fetch(`${BASE_URL}/policy/${id}`, {
       method: "DELETE",
       headers: {
-        Authorization: token ? `Bearer ${token}` : "",
+        Authorization: token || "",
       },
     });
     const data = await res.json();

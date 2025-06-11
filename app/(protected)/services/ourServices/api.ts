@@ -1,17 +1,8 @@
-import axios from "axios";
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
-
 export const fetchServices = async (type:string) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/service/${type}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    return response.data.services || [];
+    const response = await fetch(`/api/ourServices?type=${type}`);
+    const data = await response.json();
+    return data.services || data || [];
   } catch (error) {
     console.error("Error fetching services:", error);
     return [];
@@ -35,7 +26,7 @@ export const updateService = async (
     formDataSend.append("id", id);
     formDataSend.append("type", type);
     formDataSend.append("dimensions", JSON.stringify(dimension));
-  
+
     if (!mobileUrl) formDataSend.append("mobileUrl", "empty");
     if (!webUrl) formDataSend.append("webUrl","empty");
 
@@ -54,11 +45,12 @@ export const updateService = async (
     if (editedData.active !== undefined)
       formDataSend.append("active", editedData.active);
 
-    await axios.put(`${API_BASE_URL}/service`, formDataSend, {
-      headers: { "Content-Type": "multipart/form-data" },
+    const response = await fetch("/api/ourServices", {
+      method: "PUT",
+      body: formDataSend,
     });
-
-    return { success: true, message: "service updated successfully" };
+    const data = await response.json();
+    return { success: response.ok, message: data.message || "service updated successfully" };
   } catch (error) {
     console.error("Error updating service:", error);
     return { success: false, message: "Failed to update service" };
@@ -69,11 +61,8 @@ export const addService = async (
   type: string,
   dimensions: any,
   formData: any,
-  mobileFile?: File,
-  webFile?: File,
-
-  
-
+  mobileFile?: File | null,
+  webFile?: File | null,
 ) => {
   try {
     const formDataSend = new FormData();
@@ -90,14 +79,15 @@ export const addService = async (
     formDataSend.append("joiningFee", formData["Joining Fee"] || "");
     formDataSend.append("annualFee", formData["Annual Fee"] || "");
 
-    const response = await axios.post(`${API_BASE_URL}/service`, formDataSend, {
-      headers: { "Content-Type": "multipart/form-data" },
+    const response = await fetch("/api/ourServices", {
+      method: "POST",
+      body: formDataSend,
     });
-
+    const data = await response.json();
     return {
-      success: true,
-      message: "service added",
-      data: response.data,
+      success: response.ok,
+      message: data.message || "service added",
+      data,
     };
   } catch (error) {
     console.error("Error uploading image:", error);
@@ -112,13 +102,14 @@ export const toggleServiceStatus = async (id: string, type: string, value: boole
     formDataSend.append("type", type);
     formDataSend.append("active", String(value));
 
-    const response = await axios.put(`${API_BASE_URL}/service`, formDataSend, {
-      headers: { "Content-Type": "multipart/form-data" },
+    const response = await fetch("/api/ourServices", {
+      method: "PUT",
+      body: formDataSend,
     });
-
+    const data = await response.json();
     return {
-      success: response.status === 200,
-      message: `Recommend ${value ? "activated" : "deactivated"} successfully`,
+      success: response.ok,
+      message: data.message || `Recommend ${value ? "activated" : "deactivated"} successfully`,
     };
   } catch (error) {
     console.error("Error updating isActive:", error);
@@ -128,11 +119,11 @@ export const toggleServiceStatus = async (id: string, type: string, value: boole
 
 export const deleteService = async (id: string) => {
   try {
-    await axios.delete(`${API_BASE_URL}/service/${id}`, {
-      headers: { "Content-Type": "application/json" },
+    const response = await fetch(`/api/ourServices?id=${id}`, {
+      method: "DELETE",
     });
-
-    return { success: true, message: "Service data deleted" };
+    const data = await response.json();
+    return { success: response.ok, message: data.message || "Service data deleted" };
   } catch (error) {
     console.error("Error deleting item:", error);
     return { success: false, message: "Service data not deleted" };

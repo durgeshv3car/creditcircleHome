@@ -8,8 +8,8 @@ export async function GET(req: NextRequest) {
   try {
     const token = await getToken();
     const res = await fetch(`${BASE_URL}/offer/money`, {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
+       headers: {
+        Authorization: token  || "",
       },
     });
     if (!res.ok) {

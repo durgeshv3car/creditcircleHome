@@ -9,14 +9,11 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type") || "";
     const token = await getToken();
-    const res = await fetch(
-      `${BASE_URL}/banner/images/${type}`,
-      {
-        headers: {
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-      }
-    );
+    const res = await fetch(`${BASE_URL}/banner/images/${type}`, {
+      headers: {
+        Authorization: token || "",
+      },
+    });
 
     if (!res.ok) {
       return NextResponse.json(
@@ -38,6 +35,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const token = await getToken();
     const contentType = req.headers.get("content-type") || "";
     let res;
 
@@ -46,6 +44,9 @@ export async function POST(req: NextRequest) {
       res = await fetch(`${BASE_URL}/banner/upload`, {
         method: "POST",
         body: formData,
+        headers: {
+          Authorization: token || "",
+        },
       });
     } else {
       const body = await req.json();
@@ -76,6 +77,7 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    const token = await getToken();
     const contentType = req.headers.get("content-type") || "";
     let res;
 
@@ -84,6 +86,9 @@ export async function PUT(req: NextRequest) {
       res = await fetch(`${BASE_URL}/banner/image`, {
         method: "PUT",
         body: formData,
+        headers: {
+          Authorization: token || "",
+        },
       });
     } else {
       const body = await req.json();
@@ -114,6 +119,7 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
+    const token = await getToken();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
@@ -123,7 +129,10 @@ export async function DELETE(req: NextRequest) {
 
     const res = await fetch(`${BASE_URL}/banner/image`, {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+       headers: {
+        "Content-Type": "application/json",
+        Authorization: token || "",
+      },
       body: JSON.stringify({ id }),
     });
 
