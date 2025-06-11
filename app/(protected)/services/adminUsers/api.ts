@@ -15,6 +15,21 @@ export const deleteUser = async (id: string, adminId: string) => {
   }
 };
 
+export const createUser = async (user:any) => {
+  try {
+    const response = await fetch(`/api/adminUsers`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(user),
+    });
+    const data = await response.json();
+    return { success: response.ok, data };
+  } catch (error) {
+    console.error("Error creating user:", error);
+    return { success: false };
+  }
+}
+
 export const updateUser = async (
   id: string,
   name?: string,

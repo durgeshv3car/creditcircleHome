@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import axios from "axios";
+import { createUser } from "@/app/(protected)/services/adminUsers/api";
 
 
 type Inputs = {
@@ -50,7 +51,7 @@ const RegForm = ({ roleType }: { roleType: string }) => {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setLoading(true);
-    const Api_url=process.env.NEXT_PUBLIC_API_BASE_URL
+  
 
     // Replace role with customRole if "Other" is selected
     if (selectedRole === "Other") {
@@ -58,10 +59,7 @@ const RegForm = ({ roleType }: { roleType: string }) => {
     }
 
     try {
-      const response = await axios.post(
-        `${Api_url}/auth/register`,
-        data
-      );
+      const response = await createUser(data);
 
       if (response.data.user?.id) {
         toast.success("User created successfully");

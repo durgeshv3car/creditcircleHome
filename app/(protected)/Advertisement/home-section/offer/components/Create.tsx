@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { addOffer } from "@/app/(protected)/services/offers/api";
 import type { FileWithPreview } from "../../../components/ImageUpload";
+import { fetchCategories } from "@/app/(protected)/services/categorys/api";
 
 interface CreateModalProps {
   onClose: () => void;
@@ -81,21 +82,20 @@ const CreateModal: React.FC<CreateModalProps> = ({
   ];
 
   // Fetch categories from API
-  useEffect(() => {
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-    axios
-      .get(`${API_BASE_URL}/category`)
-      .then((response) => {
-        setCategories(response.data);
-      })
-      .catch((error) => {
-        if (error.response && error.response.status === 404) {
-          setCategories([]);
-        } else {
-          console.error("Error fetching categories:", error);
-        }
-      });
-  }, []);
+  const fetchData = async () => {
+      try {
+        const result = await fetchCategories();
+        console.log("result", result.status);
+  
+        setCategories(result);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } 
+    };
+  
+    useEffect(() => {
+      fetchData();
+    }, []);
 
   const handleClose = () => {
     onClose();

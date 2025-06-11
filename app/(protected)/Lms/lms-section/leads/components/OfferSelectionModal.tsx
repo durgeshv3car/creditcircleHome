@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dropdown } from 'primereact/dropdown';
+import { fetchOffers } from "@/app/(protected)/services/offers/api";
 import axios from "axios";
 import {
   Command,
@@ -59,26 +60,23 @@ const OfferSelectionModal: React.FC<OfferSelectionModalProps> = ({
 useEffect(() => {
   if (!isOpen) return;
 
-  const fetchOffers = async () => {
-    const Api_url = process.env.NEXT_PUBLIC_API_BASE_URL;
-
+  const fetchOffersData = async () => {
     try {
       console.log("Fetching offers from API...");
-      const response = await axios.get(`${Api_url}/offer/offer`);
-  
+      const response = await fetchOffers();
 
-      const offers = response.data.offers.filter(
+      const activeOffers = response.filter(
         (offer: Offer) => offer.isActive === true
       );
 
-      console.log("Offers fetched successfully:", offers);
-      setOffers(offers);
+      console.log("Offers fetched successfully:", activeOffers);
+      setOffers(activeOffers);
     } catch (error: any) {
       console.error("Error fetching offers:", error.message);
     }
   };
 
-  fetchOffers();
+  fetchOffersData();
 }, [isOpen]);
 
 
@@ -90,7 +88,7 @@ useEffect(() => {
 
   // Submit the selected offer
  const handleSubmit = async () => {
-  const Api_url = process.env.NEXT_PUBLIC_API_BASE_URL;
+  
   if (!selectedOffer || !selectedRowsData.length) return;
 
   try {
@@ -106,7 +104,7 @@ useEffect(() => {
       type: `${sending}_create`,
     };
 
-    const response = await axios.post(`${Api_url}/notifications`, payload, {
+    const response = await axios.post(`api/notifications`, payload, {
       headers: {
         "Content-Type": "application/json",
       },

@@ -19,6 +19,7 @@ import {
 import TextEditor from "./SunEditor";
 
 import type { FileWithPreview } from "../../../components/ImageUpload";
+import { fetchCategories } from "@/app/(protected)/services/categorys/api";
 
 interface TableRow {
   id: string;
@@ -79,23 +80,20 @@ const EditModal: React.FC<EditModalProps> = ({
     { id: "shop_now", name: "Shop Now" },
   ];
 
-  useEffect(() => {
-    const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-    axios
-      .get(`${API_URL}/category`)
-      .then((response) => {
-        console.log(response, "category");
-        setCategories(response.data);
-      })
-      .catch((error) => {
-        if (error.response && error.response.status === 404) {
-          setCategories([]);
-        } else {
-          console.error("Error fetching categories:", error);
-        }
-      });
-  }, []); // Fixed dependency array to avoid infinite re-fetching
-
+    const fetchData = async () => {
+      try {
+        const result = await fetchCategories();
+        console.log("result", result.status);
+  
+        setCategories(result);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } 
+    };
+  
+    useEffect(() => {
+      fetchData();
+    }, []);
   // Find the row data based on the id
   useEffect(() => {
     if (id && tableData) {

@@ -96,3 +96,30 @@ export async function DELETE(req: NextRequest) {
     );
   }
 }
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const res = await fetch(`${BASE_URL}/auth/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      return NextResponse.json(data, { status: res.status });
+    } else {
+      return NextResponse.json(
+        { error: data?.error || "Failed to register user" },
+        { status: res.status }
+      );
+    }
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to register user" },
+      { status: 500 }
+    );
+  }
+}
