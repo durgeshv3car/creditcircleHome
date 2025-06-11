@@ -1,44 +1,38 @@
-import { Link } from '@/i18n/routing';
+import { Link } from "@/i18n/routing";
 import LoginForm from "@/components/partials/auth/login-form";
 import Image from "next/image";
 import Social from "@/components/partials/auth/social";
 import Copyright from "@/components/partials/auth/copyright";
 import { auth } from "@/lib/auth";
 import Logo from "@/components/partials/auth/logo";
-const Login = async() => {
-    const session = await auth();
-    let token = "";
-  
-    if ((session?.user as { token?: string })?.token) {
-      token = (session?.user as { token?: string })?.token || "";
-    }
+const Login = async () => {
+  const session = await auth();
+  let token = "";
+
+  if ((session?.user as { token?: string })?.token) {
+    token = (session?.user as { token?: string })?.token || "";
+  }
   return (
     <>
       <div className="flex w-full items-center overflow-hidden min-h-dvh h-dvh basis-full">
         <div className="overflow-y-auto flex flex-wrap w-full h-dvh">
           <div
             className="lg:block hidden flex-1 overflow-hidden text-[40px] leading-[48px] text-default-600 
- relative z-[1] bg-default-50"
+         relative z-[1] bg-default-50"
           >
-            <div className="max-w-[520px] pt-20 ps-20 ">
-              <Link href="/" className="mb-6 inline-block">
-                <Logo />
-              </Link>
-              <h4>
-                Unlock your Project
-                <span className="text-default-800 font-bold ms-2">
-                  performance
-                </span>
-              </h4>
-            </div>
-            <div className="absolute left-0 2xl:bottom-[-160px] bottom-[-130px] h-full w-full z-[-1]">
-              <Image
-                src="/images/auth/ils1.svg"
-                alt=""
-                width={300}
-                height={300}
-                className="mb-10 w-full h-full"
-              />
+            <div className="md:w-1/2 m-auto h-full w-full flex justify-center items-center">
+              <div>
+                <Image
+                  alt=""
+                  loading="lazy"
+                  width="500"
+                  height="500"
+                  decoding="async"
+                  data-nimg="1"
+                  className="object-contain"
+                  src="/images/logo/logo.svg"
+                />
+              </div>
             </div>
           </div>
           <div className="flex-1 relative">
@@ -61,7 +55,7 @@ const Login = async() => {
                     Or continue with
                   </div>
                 </div> */}
-                
+
                 {/* <div className="md:max-w-[345px] mx-auto font-normal text-default-500 mt-12 uppercase text-sm">
                   Don’t have an account?{" "}
                   <Link
