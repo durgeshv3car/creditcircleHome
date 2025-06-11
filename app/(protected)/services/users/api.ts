@@ -1,22 +1,23 @@
-import axios from "axios";
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
-
 export const fetchUsers = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/otp/get-all-profile`, {
-    });
-
-    return response.data; 
+    const response = await fetch(`/api/users`);
+    const data = await response.json();
+    return data;
   } catch (error) {
-    console.error("Error fetching notifications:", error);
+    console.error("Error fetching users:", error);
     throw error;
   }
 };
 
 export const updateUser = async (id: string, data: object) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/otp/update-profile/${id}`, data);
-    return response.data;
+    const response = await fetch(`/api/users?id=${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    const result = await response.json();
+    return result;
   } catch (error) {
     console.error("Error updating user:", error);
     throw error;
@@ -25,8 +26,11 @@ export const updateUser = async (id: string, data: object) => {
 
 export const deleteUser = async (id: string) => {
   try {
-    const response = await axios.delete(`${API_BASE_URL}/otp/delete-profile/${id}`);
-    return response.data;
+    const response = await fetch(`/api/users?id=${id}`, {
+      method: "DELETE",
+    });
+    const result = await response.json();
+    return result;
   } catch (error) {
     console.error("Error deleting user:", error);
     throw error;

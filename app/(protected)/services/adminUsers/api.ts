@@ -1,22 +1,17 @@
-import axios from "axios";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
-
-export const deleteUser = async (id: string,adminId: string) => {
+export const deleteUser = async (id: string, adminId: string) => {
   try {
-    await axios.delete(`${API_BASE_URL}/auth/user/${adminId}/${id}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-
+    const response = await fetch(`/api/adminUsers?id=${id}&adminId=${adminId}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
     });
-
-    return { success: true };
+    const data = await response.json();
+    return { success: response.ok, data };
   } catch (error) {
-    console.error("Error deleting category:", error);
+    console.error("Error deleting user:", error);
     return { success: false };
   }
 };
+
 export const updateUser = async (
   id: string,
   name?: string,
@@ -26,42 +21,30 @@ export const updateUser = async (
 ) => {
   try {
     const updatePayload: any = {};
-
     if (name !== undefined) updatePayload.name = name;
     if (email !== undefined) updatePayload.email = email;
     if (role !== undefined) updatePayload.role = role;
     if (permissions !== undefined) updatePayload.permissions = permissions;
-
-    await axios.put(
-      `${API_BASE_URL}/auth/update/${id}`,
-      updatePayload,
-      {
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-
-    return { success: true };
+    const response = await fetch(`/api/adminUsers?id=${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatePayload),
+    });
+    const data = await response.json();
+    return { success: response.ok, data };
   } catch (error) {
     console.error("Error updating user:", error);
     return { success: false };
   }
 };
 
-
-
-
 export const fetchUsers = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/auth/user`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    console.log("Fetched user:", response.data);
-
-    return response.data;
+    const response = await fetch(`/api/adminUsers`);
+    const data = await response.json();
+    return data;
   } catch (error) {
-    console.error("Error fetching categories:", error);
+    console.error("Error fetching users:", error);
     return [];
   }
 };

@@ -26,7 +26,6 @@ import {
 } from '@tanstack/react-table';
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import {
-  toggleMoneyStatus,
   deleteMoney,
 } from "@/app/(protected)/services/moneySmart/api";
 interface ColumnsSliderProps {

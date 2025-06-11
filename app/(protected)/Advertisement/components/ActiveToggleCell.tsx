@@ -3,19 +3,36 @@
 import React from "react";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { toggleServiceStatus } from "@/app/(protected)/services/ourServices/api"; 
+import { updateService } from "@/app/(protected)/services/ourServices/api"; 
 
 const ActiveToggleCell = ({ row,type,setRefresh }: { row: any; type: string , setRefresh: React.Dispatch<React.SetStateAction<boolean>> }) => {
   const activeData = row?.original?.active ;
   const id= row?.original?.id  ;
   const [isActive, setIsActive] = React.useState(activeData);
+  
+  const Web_DIMENSIONS = { width: 1920, height: 970 };
+  const Mobile_DIMENSIONS = { width: 356, height: 180 };
+  const Logo_DIMENSIONS = { width: 150, height: 150 };
+   const dimensions={
+    web: Web_DIMENSIONS,
+    mobile: Mobile_DIMENSIONS,
+  }
+
 
   const handleToggle = async (value: boolean) => {
     const previousState = isActive; 
     setIsActive(value); 
 
     try {
-      const result = await toggleServiceStatus(id, type, value);
+      const result = await updateService( 
+         row.original.id,
+        row.original.type,
+        dimensions,
+        { active: value },
+        null, // file
+        null, // mobileFile
+        row.original.mobileUrl || "",
+        row.original.webUrl || "");
       if (result.success) {
         toast.success(`${type} ${value ? "activated" : "deactivated"} successfully`);
         setIsActive(value)

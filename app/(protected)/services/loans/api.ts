@@ -1,34 +1,38 @@
-import axios from "axios";
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
-
 export const fetchLoans = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/all-loan-application`, {
-    });
-
-    return response.data; 
+    const response = await fetch(`/api/loans`);
+    const data = await response.json();
+    return data;
   } catch (error) {
-    console.error("Error fetching notifications:", error);
+    console.error("Error fetching loans:", error);
     throw error;
   }
 };
 
 export const updateLoan = async (userId: string, data: object) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/loan-application/${userId}`, data);
-    return response.data;
+    const response = await fetch(`/api/loans?id=${userId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    const result = await response.json();
+    return result;
   } catch (error) {
-    console.error("Error updating user:", error);
+    console.error("Error updating loan:", error);
     throw error;
   }
 };
 
 export const deleteLoan = async (userId: string) => {
   try {
-    const response = await axios.delete(`${API_BASE_URL}/loan-application/${userId}`);
-    return response.data;
+    const response = await fetch(`/api/loans?id=${userId}`, {
+      method: "DELETE",
+    });
+    const result = await response.json();
+    return result;
   } catch (error) {
-    console.error("Error deleting user:", error);
+    console.error("Error deleting loan:", error);
     throw error;
   }
 };

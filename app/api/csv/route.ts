@@ -1,25 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
-import { addcsv } from "@/app/(protected)/services/csv/api";
 
-// POST /api/csv
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 export async function POST(req: NextRequest) {
   try {
     const contentType = req.headers.get("content-type") || "";
+    let res;
     if (contentType.includes("multipart/form-data")) {
-      // Handle file upload with FormData
       const formData = await req.formData();
-      const file = formData.get("file") as File | null;
-      if (!file) {
-        return NextResponse.json({ error: "File is required" }, { status: 400 });
-      }
-      const result = await addcsv(file);
-      if (result.success) {
-        return NextResponse.json(result.data, { status: 201 });
-      } else {
-        return NextResponse.json({ error: result.error || "Failed to upload file" }, { status: 500 });
-      }
+      res = await fetch(`${BASE_URL}/csv`, {
+        method: "POST",
+        body: formData,
+      });
     } else {
       return NextResponse.json({ error: "Content-Type must be multipart/form-data for file uploads." }, { status: 400 });
+    }
+    const data = await res.json();
+    if (res.ok) {
+      return NextResponse.json(data, { status: res.status });
+    } else {
+      return NextResponse.json({ error: data?.error || "Failed to upload file" }, { status: res.status });
     }
   } catch (error) {
     console.error("POST Error:", error);

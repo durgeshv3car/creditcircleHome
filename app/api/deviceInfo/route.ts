@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fetchDevices, deleteDevice } from "@/app/(protected)/services/deviceInfo/api";
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // GET /api/deviceInfo
 export async function GET() {
   try {
-    const devices = await fetchDevices();
-    return NextResponse.json(devices);
+    const res = await fetch(`${BASE_URL}/devices`);
+    const data = await res.json();
+    if (res.ok) {
+      return NextResponse.json(data, { status: res.status });
+    } else {
+      return NextResponse.json({ error: data?.error || "Failed to fetch devices" }, { status: res.status });
+    }
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch devices" }, { status: 500 });
   }
@@ -19,11 +25,15 @@ export async function DELETE(req: NextRequest) {
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
-    const result = await deleteDevice(id);
-    if (result.success) {
-      return NextResponse.json({ success: true });
+    const res = await fetch(`${BASE_URL}/devices/${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+    const data = await res.json();
+    if (res.ok) {
+      return NextResponse.json(data, { status: res.status });
     } else {
-      return NextResponse.json({ error: "Failed to delete device" }, { status: 500 });
+      return NextResponse.json({ error: data?.error || "Failed to delete device" }, { status: res.status });
     }
   } catch (error) {
     return NextResponse.json({ error: "Failed to delete device" }, { status: 500 });

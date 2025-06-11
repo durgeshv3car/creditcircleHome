@@ -1,7 +1,5 @@
 import { format } from 'date-fns';
-import axios from "axios";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
+// Removed axios import as it's no longer needed
 
 /**
  * Uploads a CSV or XLSX file to the server
@@ -10,22 +8,14 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5
  */
 export const addcsv = async (file: File ) => {
     try {
-      // Create a FormData object to properly send the file
       const formData = new FormData();
       formData.append('file', file);
-      
-      const response = await axios.post(
-        `${API_BASE_URL}/csv`,
-        formData,
-        {
-          headers: {
-            // Don't set Content-Type when using FormData - axios will set it automatically
-            // with the correct boundary for multipart/form-data
-          },
-        }
-      );
-  
-      return { success: true, data: response.data };
+      const response = await fetch("/api/csv", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+      return { success: response.ok, data };
     } catch (error) {
       console.error("Error uploading file:", error);
       return { success: false, error: (error as any).message };

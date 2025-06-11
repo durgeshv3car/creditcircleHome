@@ -90,7 +90,7 @@ const EditModal: React.FC<EditModalProps> = ({
     if (result?.success) {
       refreshData();
       handleClose();
-      toast.success(result.message);
+      toast.success("MoneySmart updated successfully!");
     } else {
       toast.error(result?.message || "An error occurred.");
     }

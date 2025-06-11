@@ -118,8 +118,8 @@ const CreateModal: React.FC<CreateModalProps> = ({
       brandLogoFile?.file
     );
 
-    if (result.success) {
-      toast.success(result.message);
+    if (result?.success) {
+      toast.success((result as any).message || "Offer created successfully.");
       setMobileFile(null);
       setWebFile(null);
       setBannerFile(null);
@@ -127,7 +127,7 @@ const CreateModal: React.FC<CreateModalProps> = ({
       refreshData();
       handleClose();
     } else {
-      toast.error(result.message);
+      toast.error((result as any).message || "Failed to create offer.");
     }
   };
   const excludedFields = ["schedulexpire", "isactive", "ishome"];

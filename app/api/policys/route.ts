@@ -1,35 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fetchpolicy, addpolicy, updatepolicy, deletepolicy } from "@/app/(protected)/services/policys/api";
 
-// GET /api/policys
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 export async function GET() {
   try {
-    const policys = await fetchpolicy();
-    return NextResponse.json(policys);
+    const res = await fetch(`${BASE_URL}/policy`);
+    const data = await res.json();
+    if (res.ok) {
+      return NextResponse.json(data, { status: res.status });
+    } else {
+      return NextResponse.json({ error: data?.error || "Failed to fetch policies" }, { status: res.status });
+    }
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch policies" }, { status: 500 });
   }
 }
 
-// POST /api/policys
 export async function POST(req: NextRequest) {
   try {
-    const { title, description } = await req.json();
-    if (!title || !description) {
+    const body = await req.json();
+    if (!body.title || !body.description) {
       return NextResponse.json({ error: "Title and description are required" }, { status: 400 });
     }
-    const result = await addpolicy(title, description);
-    if (result.success) {
-      return NextResponse.json(result.data, { status: 201 });
+    const res = await fetch(`${BASE_URL}/policy`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      return NextResponse.json(data, { status: res.status });
     } else {
-      return NextResponse.json({ error: "Failed to add policy" }, { status: 500 });
+      return NextResponse.json({ error: data?.error || "Failed to add policy" }, { status: res.status });
     }
   } catch (error) {
     return NextResponse.json({ error: "Failed to add policy" }, { status: 500 });
   }
 }
 
-// PUT /api/policys?id=...
 export async function PUT(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -37,22 +45,26 @@ export async function PUT(req: NextRequest) {
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
-    const { title, description } = await req.json();
-    if (!title || !description) {
+    const body = await req.json();
+    if (!body.title || !body.description) {
       return NextResponse.json({ error: "Title and description are required" }, { status: 400 });
     }
-    const result = await updatepolicy(id, title, description);
-    if (result.success) {
-      return NextResponse.json({ success: true });
+    const res = await fetch(`${BASE_URL}/policy/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      return NextResponse.json(data, { status: res.status });
     } else {
-      return NextResponse.json({ error: "Failed to update policy" }, { status: 500 });
+      return NextResponse.json({ error: data?.error || "Failed to update policy" }, { status: res.status });
     }
   } catch (error) {
     return NextResponse.json({ error: "Failed to update policy" }, { status: 500 });
   }
 }
 
-// DELETE /api/policys?id=...
 export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -60,11 +72,14 @@ export async function DELETE(req: NextRequest) {
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
-    const result = await deletepolicy(id);
-    if (result.success) {
-      return NextResponse.json({ success: true });
+    const res = await fetch(`${BASE_URL}/policy/${id}`, {
+      method: "DELETE",
+    });
+    const data = await res.json();
+    if (res.ok) {
+      return NextResponse.json(data, { status: res.status });
     } else {
-      return NextResponse.json({ error: "Failed to delete policy" }, { status: 500 });
+      return NextResponse.json({ error: data?.error || "Failed to delete policy" }, { status: res.status });
     }
   } catch (error) {
     return NextResponse.json({ error: "Failed to delete policy" }, { status: 500 });

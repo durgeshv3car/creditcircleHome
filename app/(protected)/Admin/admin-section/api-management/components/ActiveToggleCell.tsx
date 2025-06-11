@@ -10,7 +10,7 @@ const ActiveToggleCell = ({ row,refreshData }: { row: any,refreshData:()=>void }
 
   const handleToggle = async (value: boolean) => {
     try {
-      const result = await updateApi(row.original.id,row.original.title, value);
+      const result = await updateApi(row.original.id,row.original.name, value);
       if (result.success) {
         toast.success(`Api-Management ${value ? "activated" : "deactivated"} successfully`);
         setIsActive(value);

@@ -1,70 +1,54 @@
-import axios from "axios";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
-
 export const deletepolicy = async (id: string) => {
   try {
-    await axios.delete(`${API_BASE_URL}/policy/${id}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
+    const response = await fetch(`/api/policys?id=${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
     });
-
-    return { success: true };
+    const data = await response.json();
+    return { success: response.ok, data };
   } catch (error) {
     console.error("Error deleting policy:", error);
     return { success: false };
   }
 };
 
-export const updatepolicy = async (id: string, title: string,description: string) => {
+export const updatepolicy = async (id: string, title: string, description: string) => {
   try {
-    await axios.put(
-      `${API_BASE_URL}/policy/${id}`,
-      { title ,description},
-      {
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-
-    return { success: true };
+    const response = await fetch(`/api/policys?id=${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, description }),
+    });
+    const data = await response.json();
+    return { success: response.ok, data };
   } catch (error) {
     console.error("Error updating policy:", error);
     return { success: false };
   }
 };
 
-
-export const addpolicy = async (title: string,description:string) => {
+export const addpolicy = async (title: string, description: string) => {
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/policy`,
-      { title,description },
-      {
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-
-    return { success: true, data: response.data };
+    const response = await fetch(`/api/policys`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, description }),
+    });
+    const data = await response.json();
+    return { success: response.ok, data };
   } catch (error) {
     console.error("Error adding policy:", error);
     return { success: false };
   }
 };
 
-
 export const fetchpolicy = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/policy`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    console.log("Fetched categories:", response.data);
-
-    return response.data.data;
+    const response = await fetch(`/api/policys`);
+    const data = await response.json();
+    return data;
   } catch (error) {
-    console.error("Error fetching categories:", error);
+    console.error("Error fetching policies:", error);
     return [];
   }
 };

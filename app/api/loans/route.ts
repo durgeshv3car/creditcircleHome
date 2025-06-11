@@ -1,17 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fetchLoans, updateLoan, deleteLoan } from "@/app/(protected)/services/loans/api";
 
-// GET /api/loans
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 export async function GET() {
   try {
-    const loans = await fetchLoans();
-    return NextResponse.json(loans);
+    const res = await fetch(`${BASE_URL}/all-loan-application`);
+    const data = await res.json();
+    if (res.ok) {
+      return NextResponse.json(data, { status: res.status });
+    } else {
+      return NextResponse.json({ error: data?.error || "Failed to fetch loans" }, { status: res.status });
+    }
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch loans" }, { status: 500 });
   }
 }
 
-// PUT /api/loans?id=...
 export async function PUT(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -19,15 +23,23 @@ export async function PUT(req: NextRequest) {
     if (!userId) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
-    const data = await req.json();
-    const result = await updateLoan(userId, data);
-    return NextResponse.json(result);
+    const body = await req.json();
+    const res = await fetch(`${BASE_URL}/loans/${userId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      return NextResponse.json(data, { status: res.status });
+    } else {
+      return NextResponse.json({ error: data?.error || "Failed to update loan" }, { status: res.status });
+    }
   } catch (error) {
     return NextResponse.json({ error: "Failed to update loan" }, { status: 500 });
   }
 }
 
-// DELETE /api/loans?id=...
 export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -35,8 +47,15 @@ export async function DELETE(req: NextRequest) {
     if (!userId) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
-    const result = await deleteLoan(userId);
-    return NextResponse.json(result);
+    const res = await fetch(`${BASE_URL}/loans/${userId}`, {
+      method: "DELETE",
+    });
+    const data = await res.json();
+    if (res.ok) {
+      return NextResponse.json(data, { status: res.status });
+    } else {
+      return NextResponse.json({ error: data?.error || "Failed to delete loan" }, { status: res.status });
+    }
   } catch (error) {
     return NextResponse.json({ error: "Failed to delete loan" }, { status: 500 });
   }

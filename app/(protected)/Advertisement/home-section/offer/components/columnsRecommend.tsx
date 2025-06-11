@@ -19,9 +19,7 @@ import  HomeToggleCell  from "./HomeToggleCell";
 import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import {
-  toggleOfferStatus,
   deleteOffer,
-  toggleHomeStatus,
 } from "@/app/(protected)/services/offers/api";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 

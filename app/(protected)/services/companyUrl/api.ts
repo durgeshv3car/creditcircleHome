@@ -1,16 +1,11 @@
-import axios from "axios";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
-
 export const deletecompanyUrl = async (id: string) => {
   try {
-    await axios.delete(`${API_BASE_URL}/credit-score-url/${id}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
+    const response = await fetch(`/api/companyUrl?id=${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
     });
-
-    return { success: true };
+    const data = await response.json();
+    return { success: response.ok, data };
   } catch (error) {
     console.error("Error deleting companyUrl:", error);
     return { success: false };
@@ -19,52 +14,41 @@ export const deletecompanyUrl = async (id: string) => {
 
 export const updatecompanyUrl = async (id: string, companyUrl: string) => {
   try {
-    await axios.put(
-      `${API_BASE_URL}/credit-score-url/${id}`,
-      { companyUrl },
-      {
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-
-    return { success: true };
+    const response = await fetch(`/api/companyUrl?id=${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ companyUrl }),
+    });
+    const data = await response.json();
+    return { success: response.ok, data };
   } catch (error) {
     console.error("Error updating companyUrl:", error);
     return { success: false };
   }
 };
 
-
 export const addcompanyUrl = async (companyUrl: string) => {
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/credit-score-url`,
-      { companyUrl },
-      {
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-
-    return { success: true, data: response.data };
+    const response = await fetch(`/api/companyUrl`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ companyUrl }),
+    });
+    const data = await response.json();
+    return { success: response.ok, data };
   } catch (error) {
     console.error("Error adding companyUrl:", error);
     return { success: false };
   }
 };
 
-
 export const fetchcompanyUrl = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/credit-score-url`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    console.log("Fetched categories:", response.data);
-
-    return response.data.data;
+    const response = await fetch(`/api/companyUrl`);
+    const data = await response.json();
+    return data;
   } catch (error) {
-    console.error("Error fetching categories:", error);
+    console.error("Error fetching companyUrl:", error);
     return [];
   }
 };

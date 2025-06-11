@@ -24,7 +24,7 @@ import {
   Row,
   Table,
 } from '@tanstack/react-table';
-import { scheduleDeleteReferImage,toggleReferImageStatus,deleteReferImage } from "@/app/(protected)/services/refer-earns/api";
+import { scheduleDeleteReferImage,deleteReferImage } from "@/app/(protected)/services/refer-earns/api";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 export interface SliderData {
   id: string;

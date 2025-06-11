@@ -101,14 +101,14 @@ const CreateModal: React.FC<CreateModalProps> = ({
     );
 
     if (result.success) {
-      toast.success(result.message);
+      toast.success("Operation successful.");
       console.log("Upload success:", result.data);
       setMobileFile(null);
       setWebFile(null);
       refreshData();
       handleClose();
     } else {
-      toast.error(result.message);
+      toast.error("An error occurred.");
     }
   };
   const excludedFields = ["schedulexpire", "isactive"];

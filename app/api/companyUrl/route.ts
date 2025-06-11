@@ -1,40 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  fetchcompanyUrl,
-  addcompanyUrl,
-  updatecompanyUrl,
-  deletecompanyUrl
-} from "@/app/(protected)/services/companyUrl/api";
 
-// GET /api/companyUrl
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 export async function GET() {
   try {
-    const urls = await fetchcompanyUrl();
-    return NextResponse.json(urls);
+    const res = await fetch(`${BASE_URL}/credit-score-url`);
+    const data = await res.json();
+    if (res.ok) {
+      return NextResponse.json(data, { status: res.status });
+    } else {
+      return NextResponse.json({ error: data?.error || "Failed to fetch company URLs" }, { status: res.status });
+    }
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch company URLs" }, { status: 500 });
   }
 }
 
-// POST /api/companyUrl
 export async function POST(req: NextRequest) {
   try {
-    const { companyUrl } = await req.json();
-    if (!companyUrl) {
+    const body = await req.json();
+    if (!body.companyUrl) {
       return NextResponse.json({ error: "companyUrl is required" }, { status: 400 });
     }
-    const result = await addcompanyUrl(companyUrl);
-    if (result.success) {
-      return NextResponse.json(result.data, { status: 201 });
+    const res = await fetch(`${BASE_URL}/credit-score-url`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      return NextResponse.json(data, { status: res.status });
     } else {
-      return NextResponse.json({ error: "Failed to add companyUrl" }, { status: 500 });
+      return NextResponse.json({ error: data?.error || "Failed to add companyUrl" }, { status: res.status });
     }
   } catch (error) {
     return NextResponse.json({ error: "Failed to add companyUrl" }, { status: 500 });
   }
 }
 
-// PUT /api/companyUrl?id=...
 export async function PUT(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -42,22 +45,26 @@ export async function PUT(req: NextRequest) {
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
-    const { companyUrl } = await req.json();
-    if (!companyUrl) {
+    const body = await req.json();
+    if (!body.companyUrl) {
       return NextResponse.json({ error: "companyUrl is required" }, { status: 400 });
     }
-    const result = await updatecompanyUrl(id, companyUrl);
-    if (result.success) {
-      return NextResponse.json({ success: true });
+    const res = await fetch(`${BASE_URL}/credit-score-url/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      return NextResponse.json(data, { status: res.status });
     } else {
-      return NextResponse.json({ error: "Failed to update companyUrl" }, { status: 500 });
+      return NextResponse.json({ error: data?.error || "Failed to update companyUrl" }, { status: res.status });
     }
   } catch (error) {
     return NextResponse.json({ error: "Failed to update companyUrl" }, { status: 500 });
   }
 }
 
-// DELETE /api/companyUrl?id=...
 export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -65,11 +72,14 @@ export async function DELETE(req: NextRequest) {
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
-    const result = await deletecompanyUrl(id);
-    if (result.success) {
-      return NextResponse.json({ success: true });
+    const res = await fetch(`${BASE_URL}/credit-score-url/${id}`, {
+      method: "DELETE",
+    });
+    const data = await res.json();
+    if (res.ok) {
+      return NextResponse.json(data, { status: res.status });
     } else {
-      return NextResponse.json({ error: "Failed to delete companyUrl" }, { status: 500 });
+      return NextResponse.json({ error: data?.error || "Failed to delete companyUrl" }, { status: res.status });
     }
   } catch (error) {
     return NextResponse.json({ error: "Failed to delete companyUrl" }, { status: 500 });
