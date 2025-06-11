@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "@/lib/getToken";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export async function GET() {
   try {
-    const res = await fetch(`${BASE_URL}/otp/get-all-profile`);
+    const token = await getToken();
+    const res = await fetch(`${BASE_URL}/otp/get-all-profile`, {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    });
     const data = await res.json();
     if (res.ok) {
       return NextResponse.json(data, { status: res.status });
@@ -24,9 +30,13 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
     const body = await req.json();
+    const token = await getToken();
     const res = await fetch(`${BASE_URL}/otp/update-profile/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
       body: JSON.stringify(body),
     });
     const data = await res.json();
@@ -47,8 +57,12 @@ export async function DELETE(req: NextRequest) {
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
+    const token = await getToken();
     const res = await fetch(`${BASE_URL}/otp/delete-profile/${id}`, {
       method: "DELETE",
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
     });
     const data = await res.json();
     if (res.ok) {

@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "@/lib/getToken";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export async function GET() {
   try {
-    const res = await fetch(`${BASE_URL}/logs`);
+    const token = await getToken();
+    const res = await fetch(`${BASE_URL}/logs`, {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    });
     const data = await res.json();
     if (res.ok) {
       return NextResponse.json(data, { status: res.status });

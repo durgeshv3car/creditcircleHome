@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "@/lib/getToken";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export async function GET() {
   try {
-    const res = await fetch(`${BASE_URL}/credit-score-url`);
+    const token = await getToken();
+    const res = await fetch(`${BASE_URL}/credit-score-url`, {
+      headers: {
+        Authorization: token || "",
+      },
+    });
     const data = await res.json();
     if (res.ok) {
       return NextResponse.json(data, { status: res.status });
@@ -18,13 +24,17 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    const token = await getToken();
     const body = await req.json();
     if (!body.companyUrl) {
       return NextResponse.json({ error: "companyUrl is required" }, { status: 400 });
     }
     const res = await fetch(`${BASE_URL}/credit-score-url`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token || "",
+      },
       body: JSON.stringify(body),
     });
     const data = await res.json();
@@ -40,6 +50,7 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    const token = await getToken();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     if (!id) {
@@ -51,7 +62,10 @@ export async function PUT(req: NextRequest) {
     }
     const res = await fetch(`${BASE_URL}/credit-score-url/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token || "",
+      },
       body: JSON.stringify(body),
     });
     const data = await res.json();
@@ -67,6 +81,7 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
+    const token = await getToken();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     if (!id) {
@@ -74,6 +89,9 @@ export async function DELETE(req: NextRequest) {
     }
     const res = await fetch(`${BASE_URL}/credit-score-url/${id}`, {
       method: "DELETE",
+      headers: {
+        Authorization: token || "",
+      },
     });
     const data = await res.json();
     if (res.ok) {

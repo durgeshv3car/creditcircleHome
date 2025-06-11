@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "@/lib/getToken";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -6,7 +7,15 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type") || "";
-    const res = await fetch(`${BASE_URL}/banner/images/${type}`);
+    const token = await getToken();
+    const res = await fetch(
+      `${BASE_URL}/banner/images/${type}`,
+      {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      }
+    );
     if (!res.ok) {
       return NextResponse.json(
         { error: "Failed to fetch data" },
@@ -27,18 +36,25 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const contentType = req.headers.get("content-type") || "";
+    const token = await getToken();
     let res;
     if (contentType.includes("multipart/form-data")) {
       const formData = await req.formData();
       res = await fetch(`${BASE_URL}/banner/upload`, {
         method: "POST",
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
         body: formData,
       });
     } else {
       const body = await req.json();
       res = await fetch(`${BASE_URL}/banner/upload`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
         body: JSON.stringify(body),
       });
     }
@@ -62,18 +78,25 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const contentType = req.headers.get("content-type") || "";
+    const token = await getToken();
     let res;
     if (contentType.includes("multipart/form-data")) {
       const formData = await req.formData();
       res = await fetch(`${BASE_URL}/banner/image`, {
         method: "PUT",
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
         body: formData,
       });
     } else {
       const body = await req.json();
       res = await fetch(`${BASE_URL}/banner/image`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
         body: JSON.stringify(body),
       });
     }
@@ -101,9 +124,13 @@ export async function DELETE(req: NextRequest) {
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
+    const token = await getToken();
     const res = await fetch(`${BASE_URL}/banner/image`, {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
       body: JSON.stringify({ id }),
     });
     if (!res.ok) {

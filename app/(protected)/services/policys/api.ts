@@ -46,7 +46,7 @@ export const fetchpolicy = async () => {
   try {
     const response = await fetch(`/api/policys`);
     const data = await response.json();
-    return data;
+    return data.data;
   } catch (error) {
     console.error("Error fetching policies:", error);
     return [];

@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "@/lib/getToken";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // GET /api/deviceInfo
 export async function GET() {
   try {
-    const res = await fetch(`${BASE_URL}/devices`);
+    const token = await getToken();
+    const res = await fetch(`${BASE_URL}/devices`, {
+      headers: {
+        Authorization: token || "",
+      },
+    });
     const data = await res.json();
     if (res.ok) {
       return NextResponse.json(data, { status: res.status });
@@ -20,6 +26,7 @@ export async function GET() {
 // DELETE /api/deviceInfo?id=...
 export async function DELETE(req: NextRequest) {
   try {
+    const token = await getToken();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     if (!id) {
@@ -27,7 +34,10 @@ export async function DELETE(req: NextRequest) {
     }
     const res = await fetch(`${BASE_URL}/devices/${id}`, {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token || "",
+      },
     });
     const data = await res.json();
     if (res.ok) {

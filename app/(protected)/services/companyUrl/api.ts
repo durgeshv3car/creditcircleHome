@@ -46,7 +46,7 @@ export const fetchcompanyUrl = async () => {
   try {
     const response = await fetch(`/api/companyUrl`);
     const data = await response.json();
-    return data;
+    return data.data;
   } catch (error) {
     console.error("Error fetching companyUrl:", error);
     return [];

@@ -1,3 +1,13 @@
+import { auth } from "@/lib/auth";
+
+  const session = await auth();
+  let token = "";
+  if (session?.user && "token" in session.user) {
+   
+    token = (session.user as { token: string }).token;
+   
+  }
+
 export const deleteDevice = async (id: string) => {
   try {
     const response = await fetch(`/api/deviceInfo?id=${id}`, {
@@ -13,10 +23,12 @@ export const deleteDevice = async (id: string) => {
 };
 
 export const fetchDevices = async () => {
+
   try {
+    
     const response = await fetch(`/api/deviceInfo`);
     const data = await response.json();
-    return data;
+    return data.data;
   } catch (error) {
     console.error("Error fetching devices:", error);
     return [];

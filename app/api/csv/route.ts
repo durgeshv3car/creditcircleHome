@@ -1,15 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "@/lib/getToken";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export async function POST(req: NextRequest) {
   try {
+    const token = await getToken();
     const contentType = req.headers.get("content-type") || "";
     let res;
     if (contentType.includes("multipart/form-data")) {
       const formData = await req.formData();
       res = await fetch(`${BASE_URL}/csv`, {
         method: "POST",
+        headers: {
+          Authorization: token || "",
+        },
         body: formData,
       });
     } else {

@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "@/lib/getToken";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 
 // GET /api/ourServices?type=serviceType
 export async function GET(req: NextRequest) {
   try {
+    const token = await getToken();
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type") || "";
-    const res = await fetch(`${BASE_URL}/service/${type}`);
+    const res = await fetch(`${BASE_URL}/service/${type}`,
+      { headers: { Authorization: token || "" } }
+    );
     if (!res.ok) {
       return NextResponse.json(
         { error: "Failed to fetch data" },
@@ -28,19 +32,21 @@ export async function GET(req: NextRequest) {
 // POST /api/ourServices
 export async function POST(req: NextRequest) {
   try {
+    const token = await getToken();
     const contentType = req.headers.get("content-type") || "";
     let res;
     if (contentType.includes("multipart/form-data")) {
       const formData = await req.formData();
       res = await fetch(`${BASE_URL}/service`, {
         method: "POST",
+        headers: { Authorization: token || "" },
         body: formData,
       });
     } else {
       const body = await req.json();
       res = await fetch(`${BASE_URL}/service`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: token || "" },
         body: JSON.stringify(body),
       });
     }
@@ -65,19 +71,21 @@ export async function POST(req: NextRequest) {
 // PUT /api/ourServices
 export async function PUT(req: NextRequest) {
   try {
+    const token = await getToken();
     const contentType = req.headers.get("content-type") || "";
     let res;
     if (contentType.includes("multipart/form-data")) {
       const formData = await req.formData();
       res = await fetch(`${BASE_URL}/service`, {
         method: "PUT",
+        headers: { Authorization: token || "" },
         body: formData,
       });
     } else {
       const body = await req.json();
       res = await fetch(`${BASE_URL}/service`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: token || "" },
         body: JSON.stringify(body),
       });
     }
@@ -102,6 +110,7 @@ export async function PUT(req: NextRequest) {
 // DELETE /api/ourServices?id=serviceId
 export async function DELETE(req: NextRequest) {
   try {
+    const token = await getToken();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     if (!id) {
@@ -109,7 +118,7 @@ export async function DELETE(req: NextRequest) {
     }
     const res = await fetch(`${BASE_URL}/service/${id}`, {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: token || "" },
     });
     if (!res.ok) {
       return NextResponse.json(

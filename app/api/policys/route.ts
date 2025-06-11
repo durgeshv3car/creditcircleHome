@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "@/lib/getToken";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export async function GET() {
   try {
-    const res = await fetch(`${BASE_URL}/policy`);
+    const token = await getToken();
+    const res = await fetch(`${BASE_URL}/policy`, {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    });
     const data = await res.json();
     if (res.ok) {
       return NextResponse.json(data, { status: res.status });
@@ -22,9 +28,13 @@ export async function POST(req: NextRequest) {
     if (!body.title || !body.description) {
       return NextResponse.json({ error: "Title and description are required" }, { status: 400 });
     }
+    const token = await getToken();
     const res = await fetch(`${BASE_URL}/policy`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
       body: JSON.stringify(body),
     });
     const data = await res.json();
@@ -49,9 +59,13 @@ export async function PUT(req: NextRequest) {
     if (!body.title || !body.description) {
       return NextResponse.json({ error: "Title and description are required" }, { status: 400 });
     }
+    const token = await getToken();
     const res = await fetch(`${BASE_URL}/policy/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
       body: JSON.stringify(body),
     });
     const data = await res.json();
@@ -72,8 +86,12 @@ export async function DELETE(req: NextRequest) {
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
+    const token = await getToken();
     const res = await fetch(`${BASE_URL}/policy/${id}`, {
       method: "DELETE",
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
     });
     const data = await res.json();
     if (res.ok) {

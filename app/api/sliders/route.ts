@@ -1,5 +1,6 @@
 // API Route (route.ts)
 import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "@/lib/getToken";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -7,8 +8,15 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type") || "";
-
-    const res = await fetch(`${BASE_URL}/banner/images/${type}`);
+    const token = await getToken();
+    const res = await fetch(
+      `${BASE_URL}/banner/images/${type}`,
+      {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      }
+    );
 
     if (!res.ok) {
       return NextResponse.json(

@@ -1,9 +1,12 @@
 export const deleteUser = async (id: string, adminId: string) => {
   try {
-    const response = await fetch(`/api/adminUsers?id=${id}&adminId=${adminId}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-    });
+    const response = await fetch(
+      `/api/adminUsers?id=${id}&adminId=${adminId}`,
+      {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
     const data = await response.json();
     return { success: response.ok, data };
   } catch (error) {
@@ -40,7 +43,7 @@ export const updateUser = async (
 
 export const fetchUsers = async () => {
   try {
-    const response = await fetch(`/api/adminUsers`);
+    const response = await fetch(`/api/adminUsers`, {});
     const data = await response.json();
     return data;
   } catch (error) {

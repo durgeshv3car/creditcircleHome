@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "@/lib/getToken";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // GET /api/notifications/app
 export async function GET(req: NextRequest) {
   try {
-    const res = await fetch(`${BASE_URL}/getallnotifications?type=sms`);
+     const token = await getToken();
+        const res = await fetch(`${BASE_URL}/getallnotifications?type=sms`, {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        });
     const data = await res.json();
     if (res.ok) {
       return NextResponse.json(data, { status: res.status });
