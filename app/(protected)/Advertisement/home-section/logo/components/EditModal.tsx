@@ -39,9 +39,9 @@ const EditModal: React.FC<EditModalProps> = ({
   const [mobileFile, setMobileFile] = useState<FileWithPreview | null>(null);
   const [webFile, setWebFile] = useState<FileWithPreview | null>(null);
 
-const Logo_DIMENSIONS = { width: 150, height: 150 };
+const Logo_DIMENSIONS = { width: 150*2, height: 150*2 };
   const WEB_DIMENSIONS = { width: 1920, height: 970 };
-  const MOBILE_DIMENSIONS = { width: 150, height: 150 };
+  const MOBILE_DIMENSIONS = { width: 150*2, height: 150*2 };
     const dimensions ={
     web: WEB_DIMENSIONS,
     mobile: MOBILE_DIMENSIONS,

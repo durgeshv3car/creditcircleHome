@@ -11,7 +11,7 @@ import { auth } from "@/lib/auth";
 import { jwtDecode } from "jwt-decode";
 import HeaderGreet from "./header-greet";
 interface DecodedToken {
-  username: string;
+  name: string;
   
 }
 
@@ -24,7 +24,7 @@ const DashCodeHeader = async() => {
     if (session?.user && 'token' in session.user) {
       const decoded = jwtDecode<DecodedToken>((session.user as { token: string }).token);
       
-      name = decoded.username;
+      name = decoded.name;
     }
 
   return (

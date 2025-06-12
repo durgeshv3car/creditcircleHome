@@ -45,10 +45,10 @@ const CreateModal: React.FC<CreateModalProps> = ({
     null
   );
 
-  const Logo_DIMENSIONS = { width: 150, height: 150 };
+  const Logo_DIMENSIONS = { width: 150*2, height: 150*2 };
   const Web_DIMENSIONS = { width: 1920, height: 970 };
-  const Banner_DIMENSIONS = { width: 356, height: 180 };
-  const Mobile_DIMENSIONS = { width: 150, height: 280 };
+  const Banner_DIMENSIONS = { width: 356*2, height: 180*2 };
+  const Mobile_DIMENSIONS = { width: 150*2, height: 280*2 };
   const dimensions={
     brandLogo: Logo_DIMENSIONS,
     web: Web_DIMENSIONS,

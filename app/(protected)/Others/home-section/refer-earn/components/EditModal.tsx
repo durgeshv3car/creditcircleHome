@@ -37,7 +37,7 @@ const EditModal: React.FC<EditModalProps> = ({
   const [webFile, setWebFile] = useState<FileWithPreview | null>(null);
 
   const Web_DIMENSIONS = { width: 1920, height: 970 };
-  const Mobile_DIMENSIONS = { width: 356, height: 180 };
+  const Mobile_DIMENSIONS = { width: 356*2, height: 180*2 };
    const dimensions={
     web: Web_DIMENSIONS,
     mobile: Mobile_DIMENSIONS,
