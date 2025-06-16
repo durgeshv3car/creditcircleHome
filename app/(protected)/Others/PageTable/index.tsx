@@ -48,7 +48,7 @@ import TablePagination from "./table-pagination";
 import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 
-type ModalType = "faq" | "policy" | "creditScore";
+type ModalType = "faq" | "policy" | "creditScore" | "walletPoints";
 
 interface EditModalProps<T> {
   id: string;
@@ -102,6 +102,18 @@ const modalMap: Record<
       }
     ),
   },
+  walletPoints: {
+    create: dynamic(
+      () => import("../page-section/wallet-points/components/Create"),
+      { ssr: false }
+    ) as CreateComponent,
+    edit: dynamic(
+      () => import("../page-section/wallet-points/components/EditModal"),
+      {
+        ssr: false,
+      }
+    ),
+  },
 };
 
 interface TableProps<T> {
@@ -133,8 +145,11 @@ const ExampleTwo = <T,>({
   const closeCreateModal = () => setIsCreateOpen(false);
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnsField, setColumnsField] = React.useState<string[]>([]);
   const [pageSize, setPageSize] = React.useState(20);
@@ -143,7 +158,7 @@ const ExampleTwo = <T,>({
     pageSize,
   });
 
-  const [globalFilter, setGlobalFilter] = React.useState(""); // ✅ ADDED
+  const [globalFilter, setGlobalFilter] = React.useState(""); 
 
   const table = useReactTable({
     data: tableData,
@@ -170,7 +185,8 @@ const ExampleTwo = <T,>({
     // ✅ Custom global filter for "title" and "companyUrl"
     globalFilterFn: (row, columnId, filterValue) => {
       const title = row.getValue("title")?.toString().toLowerCase() ?? "";
-      const companyUrl = row.getValue("companyUrl")?.toString().toLowerCase() ?? "";
+      const companyUrl =
+        row.getValue("companyUrl")?.toString().toLowerCase() ?? "";
       const filter = filterValue?.toLowerCase() ?? "";
       return title.includes(filter) || companyUrl.includes(filter);
     },

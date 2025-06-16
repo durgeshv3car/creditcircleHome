@@ -372,6 +372,13 @@ export function getMenuList(
           icon: "heroicons-outline:shield-check",
           children: [],
         },
+          {
+          href: "/Others/page-section/wallet-points",
+          label: "WalletPoints",
+          active: pathname === "/Others/page-section/wallet-points",
+          icon: "heroicons-outline:shield-check",
+          children: [],
+        },
       ],
     },
   ];
