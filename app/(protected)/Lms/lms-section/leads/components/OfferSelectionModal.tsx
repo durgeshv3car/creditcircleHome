@@ -27,6 +27,7 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { DataProps } from "../table/columns";
+import { createNotifications } from "@/app/(protected)/services/notifications/app/api";
 
 // Define types for props
 interface Offer {
@@ -104,13 +105,9 @@ useEffect(() => {
       type: `${sending}_create`,
     };
 
-    const response = await axios.post(`api/notifications`, payload, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await createNotifications(payload);
 
-    console.log("Offer submitted successfully:", response.data);
+    console.log("Offer submitted successfully:", response?.data);
 
     // Redirect based on type
     if (type === "Email") {

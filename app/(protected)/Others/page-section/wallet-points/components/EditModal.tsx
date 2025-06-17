@@ -41,7 +41,7 @@ const EditModal: React.FC<EditModalProps> = ({
 
   const handleClose = () => {
     onClose();
-    router.push("/Others/page-section/credit-score", { scroll: false });
+    router.push("/Others/page-section/wallet-points", { scroll: false });
   };
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

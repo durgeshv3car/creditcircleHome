@@ -114,7 +114,7 @@ export const columnsCategory = (
                   size="icon"
                   className="w-7 h-7 border-default-200 dark:border-default-300 text-default-400"
                   onClick={() =>
-                    router.push(`/Others/page-section/credit-score?id=${row.original.id}`)
+                    router.push(`/Others/page-section/wallet-points?id=${row.original.id}`)
                   }
                 >
                   <SquarePen className="w-3 h-3" />

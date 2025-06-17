@@ -22,3 +22,26 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Failed to fetch notifications" }, { status: 500 });
   }
 }
+
+export async function POST(req: NextRequest) {
+  try {
+    const token = await getToken();
+    const body = await req.json();
+    const res = await fetch(`${BASE_URL}/notifications`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token || "",
+      },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      return NextResponse.json(data, { status: res.status });
+    } else {
+      return NextResponse.json({ error: data?.error || "Failed to create notification" }, { status: res.status });
+    }
+  } catch (error) {
+    return NextResponse.json({ error: "Failed to create notification" }, { status: 500 });
+  }
+}

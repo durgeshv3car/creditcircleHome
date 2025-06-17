@@ -26,9 +26,7 @@ export async function POST(req: NextRequest) {
   try {
     const token = await getToken();
     const body = await req.json();
-    if (!body.wallet) {
-      return NextResponse.json({ error: "wallet is required" }, { status: 400 });
-    }
+   
     const res = await fetch(`${BASE_URL}/wallet`, {
       method: "POST",
       headers: {
@@ -57,9 +55,6 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
     const body = await req.json();
-    if (!body.wallet) {
-      return NextResponse.json({ error: "wallet is required" }, { status: 400 });
-    }
     const res = await fetch(`${BASE_URL}/wallet/${id}`, {
       method: "PUT",
       headers: {

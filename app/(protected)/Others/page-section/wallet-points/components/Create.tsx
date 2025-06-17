@@ -65,7 +65,7 @@ const CreateModal: React.FC<CreateModalProps> = ({
 
         <div className="space-y-3">
           <div>
-            <label className="block text-sm font-medium">Company Url</label>
+            <label className="block text-sm font-medium">title</label>
             <Input
               name="title"
               value={title}
