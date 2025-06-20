@@ -83,7 +83,7 @@ const EditModal: React.FC<EditModalProps> = ({
     const fetchData = async () => {
       try {
         const result = await fetchCategories();
-        console.log("result", result.status);
+       
   
         setCategories(result);
       } catch (error) {

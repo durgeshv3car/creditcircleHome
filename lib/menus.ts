@@ -379,6 +379,13 @@ export function getMenuList(
           icon: "heroicons-outline:shield-check",
           children: [],
         },
+          {
+          href: "/Others/home-section/redeem-list",
+          label: "RedeemList",
+          active: pathname === "/Others/home-section/redeem-list",
+          icon: "heroicons-outline:shield-check",
+          children: [],
+        },
       ],
     },
   ];

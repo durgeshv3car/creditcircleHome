@@ -10,6 +10,7 @@ import axios from "axios";
 import { Switch } from "@/components/ui/switch";
 import { updateReferImage } from "@/app/(protected)/services/refer-earns/api";
 import type { FileWithPreview } from "../../../components/ImageUpload";
+import { updateRedeemItem } from "@/app/(protected)/services/redeemList/api";
 interface TableRow {
   id: string;
   title?: string;
@@ -42,7 +43,6 @@ const EditModal: React.FC<EditModalProps> = ({
     web: Web_DIMENSIONS,
     mobile: Mobile_DIMENSIONS,
   };
-
   // Find the row data based on the id
   useEffect(() => {
     if (id && tableData) {
@@ -60,7 +60,7 @@ const EditModal: React.FC<EditModalProps> = ({
 
   const handleClose = () => {
     onClose();
-    router.push("/Others/home-section/refer-earn", { scroll: false });
+    router.push("/Others/home-section/redeem-list", { scroll: false });
   };
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,12 +68,12 @@ const EditModal: React.FC<EditModalProps> = ({
   };
 
   const refreshData = () => setRefresh((prev) => !prev);
-  const type = "refer";
+  const type = "redeem";
 
   const handleUpdate = async () => {
     if (!id) return;
 
-    const result = await updateReferImage(
+    const result = await updateRedeemItem(
       id,
       type,
       dimensions,

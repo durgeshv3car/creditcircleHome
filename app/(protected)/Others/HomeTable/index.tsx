@@ -48,7 +48,7 @@ import TablePagination from "./table-pagination";
 import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 
-type ModalType = 'money' | 'refer' ;
+type ModalType = 'money' | 'refer' | 'redeem' ;
 
 // Define the props interface for the edit modal components
 interface EditModalProps<T> {
@@ -91,6 +91,15 @@ const modalMap: Record<ModalType, {
       { ssr: false }
     ) as CreateComponent,
     edit: dynamic(() => import("../home-section/refer-earn/components/EditModal"), {
+      ssr: false,
+    }),
+  },
+   redeem: {
+    create: dynamic(
+      () => import("../home-section/redeem-list/components/Create"),
+      { ssr: false }
+    ) as CreateComponent,
+    edit: dynamic(() => import("../home-section/redeem-list/components/EditModal"), {
       ssr: false,
     }),
   },

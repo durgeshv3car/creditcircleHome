@@ -27,6 +27,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           });
 
           const data = response.data;
+        
 
           return {
             id: data.id,
@@ -56,13 +57,15 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     },
     async session({ session, token }: { session: any; token: any }) {
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+      
 
       try {
-        await axios.get(`${API_BASE_URL}/auth/user/${token.id}`, {
+       const res =await axios.get(`${API_BASE_URL}/auth/user/${token.id}`, {
           headers: {
             Authorization: `Bearer ${token.token}`,
           },
         });
+        
 
         if (session.user) {
           session.user.id = token.id;

@@ -1,4 +1,5 @@
 import nextra from "nextra";
+import { hostname } from "os";
 
 /** @type {import('next').NextConfig} */
 
@@ -53,6 +54,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "imageccp.s3.ap-south-1.amazonaws.com",
       },
+      {
+        protocol:"https",
+        hostname:"imageccp.s3.amazonaws.com"
+      }
     ],
   },
 };

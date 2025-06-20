@@ -61,15 +61,15 @@ export function MenuClassic({role,permissions}: { role: string,permissions: stri
 
   return (
     <>
-      {isDesktop && (
+      
         <div className="flex items-center justify-between  px-4 py-4">
           <Logo />
           <SidebarHoverToggle />
         </div>
-      )}
+
 
       <ScrollArea className="[&>div>div[style]]:!block" dir={direction}>
-        {isDesktop && (
+    
           <div
             className={cn(" space-y-3 mt-6 ", {
               "px-4": !collapsed || hovered,
@@ -78,7 +78,7 @@ export function MenuClassic({role,permissions}: { role: string,permissions: stri
           >
             {/* <SearchBar /> */}
           </div>
-        )}
+      
 
         <nav className="mt-8 h-full w-full">
           <ul className=" h-full flex flex-col min-h-[calc(100vh-48px-36px-16px-32px)] lg:min-h-[calc(100vh-32px-40px-32px)] items-start space-y-1 px-4">

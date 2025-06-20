@@ -48,7 +48,9 @@ export const columns: ColumnDef<DataProps>[] = [
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => (
-      <span className="line-clamp-2">{row.original.body || "No description"}</span>
+      <span className="line-clamp-2">
+        {row.original.body || "No description"}
+      </span>
     ),
   },
   {
@@ -57,7 +59,12 @@ export const columns: ColumnDef<DataProps>[] = [
     cell: ({ row }) => {
       const url = row.original.url;
       return url ? (
-        <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-500 underline"
+        >
           {url}
         </a>
       ) : (
@@ -69,13 +76,30 @@ export const columns: ColumnDef<DataProps>[] = [
     accessorKey: "image",
     header: "Image",
     cell: ({ row }) => {
-      const imageUrl = row.original.image;
+      const imageUrl = row.original.offer?.offerBanner?.banner;
       return imageUrl ? (
         <Avatar className="w-10 h-10">
           <AvatarImage src={imageUrl} alt="Image" />
         </Avatar>
       ) : (
         <span className="text-gray-500">No Image</span>
+      );
+    },
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      const statusColors: Record<string, string> = {
+        sent: "bg-success/20 text-success",
+        failed: "bg-destructive/20 text-destructive",
+      };
+      const status = row.getValue<string>("status");
+      const statusStyles = statusColors[status] || "default";
+      return (
+        <Badge className={cn("rounded-full px-5", statusStyles)}>
+          {status}{" "}
+        </Badge>
       );
     },
   },

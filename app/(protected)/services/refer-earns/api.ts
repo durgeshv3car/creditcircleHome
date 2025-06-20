@@ -1,4 +1,4 @@
-import axios from "axios";
+
 
 // Use the Next.js API proxy endpoints instead of direct backend URLs
 export const uploadReferImage = async (formData: {
