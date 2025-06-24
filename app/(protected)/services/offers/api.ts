@@ -51,7 +51,7 @@ export const updateOffer = async (
     if (brandLogoFile) formDataSend.append("brandLogo", brandLogoFile);
     if (editedData.redirectUrl) formDataSend.append("redirectUrl", editedData.redirectUrl);
     if (editedData.isActive !== undefined) formDataSend.append("isActive", String(editedData.isActive));
-    if (editedData.isHome !== undefined) formDataSend.append("isHome", String(editedData.isHome));
+    if (editedData.isHome !== undefined) formDataSend.append("isHome", String(editedData.isHome ));
 
     const response = await fetch("/api/offers", {
       method: "PUT",

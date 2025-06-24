@@ -12,7 +12,7 @@ const HomeToggleCell = ({
   row: any;
   setRefresh: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  const [isActive, setIsActive] = React.useState(row.original.isHome);
+  const [isHome, setIsHome] = React.useState(row.original.isHome);
   
   const Logo_DIMENSIONS = { width: 150, height: 150 };
   const Web_DIMENSIONS = { width: 1920, height: 970 };
@@ -24,6 +24,25 @@ const HomeToggleCell = ({
     banner: Banner_DIMENSIONS,
     mobile: Mobile_DIMENSIONS,
   }
+    const logoData = row.original.offerBanner;
+
+      const logoimageUrls =
+      logoData && typeof logoData=== "string"
+          ? JSON.parse(logoData)
+          : logoData;
+
+   const BannerData = row.original.offerBanner;
+
+      const bannerimageUrls =
+      BannerData && typeof BannerData === "string"
+          ? JSON.parse(BannerData)
+          : BannerData;
+  const offerData = row.original.offerBanner;
+
+      const offerimageUrls =
+       offerData && typeof  offerData === "string"
+          ? JSON.parse( offerData)
+          :  offerData;
 
   const handleToggle = async (value: boolean) => {
     try {
@@ -31,21 +50,21 @@ const HomeToggleCell = ({
         row.original.id,
         row.original.type,
         dimensions,
-        { active: value },
+        { isHome: value },
         null,
         null,
         null,
         null,
-        row.original.mobileUrl || "",
-        row.original.webUrl || "",
-        row.original.bannerUrl || "",
-        row.original.logoUrl || ""
+        offerimageUrls.mobile || "",
+        offerimageUrls.web || "",
+        bannerimageUrls.banner || "",
+        logoimageUrls.logo || ""
       );
       if (result.success) {
         toast.success(
           `Offer home ${value ? "activated" : "deactivated"} successfully`
         );
-        setIsActive(value);
+        setIsHome(value);
         setRefresh((prev) => !prev);
       } else {
         toast.error("Failed to update status");
@@ -58,7 +77,7 @@ const HomeToggleCell = ({
 
   return (
     <div className="flex gap-3 items-center">
-      <Switch checked={isActive} onCheckedChange={handleToggle} />
+      <Switch checked={isHome} onCheckedChange={handleToggle} />
     </div>
   );
 };

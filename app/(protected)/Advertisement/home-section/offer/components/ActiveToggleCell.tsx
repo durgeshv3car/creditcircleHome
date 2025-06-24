@@ -24,7 +24,25 @@ const ActiveToggleCell = ({
     banner: Banner_DIMENSIONS,
     mobile: Mobile_DIMENSIONS,
   }
+  const logoData = row.original.offerBanner;
 
+      const logoimageUrls =
+      logoData && typeof logoData=== "string"
+          ? JSON.parse(logoData)
+          : logoData;
+
+   const BannerData = row.original.offerBanner;
+
+      const bannerimageUrls =
+      BannerData && typeof BannerData === "string"
+          ? JSON.parse(BannerData)
+          : BannerData;
+  const offerData = row.original.offerBanner;
+
+      const offerimageUrls =
+       offerData && typeof  offerData === "string"
+          ? JSON.parse( offerData)
+          :  offerData;
   const handleToggle = async (value: boolean) => {
     const previousState = isActive;
     setIsActive(value);
@@ -33,15 +51,15 @@ const ActiveToggleCell = ({
         row.original.id,
         row.original.type,
         dimensions,
-        { active: value },
+        { isActive: value },
         null, 
         null, 
         null,
         null,
-        row.original.mobileUrl || "",
-        row.original.webUrl || "",
-        row.original.bannerUrl || "",
-        row.original.logoUrl || ""
+        offerimageUrls.mobile || "",
+        offerimageUrls.web || "",
+        bannerimageUrls.banner || "",
+        logoimageUrls.logo || ""
       );
       if (result.success) {
         toast.success(
