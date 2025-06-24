@@ -24,21 +24,19 @@ const HomeToggleCell = ({
     banner: Banner_DIMENSIONS,
     mobile: Mobile_DIMENSIONS,
   }
-    const logoData = row.original.offerBanner;
-
+    const logoData = row.original.brandLogo;
       const logoimageUrls =
       logoData && typeof logoData=== "string"
           ? JSON.parse(logoData)
           : logoData;
 
    const BannerData = row.original.offerBanner;
-
       const bannerimageUrls =
       BannerData && typeof BannerData === "string"
           ? JSON.parse(BannerData)
           : BannerData;
-  const offerData = row.original.offerBanner;
 
+  const offerData = row.original.offerImage;
       const offerimageUrls =
        offerData && typeof  offerData === "string"
           ? JSON.parse( offerData)
