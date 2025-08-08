@@ -23,7 +23,7 @@ export default function PermissionPage({
   setSelectedPermissions: (value: string[]) => void;
 }) {
   const [allPermissions, setAllPermissions] = useState<string[]>([]);
-  console.log(selectedPermissions)
+
 
   const pathname = usePathname();
 

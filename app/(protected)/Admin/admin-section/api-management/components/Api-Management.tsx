@@ -37,7 +37,6 @@ function Category({
     try {
       const result = await fetchApis();
       setData(result);
-      console.log(result, "result");
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -45,7 +44,6 @@ function Category({
     }
   };
 
-  console.log(refresh, "refresh");
   useEffect(() => {
     fetchData();
   }, [refresh]);

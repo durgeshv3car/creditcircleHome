@@ -101,7 +101,6 @@ const EditModal: React.FC<EditModalProps> = ({
       setSelectedRow(foundRow);
       setEditedData(foundRow || {});
       const mobileUrl = foundRow?.offerImage?.mobile;
-      console.log(mobileUrl, "mobileUrl");
       if (foundRow?.offerImage?.mobile) {
         setMobileFile({
           preview: foundRow.offerImage.mobile,

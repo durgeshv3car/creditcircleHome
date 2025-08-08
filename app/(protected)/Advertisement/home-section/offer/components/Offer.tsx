@@ -24,7 +24,6 @@ function Users() {
   const fetchData = async () => {
     try {
       const result = await fetchOffers();
-      console.log("result", result.status);
       setData(result);
     } catch (error) {
       console.error("Error fetching data:", error);

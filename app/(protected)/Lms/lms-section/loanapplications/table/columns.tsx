@@ -6,11 +6,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import { ColumnDef,Row } from "@tanstack/react-table";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import { Eye, SquarePen, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import PartnerStatus from "../components/PartnerStatus";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 // Define all fields explicitly
 const fields = [
@@ -52,21 +55,30 @@ const fields = [
   "fatherName",
   "motherName",
   "livesWithParents",
-  "loanCompletion"
+  "loanCompletion",
 ];
-
 
 export type DataProps = {
   [key in (typeof fields)[number]]?: string | number | boolean;
 };
 
 // Define columns dynamically
-export const columns: ColumnDef<DataProps>[] = [
+export const columns = ({
+  isModalOpen,
+  setIsModalOpen,
+}: {
+  isModalOpen: boolean;
+  setIsModalOpen: (val: boolean) => void;
+}): ColumnDef<DataProps>[] => [
+
   {
     id: "select",
     header: ({ table }) => (
       <Checkbox
-        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
       />
@@ -81,6 +93,7 @@ export const columns: ColumnDef<DataProps>[] = [
     enableSorting: false,
     enableHiding: false,
   },
+
   {
     id: "index",
     header: "ID",
@@ -89,19 +102,53 @@ export const columns: ColumnDef<DataProps>[] = [
   ...fields.map((key) => ({
     accessorKey: key,
     header: key.replace(/([A-Z])/g, " $1").trim(),
-    cell: ({ row }:{row: Row<DataProps>}) => <span>{String(row.original[key] ?? "-")}</span>,
+    cell: ({ row }: { row: Row<DataProps> }) => (
+      <span>{String(row.original[key] ?? "-")}</span>
+    ),
   })),
+
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      const statusColors: Record<string, string> = {
+        blue: "bg-blue-100 text-blue-700",
+      };
+      const status = "blue";
+      const statusStyles = statusColors[status];
+      return (
+        <>
+          <Badge
+            className={cn("rounded-full px-5 cursor-pointer", statusStyles)}
+            onClick={()=>setIsModalOpen(true)}
+          >
+            status
+          </Badge>
+
+          {isModalOpen && (
+            <PartnerStatus
+              close={() => setIsModalOpen(false)}
+            />
+          )}
+        </>
+      );
+    },
+  },
+
   {
     id: "actions",
     header: "Action",
     enableHiding: false,
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-       
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="outline" size="icon" className="w-7 h-7 text-default-400">
+              <Button
+                variant="outline"
+                size="icon"
+                className="w-7 h-7 text-default-400"
+              >
                 <SquarePen className="w-3 h-3" />
               </Button>
             </TooltipTrigger>
@@ -114,11 +161,18 @@ export const columns: ColumnDef<DataProps>[] = [
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="outline" size="icon" className="w-7 h-7 text-default-400">
+              <Button
+                variant="outline"
+                size="icon"
+                className="w-7 h-7 text-default-400"
+              >
                 <Trash2 className="w-4 h-4" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="top" className="bg-destructive text-destructive-foreground">
+            <TooltipContent
+              side="top"
+              className="bg-destructive text-destructive-foreground"
+            >
               <p>Delete</p>
             </TooltipContent>
           </Tooltip>

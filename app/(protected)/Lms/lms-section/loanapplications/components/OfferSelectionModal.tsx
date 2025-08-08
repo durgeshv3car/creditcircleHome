@@ -28,7 +28,7 @@ const OfferSelectionModal: React.FC<OfferSelectionModalProps> = ({ isOpen, onClo
   const searchParams = useSearchParams();
   const type = searchParams?.get("type");
 
-  console.log("Type:", type);
+
 
   // Fetch offers when the modal opens
   useEffect(() => {
@@ -36,7 +36,7 @@ const OfferSelectionModal: React.FC<OfferSelectionModalProps> = ({ isOpen, onClo
 
     const fetchOffers = async () => {
       try {
-        console.log("Fetching offers from API...");
+     
         const response = await fetch("http://localhost:5000/api/offer/offer");
 
         if (!response.ok) {
@@ -44,7 +44,7 @@ const OfferSelectionModal: React.FC<OfferSelectionModalProps> = ({ isOpen, onClo
         }
 
         const data = await response.json();
-        console.log("Offers fetched successfully:", data);
+       
         setOffers(data.offers);
       } catch (error: any) {
         console.error("Error fetching offers:", error.message);
@@ -65,8 +65,7 @@ const OfferSelectionModal: React.FC<OfferSelectionModalProps> = ({ isOpen, onClo
 
     try {
       setLoading(true);
-      console.log("Submitting selected offer:", selectedOffer);
-      console.log("Selected rows:", selectedRowsData);
+      
       let sending;
       if (type === "Notification") {
         sending = "Application";
@@ -91,7 +90,7 @@ const OfferSelectionModal: React.FC<OfferSelectionModalProps> = ({ isOpen, onClo
       }
 
       const result = await response.json();
-      console.log("Offer submitted successfully:", result);
+
       if (type === "Email") {
         router.push("/messageCenter/email");
       } else if (type === "Notification") {

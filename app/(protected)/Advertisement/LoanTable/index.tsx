@@ -184,13 +184,13 @@ const ExampleTwo =<T,> ({
   setRefresh,
   type,
 }: TableProps<T>)=> {
-  console.log(tableData, `${type} Data`);
+
 
   const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [isCreateOpen, setIsCreateOpen] = React.useState(false);
   const leadId = searchParams?.get("id") || "";
-  console.log(typeof leadId, "leadId");
+
 
   React.useEffect(() => {
     setIsModalOpen(!!leadId);

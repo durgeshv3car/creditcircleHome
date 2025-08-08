@@ -13,16 +13,16 @@ interface RevenueBarChartProps {
   chartColors?: string[]
 }
 const defaultSeries = [{
-  name: "Net Profit",
-  data: [44, 55, 57, 56, 61, 58, 63, 60, 66],
+  name: "Cashe",
+  data: [44, 55, 57, 56, 61, 58, 63, 60, 66,89,67,98],
 },
 {
-  name: "Revenue",
-  data: [76, 85, 101, 98, 87, 105, 91, 114, 94],
+  name: "Money Control",
+  data: [76, 85, 101, 98, 87, 105, 91, 114, 94,56,90,95],
 },
 {
-  name: "Free Cash Flow",
-  data: [35, 41, 36, 26, 45, 48, 52, 53, 41],
+  name: "Bank",
+  data: [35, 41, 36, 26, 45, 48, 52, 53, 41,45,65,34],
 }]
 const RevenueBarChart = ({
   height = 400,
@@ -71,14 +71,14 @@ const RevenueBarChart = ({
       },
     },
     title: {
-      text: `${("revenue_report")}`,
+      text: `${("Users_Loan_From_Partners")}`,
       align: "left",
       offsetY: 13,
       offsetX: isRtl ? "0%" : 0,
       floating: false,
       style: {
-        fontSize: "20px",
-        fontWeight: "500",
+        fontSize: "24px",
+        fontWeight: "600",
         fontFamily: "Inter",
         color: mode === "dark" ? "#fff" : "#0f172a",
       },
@@ -101,6 +101,7 @@ const RevenueBarChart = ({
     },
     xaxis: {
       categories: [
+        "Jan",
         "Feb",
         "Mar",
         "Apr",
@@ -110,6 +111,8 @@ const RevenueBarChart = ({
         "Aug",
         "Sep",
         "Oct",
+        "Nov",
+        "Dec"
       ],
       labels: {
         style: {
@@ -131,7 +134,7 @@ const RevenueBarChart = ({
     tooltip: {
       y: {
         formatter: function (val: number) {
-          return "$ " + val + " thousands";
+          return val;
         },
       },
     },

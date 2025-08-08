@@ -32,6 +32,8 @@ const LeadPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [refresh, setRefresh] = useState<boolean>(false);
   const [tableColumns, setTableColumns] = useState<ColumnDef<DataProps>[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<{ id: string; phoneNumber: number } | null>(null);
 
   const router = useRouter();
 
@@ -51,24 +53,25 @@ const LeadPage: React.FC = () => {
     }
   }, []);
 
-  useEffect(() => {
-    const loadColumns = async () => {
-      try {
-        const columnsModule = await import(".././table/columns");
-        setTableColumns(columnsModule.columns(fetchData, router));
-      } catch (error) {
-        console.error("Error loading columns:", error);
-        setTableColumns([]);
-      }
-    };
+useEffect(() => {
+  const loadColumns = async () => {
+    try {
+      const columnsModule = await import(".././table/columns");
+      setTableColumns(columnsModule.columns({ isModalOpen, setIsModalOpen,fetchData,router,selectedUser,setSelectedUser }));
+    } catch (error) {
+      console.error("Error loading columns:", error);
+      setTableColumns([]);
+    }
+  };
 
-    loadColumns();
-  }, [fetchData, router]);
+  loadColumns();
+}, [fetchData,isModalOpen,router]); 
+
 
   useEffect(() => {
     fetchData();
   }, [fetchData, refresh]);
-  console.log("data", data);
+ 
 
   const [allFilterOptions, setAllFilterOptions] = useState<
     Record<string, Set<string>>
@@ -188,17 +191,25 @@ const LeadPage: React.FC = () => {
         )
       : data;
 
-    const incomeData = selectedValues.netMonthlyIncome?.length
-      ? data.filter((user) =>
-          selectedValues.netMonthlyIncome!.some((incomeFilter) => {
-            const income = parseFloat((user.netMonthlyIncome as string) || "");
+const incomeData = selectedValues.netMonthlyIncome?.length
+  ? data.filter((user) => {
+      return selectedValues.netMonthlyIncome!.some((incomeFilter) => {
+        return (
+          Array.isArray(user.LoanApplications) &&
+          user.LoanApplications.some((app) => {
+            const rawIncome = app?.netMonthlyIncome ?? "";
+            const income = parseFloat(String(rawIncome));
+            
+            // Add debugging
+            console.log('Raw income:', rawIncome, 'Parsed income:', income, 'Filter:', incomeFilter);
+            
             if (isNaN(income)) return false;
-
+            
             switch (incomeFilter) {
               case "Under 15000":
                 return income < 15000;
               case "15001-20000":
-                return income >= 15001 && income <= 20000;
+                return income >= 15000 && income <= 20000; // Fixed: changed from 15001 to 15000
               case "20001-25000":
                 return income >= 20001 && income <= 25000;
               case "25001-35000":
@@ -215,13 +226,14 @@ const LeadPage: React.FC = () => {
                 return income >= 150001 && income <= 200000;
               case "2lac+":
                 return income > 200000;
-
               default:
                 return false;
             }
           })
-        )
-      : data;
+        );
+      });
+    })
+  : data;
 
     // Updated to properly handle array of loan applications
     const loanTypeData = selectedValues.loanType?.length
@@ -455,33 +467,36 @@ const LeadPage: React.FC = () => {
       // options.dob.add("Custom");
     }
 
-    if (dataForIncomeFilter.length > 0) {
-      dataForIncomeFilter.forEach((user) => {
-        const income = parseFloat((user.netMonthlyIncome as string) || "");
-        if (isNaN(income)) return;
+  if (dataForIncomeFilter.length > 0) {
+  dataForIncomeFilter.forEach((user) => {
+    // Use the same structure as in your filter
+    const loanApps = Array.isArray(user.LoanApplications) ? user.LoanApplications : [user.LoanApplication];
+    
+    loanApps.forEach((app) => {
+      const income = parseFloat((app?.netMonthlyIncome as string) || "");
+      if (isNaN(income)) return;
 
-        if (income < 15000) options.netMonthlyIncome.add("Under 15000");
-        else if (income >= 15001 && income <= 20000)
-          options.netMonthlyIncome.add("15001-20000");
-        else if (income >= 20001 && income <= 25000)
-          options.netMonthlyIncome.add("20001-25000");
-        else if (income >= 25001 && income <= 35000)
-          options.netMonthlyIncome.add("25001-35000");
-        else if (income >= 35001 && income <= 50000)
-          options.netMonthlyIncome.add("35001-50000");
-        else if (income >= 50001 && income <= 75000)
-          options.netMonthlyIncome.add("50001-75000");
-        else if (income >= 75001 && income <= 100000)
-          options.netMonthlyIncome.add("75001-100000");
-        else if (income >= 100001 && income <= 150000)
-          options.netMonthlyIncome.add("100001-150000");
-        else if (income >= 150001 && income <= 200000)
-          options.netMonthlyIncome.add("150001-200000");
-        else if (income > 200000) options.netMonthlyIncome.add("2lac+");
-      });
-
-      // options.netMonthlyIncome.add("Custom");
-    }
+      if (income < 15000) options.netMonthlyIncome.add("Under 15000");
+      else if (income >= 15000 && income <= 20000)  // Fixed: 15000 instead of 15001
+        options.netMonthlyIncome.add("15001-20000");
+      else if (income >= 20001 && income <= 25000)
+        options.netMonthlyIncome.add("20001-25000");
+      else if (income >= 25001 && income <= 35000)
+        options.netMonthlyIncome.add("25001-35000");
+      else if (income >= 35001 && income <= 50000)
+        options.netMonthlyIncome.add("35001-50000");
+      else if (income >= 50001 && income <= 75000)
+        options.netMonthlyIncome.add("50001-75000");
+      else if (income >= 75001 && income <= 100000)
+        options.netMonthlyIncome.add("75001-100000");
+      else if (income >= 100001 && income <= 150000)
+        options.netMonthlyIncome.add("100001-150000");
+      else if (income >= 150001 && income <= 200000)
+        options.netMonthlyIncome.add("150001-200000");
+      else if (income > 200000) options.netMonthlyIncome.add("2lac+");
+    });
+  });
+}
 
     // Updated to properly collect loan types from LoanApplications array
     dataForLoanTypeFilter.forEach((user) => {

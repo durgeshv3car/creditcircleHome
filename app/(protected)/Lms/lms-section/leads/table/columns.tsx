@@ -13,8 +13,10 @@ import { Eye, SquarePen, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Router } from "next/router"; // Import Router type
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import PartnerStatus from "../components/PartnerStatus";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 // Define all fields explicitly
 const fields = [
@@ -36,17 +38,6 @@ const fields = [
   "liveWith",
   "ownsFourWheeler",
   "ownsTwoWheeler",
-  "companyName",
-  "employmentLevel",
-  "officeNo",
-  "officeStreet",
-  "officePinCode",
-  "officeCity",
-  "officeState",
-  "netMonthlyIncome",
-  "modeOfIncome",
-  "bankAccount",
-  "hasCreditCard",
   "insurancePlans",
   "investmentOptions",
   "earningMembers",
@@ -65,10 +56,21 @@ export type DataProps = {
   };
 };
 // Define columns dynamically
-export const columns = (
-  fetchData: () => Promise<void>, 
-  router: AppRouterInstance
-): ColumnDef<DataProps>[] => [
+export const columns = ({
+  isModalOpen,
+  setIsModalOpen,
+  fetchData,
+  router,
+  selectedUser,
+  setSelectedUser, // ✅ accept here
+}: {
+  isModalOpen: boolean;
+  setIsModalOpen: (val: boolean) => void;
+  fetchData: () => void;
+  router: AppRouterInstance;
+  selectedUser:any,
+  setSelectedUser: (val: { id: string; phoneNumber: number }) => void;
+}): ColumnDef<DataProps>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -99,8 +101,56 @@ export const columns = (
   ...fields.map((key) => ({
     accessorKey: key,
     header: key.replace(/([A-Z])/g, " $1").trim(),
-    cell: ({ row }: { row: Row<DataProps> }) => <span>{String(row.original[key] ?? "-")}</span>,
+    cell: ({ row }: { row: Row<DataProps> }) => (
+      <span>{String(row.original[key] ?? "-")}</span>
+    ),
   })),
+{
+  accessorKey: "status",
+  header: "Status",
+  cell: ({ row }) => {
+    const statusColors: Record<string, string> = {
+      blue: "bg-blue-100 text-blue-700",
+    };
+
+    const handleClick = () => {
+      const id =
+        typeof row.original.id === "string"
+          ? row.original.id
+          : String(row.original.id ?? "");
+
+      const phoneNumber =
+        typeof row.original.phoneNumber === "number"
+          ? row.original.phoneNumber
+          : Number(row.original.phoneNumber) || 0;
+
+      setSelectedUser({ id, phoneNumber });
+      setIsModalOpen(true);
+    };
+
+    const status = "blue"; // You can update this dynamically if needed
+    const statusStyles = statusColors[status];
+
+    return (
+      <>
+        <Badge
+          className={cn("rounded-full px-5 cursor-pointer", statusStyles)}
+          onClick={handleClick}
+        >
+          status
+        </Badge>
+        {isModalOpen && (
+          <PartnerStatus
+            close={() => setIsModalOpen(false)}
+            id={selectedUser.id}
+            phoneNumber={selectedUser.phoneNumber}
+          />
+        )}
+      </>
+    );
+  },
+},
+
   {
     id: "actions",
     header: "Action",

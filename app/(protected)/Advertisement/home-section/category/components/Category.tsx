@@ -31,7 +31,6 @@ function Category() {
   const fetchData = async () => {
     try {
       const result = await fetchCategories();
-      console.log("result", result.status);
 
       setData(result);
     } catch (error) {
