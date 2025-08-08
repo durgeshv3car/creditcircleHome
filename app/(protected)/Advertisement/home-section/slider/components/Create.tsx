@@ -54,7 +54,7 @@ const CreateModal: React.FC<CreateModalProps> = ({
   };
 
   const refreshData = () => setRefresh((prev) => !prev);
-  console.log(mobileFile, webFile);
+
 
   const handleSubmit = async () => {
     try {
@@ -69,7 +69,6 @@ const CreateModal: React.FC<CreateModalProps> = ({
 
       if (result.success) {
         toast.success("Slider image added");
-        console.log("Upload success:", result.data);
         setMobileFile(null);
         setWebFile(null);
         refreshData();

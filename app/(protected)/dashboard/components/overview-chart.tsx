@@ -4,23 +4,54 @@ const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 import { colors } from "@/lib/colors";
 import { useTheme } from "next-themes";
 import { useConfig } from "@/hooks/use-config";
+import { fetchLoans } from "../../services/loans/api";
+import { useEffect, useState, useMemo } from "react";
 
 interface OverviewChartProps {
   height?: number;
-  series?: number[];
   chartType?: "donut" | "pie" | "radialBar";
-  labels?: string[]
+  labels?: string[];
 }
+
 const OverviewChart = ({
   height = 373,
-  series = [44, 55, 67, 83],
   chartType = "radialBar",
-  labels = ["A", "B", "C", "D"]
-
+  labels = ["Apply For Loan", "Not Apply"],
 }: OverviewChartProps) => {
   const [config] = useConfig();
   const { theme: mode } = useTheme();
 
+  const [loanCount, setLoanCount] = useState(0);
+  const [notApplied, setNotApplied] = useState(0);
+  useEffect(() => {
+    const fetchLoanData = async () => {
+      try {
+        const result = await fetchLoans(); // Assuming this returns an array of loans
+        setLoanCount(result.length);
+
+        // Define a type for loan objects
+        type Loan = {
+          loanDataStatus?: Record<string, any>;
+          [key: string]: any;
+        };
+
+        const notAppliedCount = result.filter(
+          (loan: Loan) =>
+            !loan.loanDataStatus ||
+            Object.keys(loan.loanDataStatus).length === 0
+        ).length;
+
+        setNotApplied(notAppliedCount);
+      } catch (error) {
+        console.error("Error fetching loan data:", error);
+      }
+    };
+
+    fetchLoanData();
+  }, []);
+
+  const Applied = Math.max(loanCount - notApplied, 0);
+  const series = [Applied, notApplied];
 
   const options: any = {
     chart: {
@@ -34,7 +65,6 @@ const OverviewChart = ({
     },
     plotOptions: {
       radialBar: {
-
         dataLabels: {
           name: {
             fontSize: "22px",
@@ -42,25 +72,26 @@ const OverviewChart = ({
           value: {
             fontSize: "16px",
             fontWeight: 700,
-            color: mode === 'light' ? colors["default-600"] : colors["default-300"],
+            color:
+              mode === "light" ? colors["default-600"] : colors["default-300"],
           },
           total: {
             show: true,
             label: "Total",
-            color: mode === 'light' ? colors["default-600"] : colors["default-300"],
+            color:
+              mode === "light" ? colors["default-600"] : colors["default-300"],
             formatter: function (w: any) {
-              return 249;
-            }
-          }
-        }
-      }
+              const total = w.globals.seriesTotals.reduce(
+                (a: number, b: number) => a + b,
+                0
+              );
+              return total.toString();
+            },
+          },
+        },
+      },
     },
-    colors: [
-      colors.primary,
-      colors.info,
-      colors.success,
-      colors.warning
-    ],
+    colors: [colors.primary, colors.info],
     labels: labels,
     tooltip: {
       theme: mode === "dark" ? "dark" : "light",
@@ -72,6 +103,7 @@ const OverviewChart = ({
       left: 0,
     },
   };
+
   return (
     <Chart
       options={options}

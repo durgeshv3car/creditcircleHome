@@ -74,7 +74,6 @@ const CreateModal: React.FC<CreateModalProps> = ({
 
       if (result.success) {
         toast.success("Slider image added");
-        console.log("Upload success:", result.data);
         setMobileFile(null);
         setWebFile(null);
         refreshData();

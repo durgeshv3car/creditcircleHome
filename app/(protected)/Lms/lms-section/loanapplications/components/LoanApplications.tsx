@@ -10,11 +10,10 @@ const ExampleTwo = dynamic(() => import(".././table"), {
 });
 
 export interface SelectedValues {
-
   netMonthlyIncome: string[] | null;
   loanType: (string | { name: string })[] | null;
   profession: (string | { name: string })[] | null;
-  phoneNumber: (string | { name: string })[] | null; 
+  phoneNumber: (string | { name: string })[] | null;
   desiredLoanAmount: (string | { name: string })[] | null;
   loanTenure: (string | { name: string })[] | null;
   employmentStatus: (string | { name: string })[] | null;
@@ -64,6 +63,7 @@ const LeadPage = () => {
     studentIncome: null,
     livesWithParents: null,
   });
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const businessFields = [
     "businessName",
@@ -83,7 +83,7 @@ const LeadPage = () => {
   const filteredSelectedValues = Object.fromEntries(
     Object.entries(selectedValues).filter(([key]) => {
       if (businessFields.includes(key)) {
-        return selectedValues.hasGST?.some((item) => 
+        return selectedValues.hasGST?.some((item) =>
           typeof item === "boolean" ? item : item?.name === true
         );
       }
@@ -99,10 +99,14 @@ const LeadPage = () => {
   useEffect(() => {
     const loadColumns = async () => {
       const mod = await import(".././table/columns");
-      setColumns(mod.columns);
+      const cols = mod.columns({
+        isModalOpen,
+        setIsModalOpen,
+      });
+      setColumns(cols);
     };
     loadColumns();
-  }, []);
+  }, [isModalOpen]);
 
   const fetchData = async () => {
     try {
@@ -125,7 +129,13 @@ const LeadPage = () => {
       if (!value || !(value as string | number).toString().trim()) return true;
       const fieldValue = item[key];
       if (typeof fieldValue === "string") {
-        return typeof fieldValue === "string" && typeof value === "string" && (fieldValue as string).toLowerCase().includes((value as string).toLowerCase());
+        return (
+          typeof fieldValue === "string" &&
+          typeof value === "string" &&
+          (fieldValue as string)
+            .toLowerCase()
+            .includes((value as string).toLowerCase())
+        );
       }
       return fieldValue == value;
     });

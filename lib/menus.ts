@@ -136,13 +136,6 @@ export function getMenuList(
           children: [],
         },
         {
-          href: "/Lms/lms-section/loanstatus",
-          label: "loanstatus",
-          active: pathname === "/Lms/lms-section/loanstatus",
-          icon: "heroicons-outline:gift", // offers icon
-          children: [],
-        },
-        {
           href: "/Lms/lms-section/deviceInfo",
           label: "DeviceInfo",
           active: pathname === "/Lms/lms-section/deviceInfo",
