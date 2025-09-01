@@ -26,7 +26,7 @@ const OverviewChart = ({
   useEffect(() => {
     const fetchLoanData = async () => {
       try {
-        const result = await fetchLoans(); // Assuming this returns an array of loans
+        const result = await fetchLoans(); 
         setLoanCount(result.length);
 
         // Define a type for loan objects
