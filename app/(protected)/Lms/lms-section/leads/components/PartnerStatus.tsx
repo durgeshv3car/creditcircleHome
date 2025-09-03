@@ -1,12 +1,13 @@
-import { customerStatus } from "@/app/api/partners/cashe/api";
 import React, { useState } from "react";
 
 function PartnerStatus({
   close,
+  userdata,
   id,
   phoneNumber,
 }: {
   close: any;
+  userdata:any;
   id: string;
   phoneNumber: number;
 }) {
@@ -15,38 +16,17 @@ function PartnerStatus({
     { id: 2, name: "Money Control", status: "" },
   ]);
 
-  const [notifications, setNotifications] = useState<number[]>([]);
+  
 
-  const handleSendNotification = (companyId: number, companyName: string) => {
-    setNotifications((prev) => [...prev, companyId]);
-    setTimeout(() => {
-      setNotifications((prev) => prev.filter((id) => id !== companyId));
-    }, 3000);
-    console.log(`Notification sent for: ${companyName}`);
-  };
+
+
 
   const handleClose = () => {
     close();
   };
 
-  const checkStatus = async (name: string) => {
-    if (name === "Cashe") {
-      const res = await customerStatus(id, phoneNumber);
+  console.log(userdata)
 
-      const payLoad = res?.data?.payLoad;
-
-      // Check if payLoad has nested object(s)
-      const hasNestedObject = typeof payLoad === "object";
-
-      const finalStatus = hasNestedObject ? "Error" : payLoad;
-
-      setCompanies((prevCompanies) =>
-        prevCompanies.map((company) =>
-          company.name === name ? { ...company, status: finalStatus } : company
-        )
-      );
-    }
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -102,7 +82,6 @@ function PartnerStatus({
                 company.status === "Rejected" ||
                 company.status === "Pending";
 
-              const isNotificationSent = notifications.includes(company.id);
 
               return (
                 <div
@@ -137,41 +116,12 @@ function PartnerStatus({
                         </div>
                       </div>
 
-                      {showNotificationButton && (
-                        <div>
-                          <button
-                            onClick={() =>
-                              handleSendNotification(company.id, company.name)
-                            }
-                            disabled={isNotificationSent}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                              isNotificationSent
-                                ? "bg-green-500 text-white cursor-not-allowed"
-                                : "bg-blue-500 hover:bg-blue-600 text-white hover:shadow-md transform hover:-translate-y-0.5"
-                            }`}
-                          >
-                            {isNotificationSent ? (
-                              <span className="flex items-center gap-2">
-                                <span className="w-4 h-4 rounded-full bg-white bg-opacity-30 flex items-center justify-center text-xs">
-                                  ✓
-                                </span>
-                                Sent
-                              </span>
-                            ) : (
-                              <span className="flex items-center gap-2">
-                                <span>📤</span>
-                                Send Notification
-                              </span>
-                            )}
-                          </button>
-                        </div>
-                      )}
+                
                     </div>
 
                     {/* Bottom section with Check Status button aligned to the right */}
                     <div className="flex justify-end">
                       <button
-                        onClick={() => checkStatus(company.name)}
                         className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg transition"
                       >
                         Check Status

@@ -142,6 +142,7 @@ export const columns = ({
         {isModalOpen && (
           <PartnerStatus
             close={() => setIsModalOpen(false)}
+            userdata={row.original.registerStatus}
             id={selectedUser.id}
             phoneNumber={selectedUser.phoneNumber}
           />
