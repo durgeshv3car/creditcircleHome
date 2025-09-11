@@ -21,3 +21,36 @@ export async function GET() {
     return NextResponse.json({ error: "Failed to fetch user logs" }, { status: 500 });
   }
 }
+
+export async function POST(req: Request) {
+  try {
+    const token = await getToken();
+    const { action } = await req.json(); 
+
+    const response = await fetch(`${BASE_URL}/logs`, {
+      method: "POST", 
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `${token}` : "",
+      },
+      body: JSON.stringify({ action }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      return NextResponse.json(data, { status: response.status });
+    } else {
+      return NextResponse.json(
+        { error: data?.error || "Failed to create log" },
+        { status: response.status }
+      );
+    }
+  } catch (error) {
+    console.error("POST /logs error:", error);
+    return NextResponse.json(
+      { error: "Failed to create log" },
+      { status: 500 }
+    );
+  }
+}

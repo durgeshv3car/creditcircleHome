@@ -14,30 +14,36 @@ import { ColumnDef } from "@tanstack/react-table";
 import ActiveToggleCell from "./ActiveToggleCell";
 import { deleteAPi } from "@/app/(protected)/services/apiManagement/api";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-
+import { CounterStatusModal } from "./CounterStatus";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export interface Categorys {
   id: string; // Ensure this matches the key in your data
   title: string; // Ensure this matches the key in your data
   active: boolean; // Add this field if it exists in your data
-  name:string;
-  ipAddress:string;
-  action:string;
-  createdAt:Date;
+  name: string;
+  ipAddress: string;
+  action: string;
+  createdAt: Date;
   username: string; // Ensure this matches the key in your data
   email: string;
   role: string;
-  permissions:[]
+  thumbnail: string;
+  permissions: [];
 }
 
 interface ColumnsCategoryProps {
   fetchData: () => void;
   router: AppRouterInstance;
+  startDateRange: string;
+  endDateRange: string;
 }
 
 export const columnsCategory = ({
   fetchData,
   router,
+  startDateRange,
+  endDateRange,
 }: ColumnsCategoryProps): ColumnDef<Categorys>[] => [
   {
     id: "select",
@@ -81,10 +87,44 @@ export const columnsCategory = ({
     ),
   },
   {
-    accessorKey: "active", // Ensure this matches the key in your data
+    accessorKey: "thumbnail.mobile",
+    header: "Logo",
+    cell: ({ row }) => {
+      const thumbnailData = row.original.thumbnail;
+      const imageUrls =
+        typeof thumbnailData === "string"
+          ? JSON.parse(thumbnailData)
+          : thumbnailData;
+
+      return (
+        <div className="flex gap-3 items-center">
+          <Avatar className="w-8 h-8 rounded-none bg-transparent shadow-none border-none">
+            {imageUrls?.mobile ? (
+              <AvatarImage src={imageUrls.mobile} className="rounded-none" />
+            ) : (
+              <AvatarFallback className="rounded-none">NA</AvatarFallback>
+            )}
+          </Avatar>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "active",
     header: "isActive",
     cell: ({ row }) => <ActiveToggleCell row={row} refreshData={fetchData} />,
   },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+     
+     
+
+      return <CounterStatusModal name={row.original.name} startDate={startDateRange} endDate={endDateRange} />;
+    },
+  },
+
   {
     id: "actions",
     header: "Action",
@@ -115,7 +155,9 @@ export const columnsCategory = ({
                   size="icon"
                   className="w-7 h-7 border-default-200 dark:border-default-300 text-default-400"
                   onClick={() =>
-                    router.push(`/Admin/admin-section/api-management?id=${row.original.id}`)
+                    router.push(
+                      `/Admin/admin-section/api-management?id=${row.original.id}`
+                    )
                   }
                 >
                   <SquarePen className="w-3 h-3" />

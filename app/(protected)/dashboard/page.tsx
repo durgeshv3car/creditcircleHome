@@ -63,13 +63,13 @@ const DashboardPage = () => {
                   className="bg-info/10 border-none shadow-none"
                 />
                 <StatisticsBlock
-                  title={"Total Loans"}
+                  title={"Loan Applications"}
                   total={loanCount}
                   className="bg-warning/10 border-none shadow-none"
                   chartColor="#FB8F65"
                 />
                 <StatisticsBlock
-                  title={"Total Partners"}
+                  title={"Partners"}
                   total={apiCount}
                   className="bg-primary/10 border-none shadow-none"
                   chartColor="#2563eb"

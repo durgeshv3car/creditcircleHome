@@ -71,7 +71,7 @@ const RevenueBarChart = ({
       },
     },
     title: {
-      text: `${("Users_Loan_From_Partners")}`,
+      text: `${("Partners Loan Approval")}`,
       align: "left",
       offsetY: 13,
       offsetX: isRtl ? "0%" : 0,

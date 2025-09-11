@@ -8,6 +8,13 @@ import {
 } from "@/components/ui/tooltip";
 
 import { SquarePen, Trash2, CalendarClock, Timer } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -15,11 +22,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import ActiveToggleCell from "./ActiveToggleCell";
-import  HomeToggleCell  from "./HomeToggleCell";
+import HomeToggleCell from "./HomeToggleCell";
 import { Calendar } from "@/components/ui/calendar";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+
 import {
   deleteOffer,
+  scheduleExpireOffer,
 } from "@/app/(protected)/services/offers/api";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
@@ -30,17 +38,22 @@ export interface RowData {
   description?: string;
   thumbnail?: string | { web?: string; mobile?: string };
   brandthumbnail?: string | { web?: string; mobile?: string };
-  offerBanner?: string | { banner?: string;  };
-  brandLogo?: string | { logo?: string;  };
+  offerBanner?: string | { banner?: string };
+  brandLogo?: string | { logo?: string };
   buttonType: string;
   redirectUrl: string;
   active: boolean;
   brandName: string;
 }
-
 export const columnsRecommend = (
   setRefresh: React.Dispatch<React.SetStateAction<boolean>>,
-  router:AppRouterInstance
+  router: AppRouterInstance,
+  setSelectedDate: React.Dispatch<React.SetStateAction<Date | undefined>>,
+  open: boolean,
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>,
+  selectedDate: Date | undefined,
+  setOfferId: React.Dispatch<React.SetStateAction<string>>,
+  offerId: string
 ) => [
   {
     id: "select",
@@ -117,7 +130,7 @@ export const columnsRecommend = (
       const BannerData = row.original.offerBanner;
 
       const imageUrls =
-      BannerData && typeof BannerData === "string"
+        BannerData && typeof BannerData === "string"
           ? JSON.parse(BannerData)
           : BannerData;
 
@@ -158,7 +171,7 @@ export const columnsRecommend = (
       );
     },
   },
- 
+
   {
     accessorKey: "thumbnail.mobile",
     header: "Mobile",
@@ -235,12 +248,16 @@ export const columnsRecommend = (
   {
     accessorKey: "active",
     header: "isActive",
-    cell: ({ row }: { row: { original: RowData } }) => <ActiveToggleCell row={row} setRefresh={setRefresh} />,
+    cell: ({ row }: { row: { original: RowData } }) => (
+      <ActiveToggleCell row={row} setRefresh={setRefresh} />
+    ),
   },
   {
     accessorKey: "home",
     header: "isHome",
-    cell: ({ row }: { row: { original: RowData } }) => <HomeToggleCell row={row} setRefresh={setRefresh} />,
+    cell: ({ row }: { row: { original: RowData } }) => (
+      <HomeToggleCell row={row} setRefresh={setRefresh} />
+    ),
   },
   {
     id: "actions",
@@ -303,6 +320,95 @@ export const columnsRecommend = (
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
+        </div>
+      );
+    },
+  },
+  {
+    id: "schedulExpire",
+    header: "schedulExpire",
+    enableHiding: false,
+    cell: ({ row }: { row: { original: RowData } }) => {
+      const handleDateSelect = (date: Date | undefined) => {
+        setSelectedDate(date);
+        console.log("Selected Deletion Date:", date);
+      };
+      
+      const handleScheduleDelete = async () => {
+        if (!selectedDate) {
+          console.log("❌ No date selected");
+          return;
+        }
+        console.log(offerId, "expireid set");
+
+        const result = await scheduleExpireOffer(offerId, selectedDate);
+
+        if (result.success) {
+          setRefresh((prev) => !prev);
+          setOpen(false);
+        }
+      };
+
+      const handleChange = (id: string) => {
+        setOpen(true);
+        setOfferId(id)
+      };
+
+      return (
+        <div className="flex items-center gap-2">
+          <Dialog
+            open={open}
+            onOpenChange={() => handleChange(row.original.id)}
+          >
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="w-7 h-7 border-default-200 dark:border-default-300 text-default-400"
+                      onClick={() => setOpen(true)}
+                    >
+                      <CalendarClock className="w-3 h-3" />
+                    </Button>
+                  </DialogTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  <p>Auto Delete Calendar</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            {/* Calendar Dialog */}
+            <DialogContent
+              className="p-4"
+              onOpenAutoFocus={(e) => {
+                e.preventDefault();
+                document.getElementById("schedule-delete-btn")?.focus();
+              }}
+            >
+              <DialogTitle className="text-lg font-semibold">
+                Select Expire Date
+              </DialogTitle>
+              <DialogDescription>
+                Pick a date from the calendar below to automatically expire this
+                offer.
+              </DialogDescription>
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={handleDateSelect}
+                className="border rounded-md p-2"
+              />
+              <Button
+                className="mt-4 w-full"
+                onClick={() => handleScheduleDelete()}
+              >
+                Schedule Expire
+              </Button>
+            </DialogContent>
+          </Dialog>
         </div>
       );
     },

@@ -66,9 +66,11 @@ export type DataProps = {
 export const columns = ({
   isModalOpen,
   setIsModalOpen,
+  setSelectedRow,
 }: {
   isModalOpen: boolean;
   setIsModalOpen: (val: boolean) => void;
+  setSelectedRow: (row: DataProps | null) => void;
 }): ColumnDef<DataProps>[] => [
 
   {
@@ -95,10 +97,13 @@ export const columns = ({
   },
 
   {
-    id: "index",
-    header: "ID",
-    cell: ({ row }) => <span>{row.index + 1}</span>,
+  id: "index",
+  header: "ID",
+  cell: ({ row, table }) => {
+    const total = table.options.data.length; // all rows in dataset
+    return <span>{total - row.index}</span>;
   },
+},
   ...fields.map((key) => ({
     accessorKey: key,
     header: key.replace(/([A-Z])/g, " $1").trim(),
@@ -116,21 +121,19 @@ export const columns = ({
       };
       const status = "blue";
       const statusStyles = statusColors[status];
-      return (
-        <>
-          <Badge
-            className={cn("rounded-full px-5 cursor-pointer", statusStyles)}
-            onClick={()=>setIsModalOpen(true)}
-          >
-            status
-          </Badge>
+      
+      const handleClick = () => {
+        setSelectedRow(row.original);
+        setIsModalOpen(true);
+      };
 
-          {isModalOpen && (
-            <PartnerStatus
-              close={() => setIsModalOpen(false)}
-            />
-          )}
-        </>
+      return (
+        <Badge
+          className={cn("rounded-full px-5 cursor-pointer", statusStyles)}
+          onClick={handleClick}
+        >
+          status
+        </Badge>
       );
     },
   },

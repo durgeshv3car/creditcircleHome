@@ -100,7 +100,18 @@ const ExampleTwo = <TData extends Record<string, any>>({
     []
   );
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+    React.useState<VisibilityState>({
+      liveWith: false,
+      ownsFourWheeler: false,
+      ownsTwoWheeler: false,
+      insurancePlans: false,
+      investmentOptions: false,
+      earningMembers: false,
+      shoppingFrequency: false,
+      rewardInterests: false,
+      exploreIndiaFrequency: false,
+      travelAbroadFrequency: false
+    });
   const [selectedColumn, setSelectedColumn] = React.useState<
     string | undefined
   >();
@@ -109,8 +120,12 @@ const ExampleTwo = <TData extends Record<string, any>>({
   const [pageSize, setPageSize] = React.useState(20);
 
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [rowSelection, setRowSelection] = React.useState<Record<string, boolean>>({});
-  const [selectedRowsData, setSelectedRowsData] = React.useState<DataProps[]>([]);
+  const [rowSelection, setRowSelection] = React.useState<
+    Record<string, boolean>
+  >({});
+  const [selectedRowsData, setSelectedRowsData] = React.useState<DataProps[]>(
+    []
+  );
   const [type, setType] = React.useState<string | null>(null);
   const [selectedOffer, setSelectedOffer] = React.useState<any>(null);
   const [pagination, setPagination] = React.useState<PaginationState>({
@@ -126,16 +141,35 @@ const ExampleTwo = <TData extends Record<string, any>>({
     setIsModalOpen(!!leadId);
   }, [leadId]);
 
+    // Persist column visibility settings
+  React.useEffect(() => {
+    const defaultHiddenColumns = {
+      liveWith: false,
+      ownsFourWheeler: false,
+      ownsTwoWheeler: false,
+      insurancePlans: false,
+      investmentOptions: false,
+      earningMembers: false,
+      shoppingFrequency: false,
+      rewardInterests: false,
+      exploreIndiaFrequency: false,
+      travelAbroadFrequency: false
+    };
+    setColumnVisibility(prev => ({
+      ...defaultHiddenColumns,
+      ...prev
+    }));
+  }, []);
+
   const closeModal = () => setIsModalOpen(false);
 
-   React.useEffect(() => {
-     setPagination((prev) => ({
-       ...prev,
-       pageIndex: 0,
-       pageSize: Number(pageSize),
-     }));
-   }, [pageSize]);
-  
+  React.useEffect(() => {
+    setPagination((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      pageSize: Number(pageSize),
+    }));
+  }, [pageSize]);
 
   const table = useReactTable({
     data: tableData,
@@ -154,7 +188,7 @@ const ExampleTwo = <TData extends Record<string, any>>({
       columnFilters,
       columnVisibility,
       rowSelection,
-      pagination, 
+      pagination,
     },
   });
 
@@ -212,7 +246,7 @@ const ExampleTwo = <TData extends Record<string, any>>({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {[20, 50, 100].map((value) => (
+                {[20, 50, 100, 200, 500].map((value) => (
                   <SelectItem key={value} value={String(value)}>
                     {value}
                   </SelectItem>

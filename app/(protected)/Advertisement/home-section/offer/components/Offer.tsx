@@ -10,15 +10,15 @@ import { RowData } from "./columnsRecommend";
 import { columnsRecommend } from "./columnsRecommend";
 import { fetchOffers } from "@/app/(protected)/services/offers/api";
 
-
 function Users() {
-  
-
   const router = useRouter();
 
   const [data, setData] = useState<RowData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refresh, setRefresh] = useState<boolean>(false);
+  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [offerId, setOfferId] = useState<string>("");
+  const [open, setOpen] = useState<boolean>(false);
   const type = "offer";
 
   const fetchData = async () => {
@@ -43,7 +43,16 @@ function Users() {
         <ExampleTwo
           tableHeading="Offer List"
           tableData={data}
-          tableColumns={columnsRecommend(setRefresh, router)}
+          tableColumns={columnsRecommend(
+            setRefresh,
+            router,
+            setSelectedDate,
+            open,
+            setOpen,
+            selectedDate,
+            setOfferId,
+            offerId
+          )}
           setRefresh={setRefresh}
           type={type}
         />

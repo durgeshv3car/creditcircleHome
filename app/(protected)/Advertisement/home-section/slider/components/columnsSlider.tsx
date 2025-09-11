@@ -23,7 +23,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import { Switch } from "@/components/ui/switch";
 import { Calendar } from "@/components/ui/calendar";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger,DialogDescription } from "@/components/ui/dialog";
 import { deleteSliderImage, scheduleExpireSliderImage } from "@/app/(protected)/services/sliders/api";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
@@ -42,9 +42,11 @@ interface ColumnsSliderProps {
   selectedDate?: Date;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setOfferId: React.Dispatch<React.SetStateAction<string>>,
+    offerId: string
 }
 
-export const columnsSlider = ({fetchData,router,setSelectedDate,selectedDate,open,setOpen}: ColumnsSliderProps): ColumnDef<SliderData>[] => [
+export const columnsSlider = ({fetchData,router,setSelectedDate,selectedDate,open,setOpen,setOfferId,offerId}: ColumnsSliderProps): ColumnDef<SliderData>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -220,34 +222,42 @@ export const columnsSlider = ({fetchData,router,setSelectedDate,selectedDate,ope
       );
     },
   },
-  {
+   {
     id: "schedulExpire",
     header: "schedulExpire",
     enableHiding: false,
     cell: ({ row }) => {
-    
-  
       const handleDateSelect = (date: Date | undefined) => {
         setSelectedDate(date);
         console.log("Selected Deletion Date:", date);
       };
-  
+      
       const handleScheduleDelete = async () => {
         if (!selectedDate) {
           console.log("❌ No date selected");
           return;
         }
-      
-        const result = await scheduleExpireSliderImage(row.original.id, selectedDate);
-      
+        console.log(offerId, "expireid set");
+
+        const result = await scheduleExpireSliderImage(offerId, selectedDate);
+
         if (result.success) {
+          fetchData();
           setOpen(false);
         }
       };
-  
+
+      const handleChange = (id: string) => {
+        setOpen(true);
+        setOfferId(id)
+      };
+
       return (
         <div className="flex items-center gap-2">
-          <Dialog open={open} onOpenChange={setOpen}>
+          <Dialog
+            open={open}
+            onOpenChange={() => handleChange(row.original.id)}
+          >
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -267,25 +277,40 @@ export const columnsSlider = ({fetchData,router,setSelectedDate,selectedDate,ope
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-  
+
             {/* Calendar Dialog */}
-            <DialogContent className="p-4">
-              <DialogTitle className="text-lg font-semibold">Select Deletion Date</DialogTitle>
+            <DialogContent
+              className="p-4"
+              onOpenAutoFocus={(e) => {
+                e.preventDefault();
+                document.getElementById("schedule-delete-btn")?.focus();
+              }}
+            >
+              <DialogTitle className="text-lg font-semibold">
+                Select Expire Date
+              </DialogTitle>
+              <DialogDescription>
+                Pick a date from the calendar below to automatically expire this
+                offer.
+              </DialogDescription>
               <Calendar
                 mode="single"
                 selected={selectedDate}
-                onSelect={handleDateSelect} 
+                onSelect={handleDateSelect}
                 className="border rounded-md p-2"
               />
-              <Button className="mt-4 w-full" onClick={handleScheduleDelete}>
-                Schedule Delete
+              <Button
+                className="mt-4 w-full"
+                onClick={() => handleScheduleDelete()}
+              >
+                Schedule Expire
               </Button>
             </DialogContent>
           </Dialog>
         </div>
       );
     },
-  }
+  },
   
   
 ];

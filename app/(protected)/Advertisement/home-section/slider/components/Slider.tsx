@@ -17,6 +17,7 @@ function Users() {
   const [refresh, setRefresh] = useState<boolean>(false);
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [open, setOpen] = React.useState(false);
+  const [offerId, setOfferId] = useState<string>("");
 
   const type = "slider";
 
@@ -50,6 +51,8 @@ function Users() {
             selectedDate,
             open,
             setOpen,
+            setOfferId,
+            offerId
           })}
           setRefresh={setRefresh}
           type={type}

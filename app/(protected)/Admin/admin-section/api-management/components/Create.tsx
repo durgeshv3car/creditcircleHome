@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { addApi } from "@/app/(protected)/services/apiManagement/api";
+import ImageUpload from "../../../../Advertisement/components/ImageUpload";
+import type { FileWithPreview } from "../../../../Advertisement/components/ImageUpload";
 
 interface CreateModalProps {
   onClose: () => void;
@@ -20,27 +22,42 @@ const CreateModal: React.FC<CreateModalProps> = ({
   type,
 }) => {
   const [name, setName] = useState("");
+  const [imageFile, setImageFile] = useState<FileWithPreview | null>(null);
 
+  const Logo_DIMENSIONS = { width: 150 * 2, height: 150 * 2 };
+  const WEB_DIMENSIONS = { width: 1920, height: 970 };
+  const MOBILE_DIMENSIONS = { width: 150 * 2, height: 150 * 2 };
+  const dimensions = {
+    web: WEB_DIMENSIONS,
+    mobile: MOBILE_DIMENSIONS,
+  };
   const handleClose = () => {
     onClose();
   };
 
   const refreshData = () => setRefresh((prev) => !prev);
 
-
   const handleSubmit = async () => {
     try {
-      const result = await addApi(name);
+      const result = await addApi(
+        name,
+        dimensions,
+        imageFile?.file || null,
+        
+      );
+
       if (result.success) {
-        toast.success("Name added successfully");
+        toast.success("API added successfully");
         setName("");
+        setImageFile(null);
         refreshData();
         handleClose();
       } else {
-        toast.error("Failed to add Name");
+        toast.error("Failed to add API");
       }
     } catch (error) {
-      console.error("Error adding Name:", error);
+      console.error("Error adding API:", error);
+      toast.error("An error occurred while adding the API");
     }
   };
 
@@ -69,6 +86,22 @@ const CreateModal: React.FC<CreateModalProps> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full"
+            />
+          </div>
+
+          <div>
+            <div className="flex items-center">
+              <label className="block text-sm font-medium">Logo</label>
+              <span className="text-xs text-gray-500 ml-2">
+                ({Logo_DIMENSIONS.width} x {Logo_DIMENSIONS.height})
+              </span>
+            </div>
+            <ImageUpload
+              files={imageFile ? [imageFile] : []}
+              setFiles={(files: FileWithPreview[]) =>
+                setImageFile(files[0] || null)
+              }
+              label="Image"
             />
           </div>
         </div>

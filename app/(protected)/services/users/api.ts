@@ -36,3 +36,24 @@ export const deleteUser = async (id: string) => {
     throw error;
   }
 };
+
+export const pauseServices = async (id: string, pauseData: any) => {
+  try {
+    const response = await fetch(`/api/users?id=${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify( pauseData ), 
+    });
+
+    const data = await response.json();
+    console.log(data)
+
+    return { success: response.ok, data };
+  } catch (error) {
+    console.error("❌ Error scheduling delete:", error);
+    return { success: false };
+  }
+};
+

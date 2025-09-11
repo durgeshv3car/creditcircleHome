@@ -5,6 +5,7 @@ import { fetchUsers } from "../../../../services/users/api";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataProps } from ".././table/columns";
 import { useRouter } from "next/navigation";
+import PartnerStatusModal from "./PartnerStatus";
 
 
 export type SelectedValues = {
@@ -65,7 +66,7 @@ useEffect(() => {
   };
 
   loadColumns();
-}, [fetchData,isModalOpen,router]); 
+}, [fetchData, isModalOpen, router, selectedUser]); 
 
 
   useEffect(() => {
@@ -555,6 +556,14 @@ const incomeData = selectedValues.netMonthlyIncome?.length
         setRefresh={setRefresh}
         allFilterOptions={allFilterOptions}
       />
+      {selectedUser && (
+        <PartnerStatusModal
+          open={isModalOpen}
+          onOpenChange={setIsModalOpen}
+          id={selectedUser.id}
+          phoneNumber={String(selectedUser.phoneNumber)}
+        />
+      )}
     </div>
   );
 };

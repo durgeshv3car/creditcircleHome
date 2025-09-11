@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { ColumnDef } from "@tanstack/react-table";
-import ActiveToggleCell from "./ActiveToggleCell";
 import { deleteAPi } from "@/app/(protected)/services/apiManagement/api";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { deleteUser } from "@/app/(protected)/services/adminUsers/api";
@@ -28,6 +27,7 @@ export interface Categorys {
   createdAt:Date;
   username: string; 
   email: string;
+  thumbnail:string;
   role: string;
   permissions:[]
 }
