@@ -10,6 +10,7 @@ import HeaderLogo from "./header-logo";
 import { auth } from "@/lib/auth";
 import { jwtDecode } from "jwt-decode";
 import HeaderGreet from "./header-greet";
+import { HeaderDateRange } from "./header-date-range";
 interface DecodedToken {
   name: string;
   
@@ -36,6 +37,7 @@ const DashCodeHeader = async() => {
        
       </div>
       <div className="nav-tools flex items-center md:gap-4 gap-3">
+        <HeaderDateRange />
         <ThemeSwitcher />
         <ProfileInfo />
         <SheetMenu />

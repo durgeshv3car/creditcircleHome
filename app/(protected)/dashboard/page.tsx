@@ -5,9 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DashboardDropdown from "@/components/dashboard-dropdown";
 import dynamic from "next/dynamic";
 import { fetchApis } from "../services/apiManagement/api";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { fetchUsers } from "../services/users/api";
 import { fetchLoans } from "../services/loans/api";
+import { DateRange } from "react-day-picker";
 
 const RevinueBarChart = dynamic(
   () => import("@/components/revenue-bar-chart"),
@@ -21,35 +22,66 @@ const DashboardPage = () => {
   const [apiCount, setApiCount] = useState("");
   const [userCount, setUserCount] = useState("");
   const [loanCount, setLoanCount] = useState("");
-  const lengthApi = async () => {
+  const [startDate, setStartDate] = useState<string | null>(null);
+  const [endDate, setEndDate] = useState<string | null>(null);
+  const lengthApi = useCallback(async () => {
     try {
       const result = await fetchApis();
-      setApiCount(result.length);
+      setApiCount(result.length.toString());
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  };
-  const lengthUser = async () => {
+  }, []);
+
+  const lengthUser = useCallback(async () => {
     try {
       const result = await fetchUsers();
-      setUserCount(result.length);
+      if (startDate && endDate) {
+        const filteredUsers = result.filter((user: any) => {
+          const createdDate = new Date(user.createdAt).toISOString().split('T')[0];
+          return createdDate >= startDate && createdDate <= endDate;
+        });
+        setUserCount(filteredUsers.length.toString());
+      } else {
+        setUserCount(result.length.toString());
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  };
-  const lengthLoan = async () => {
+  }, [startDate, endDate]);
+
+  const lengthLoan = useCallback(async () => {
     try {
       const result = await fetchLoans();
-      setLoanCount(result.length);
+      if (startDate && endDate) {
+        const filteredLoans = result.filter((loan: any) => {
+          const createdDate = new Date(loan.createdAt).toISOString().split('T')[0];
+          return createdDate >= startDate && createdDate <= endDate;
+        });
+        setLoanCount(filteredLoans.length.toString());
+      } else {
+        setLoanCount(result.length.toString());
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  };
+  }, [startDate, endDate]);
+
+  useEffect(() => {
+    const storedStart = localStorage.getItem("startDate");
+    const storedEnd = localStorage.getItem("endDate");
+
+    if (storedStart && storedEnd) {
+      setStartDate(storedStart);
+      setEndDate(storedEnd);
+    }
+  }, []);
+  
   useEffect(() => {
     lengthApi();
     lengthUser();
     lengthLoan();
-  }, []);
+  }, [lengthApi, lengthUser, lengthLoan]);
   return (
     <div>
       <div className="grid grid-cols-12 items-center gap-5 mb-5">
