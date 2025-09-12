@@ -2,9 +2,28 @@ import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "@/lib/getToken";
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const token = await getToken();
+    const { searchParams } = new URL(req.url);
+    const phoneNumber = searchParams.get("id");
+
+    // If phoneNumber is provided, fetch single loan
+    if (phoneNumber) {
+      const res = await fetch(`${BASE_URL}/single-loan-application-mobile/${phoneNumber}`, {
+        headers: {
+          Authorization: token || "",
+        },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        return NextResponse.json(data, { status: res.status });
+      } else {
+        return NextResponse.json({ error: data?.error || "Failed to fetch loan" }, { status: res.status });
+      }
+    }
+
+    // If no phoneNumber, fetch all loans
     const res = await fetch(`${BASE_URL}/all-loan-application`, {
       headers: {
         Authorization: token || "",
@@ -73,3 +92,5 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: "Failed to delete loan" }, { status: 500 });
   }
 }
+
+

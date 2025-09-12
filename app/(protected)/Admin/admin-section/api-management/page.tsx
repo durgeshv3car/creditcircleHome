@@ -6,6 +6,7 @@ import { checkRoute } from "@/app/(protected)/helper";
 import { auth } from "@/lib/auth";
 import { jwtDecode } from "jwt-decode";
 
+
 export default async function MainPage() {
   const allowed = await checkRoute("Api Management");
   if (!allowed) notFound();
@@ -22,6 +23,7 @@ export default async function MainPage() {
   let permissions: string[] = [];
 
   if (session?.user && "token" in session.user) {
+    
     const decoded = jwtDecode<DecodedToken>(
       (session.user as { token: string }).token
     );

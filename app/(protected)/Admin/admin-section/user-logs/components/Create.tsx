@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { addApi } from "@/app/(protected)/services/apiManagement/api";
+
 
 interface CreateModalProps {
   onClose: () => void;
@@ -28,21 +28,7 @@ const CreateModal: React.FC<CreateModalProps> = ({
   const refreshData = () => setRefresh((prev) => !prev);
 
 
-  const handleSubmit = async () => {
-    try {
-      const result = await addApi(title);
-      if (result.success) {
-        toast.success("Title added successfully");
-        setTitle("");
-        refreshData();
-        handleClose();
-      } else {
-        toast.error("Failed to add title");
-      }
-    } catch (error) {
-      console.error("Error adding title:", error);
-    }
-  };
+
 
   return (
     <>
@@ -77,7 +63,7 @@ const CreateModal: React.FC<CreateModalProps> = ({
           <Button variant="outline" onClick={handleClose}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit}>Save</Button>
+          <Button >Save</Button>
         </div>
       </div>
     </>

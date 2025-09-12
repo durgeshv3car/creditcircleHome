@@ -127,7 +127,7 @@ const ExampleTwo: React.FC<ExampleTwoProps> = ({ selectedValues, setSelectedValu
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {[20, 50, 100].map((value) => (
+              {[20, 50, 100,200,500].map((value) => (
                 <SelectItem key={value} value={String(value)}>
                   {value}
                 </SelectItem>

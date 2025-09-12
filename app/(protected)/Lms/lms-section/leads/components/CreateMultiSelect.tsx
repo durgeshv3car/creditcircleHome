@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { useState } from "react";
+import { Span } from "next/dist/trace";
 
 interface CategoryOption {
   id: string;
@@ -55,7 +56,8 @@ const CategoryMultiSelect = ({
       <PopoverTrigger asChild>
         <Button variant="outline" className="w-full justify-start flex-wrap">
           {safeSelectedIds.length === 0 ? (
-            <span>Select {label}</span>
+             (label=="dob")?<span>age</span>:<span>{label}</span>
+        
           ) : (
             <>
               {options

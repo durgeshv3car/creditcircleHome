@@ -9,6 +9,18 @@ export const fetchLoans = async () => {
   }
 };
 
+export const singleLoans=async(phoneNumber:string)=>{
+   try {
+    const response = await fetch(`/api/loans?id=${phoneNumber}`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching loans:", error);
+    throw error;
+  }
+
+}
+
 export const updateLoan = async (userId: string, data: object) => {
   try {
     const response = await fetch(`/api/loans?id=${userId}`, {

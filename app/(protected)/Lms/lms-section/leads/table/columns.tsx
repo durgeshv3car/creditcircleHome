@@ -14,9 +14,12 @@ import { Eye, SquarePen, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import PartnerStatus from "../components/PartnerStatus";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import PauseSms from "../components/PauseSms";
+import PauseEmail from "../components/PauseEmail";
+import PauseWhatsapp from "../components/PauseWhatsapp";
+import PartnerStatusModal from "../components/PartnerStatus";
 
 // Define all fields explicitly
 const fields = [
@@ -68,7 +71,7 @@ export const columns = ({
   setIsModalOpen: (val: boolean) => void;
   fetchData: () => void;
   router: AppRouterInstance;
-  selectedUser:any,
+  selectedUser: any;
   setSelectedUser: (val: { id: string; phoneNumber: number }) => void;
 }): ColumnDef<DataProps>[] => [
   {
@@ -96,8 +99,12 @@ export const columns = ({
   {
     id: "index",
     header: "ID",
-    cell: ({ row }) => <span>{row.index + 1}</span>,
+    cell: ({ row, table }) => {
+      const total = table.options.data.length; // all rows in dataset
+      return <span>{total - row.index}</span>;
+    },
   },
+
   ...fields.map((key) => ({
     accessorKey: key,
     header: key.replace(/([A-Z])/g, " $1").trim(),
@@ -105,52 +112,53 @@ export const columns = ({
       <span>{String(row.original[key] ?? "-")}</span>
     ),
   })),
-{
-  accessorKey: "status",
-  header: "Status",
-  cell: ({ row }) => {
-    const statusColors: Record<string, string> = {
-      blue: "bg-blue-100 text-blue-700",
-    };
+ 
+  {
+    accessorKey: "pauseSms",
+    header: "pauseSms",
+    cell: ({ row }) => <PauseSms row={row} refreshData={fetchData} />,
+  },
+  {
+    accessorKey: "pauseEmail",
+    header: "pauseEmail",
+    cell: ({ row }) => <PauseEmail row={row} refreshData={fetchData} />,
+  },
+  {
+    accessorKey: "pauseWhatsapp",
+    header: "pauseWhatsapp",
+    cell: ({ row }) => <PauseWhatsapp row={row} refreshData={fetchData} />,
+  },
 
-    const handleClick = () => {
-      const id =
-        typeof row.original.id === "string"
-          ? row.original.id
-          : String(row.original.id ?? "");
+   {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      const statusColors: Record<string, string> = {
+        blue: "bg-blue-100 text-blue-700",
+      };
 
-      const phoneNumber =
-        typeof row.original.phoneNumber === "number"
-          ? row.original.phoneNumber
-          : Number(row.original.phoneNumber) || 0;
+      const handleClick = () => {
+        const id = String(row.original.id ?? "");
+        const phoneNumber = Number(row.original.phoneNumber) || 0;
+        
+        console.log("Clicked status button:", { id, phoneNumber });
+        setSelectedUser({ id, phoneNumber });
+        setIsModalOpen(true);
+      };
 
-      setSelectedUser({ id, phoneNumber });
-      setIsModalOpen(true);
-    };
+      const status = "blue";
+      const statusStyles = statusColors[status];
 
-    const status = "blue"; // You can update this dynamically if needed
-    const statusStyles = statusColors[status];
-
-    return (
-      <>
+      return (
         <Badge
           className={cn("rounded-full px-5 cursor-pointer", statusStyles)}
           onClick={handleClick}
         >
           status
         </Badge>
-        {isModalOpen && (
-          <PartnerStatus
-            close={() => setIsModalOpen(false)}
-            userdata={row.original.registerStatus}
-            id={selectedUser.id}
-            phoneNumber={selectedUser.phoneNumber}
-          />
-        )}
-      </>
-    );
+      );
+    },
   },
-},
 
   {
     id: "actions",

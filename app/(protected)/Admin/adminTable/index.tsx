@@ -17,6 +17,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { CalendarIcon } from "lucide-react";
+import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
@@ -116,7 +123,12 @@ interface TableProps {
   type: ModalType;
   role: string;
   permissions: [];
+  setDateRange: (value: string) => void;
+  dateRange: string;
+  date?: Date;
+  setDate: (date: Date | undefined) => void;
 }
+
 
 const ExampleTwo = ({
   tableHeading,
@@ -126,6 +138,10 @@ const ExampleTwo = ({
   type,
   role,
   permissions,
+  setDateRange,
+  dateRange,
+  date,
+  setDate
 }: TableProps) => {
   const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
@@ -149,18 +165,18 @@ const ExampleTwo = ({
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnsField, setColumnsField] = React.useState<string[]>([]);
   const [pageSize, setPageSize] = React.useState(20);
-   const [pagination, setPagination] = React.useState<PaginationState>({
-     pageIndex: 0,
-     pageSize,
-   });
- 
-    React.useEffect(() => {
-       setPagination((prev) => ({
-         ...prev,
-         pageIndex: 0,
-         pageSize: Number(pageSize),
-       }));
-     }, [pageSize]);
+  const [pagination, setPagination] = React.useState<PaginationState>({
+    pageIndex: 0,
+    pageSize,
+  });
+
+  React.useEffect(() => {
+    setPagination((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      pageSize: Number(pageSize),
+    }));
+  }, [pageSize]);
 
   const table = useReactTable({
     data: tableData,
@@ -174,12 +190,12 @@ const ExampleTwo = ({
     onColumnVisibilityChange: setColumnVisibility,
     onPaginationChange: setPagination,
     onRowSelectionChange: setRowSelection,
-     state: {
+    state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
-      pagination, 
+      pagination,
     },
   });
 
@@ -219,7 +235,7 @@ const ExampleTwo = ({
           {type == "api" ? (
             <Button
               onClick={createPage}
-               className="bg-gray-600 hover:bg-gray-700 text-white h-8 text-xs rounded-md shadow-sm transition-all px-6"
+              className="bg-gray-600 hover:bg-gray-700 text-white h-8 text-xs rounded-md shadow-sm transition-all px-6"
             >
               Add {tableHeading}
             </Button>
@@ -229,6 +245,47 @@ const ExampleTwo = ({
         </div>
 
         <div className="flex items-center gap-4">
+          {
+            <>
+              {type === "api" && (
+                <div className="flex flex-row gap-4 max-w-sm">
+                  {/* Dropdown */}
+                  <Select onValueChange={(val) => setDateRange(val)} value={dateRange}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select Range" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1d">1 Day</SelectItem>
+                      <SelectItem value="1w">1 Week</SelectItem>
+                      <SelectItem value="1m">1 Month</SelectItem>
+                      <SelectItem value="6m">6 Months</SelectItem>
+                      <SelectItem value="custom">Custom Date</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  {/* Calendar if custom date selected */}
+                  {dateRange === "custom" && (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button className="w-full flex items-center justify-between rounded-lg border px-3 py-2 text-left text-sm">
+                          Pick a date
+                          <CalendarIcon className="h-4 w-4 opacity-50" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="p-0">
+                        <Calendar
+                          mode="single"
+                          selected={date}
+                          onSelect={setDate}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  )}
+                </div>
+              )}
+            </>
+          }
           {/* Select for Rows per Page */}
           <label className="text-sm text-gray-600">Rows per page:</label>
           <Select
@@ -239,7 +296,7 @@ const ExampleTwo = ({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {[20, 50, 100].map((value) => (
+              {[20, 50, 100, 200, 500].map((value) => (
                 <SelectItem key={value} value={String(value)}>
                   {value}
                 </SelectItem>

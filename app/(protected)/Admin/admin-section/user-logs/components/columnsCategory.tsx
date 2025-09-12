@@ -25,17 +25,22 @@ export interface Categorys {
   createdAt:Date;
   username: string; // Ensure this matches the key in your data
   email: string;
+  thumbnail:string;
   role: string;
   permissions:[]
 }
 interface ColumnsCategoryProps {
   fetchData: () => void;
   router: AppRouterInstance;
+  startDateRange: string;
+  endDateRange: string;
 }
 
 export const columnsCategory = ({
   fetchData,
   router,
+  startDateRange,
+  endDateRange,
 }: ColumnsCategoryProps): ColumnDef<Categorys>[] => [
   {
     id: "select",
@@ -101,15 +106,15 @@ export const columnsCategory = ({
   header: "Time",
   cell: ({ row }) => {
     const utcDate = new Date(row.original.createdAt);
-    const istDate = new Date(utcDate.getTime() + 5.5 * 60 * 60 * 1000); // Convert to IST
+    // const utcDate = new Date(utcDate.getTime() + 5.5 * 60 * 60 * 1000); // Convert to IST
 
-    const day = String(istDate.getDate()).padStart(2, "0");
-    const month = String(istDate.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
-    const year = istDate.getFullYear();
+    const day = String(utcDate.getDate()).padStart(2, "0");
+    const month = String(utcDate.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
+    const year = utcDate.getFullYear();
 
-    const hours = String(istDate.getHours()).padStart(2, "0");
-    const minutes = String(istDate.getMinutes()).padStart(2, "0");
-    const seconds = String(istDate.getSeconds()).padStart(2, "0");
+    const hours = String(utcDate.getHours()).padStart(2, "0");
+    const minutes = String(utcDate.getMinutes()).padStart(2, "0");
+    const seconds = String(utcDate.getSeconds()).padStart(2, "0");
 
     const formatted = `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
 

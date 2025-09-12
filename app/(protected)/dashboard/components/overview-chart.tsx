@@ -23,19 +23,44 @@ const OverviewChart = ({
 
   const [loanCount, setLoanCount] = useState(0);
   const [notApplied, setNotApplied] = useState(0);
+  const [startDate, setStartDate] = useState<string | null>(null);
+  const [endDate, setEndDate] = useState<string | null>(null);
+
+  // Load dates from localStorage
+  useEffect(() => {
+    const storedStart = localStorage.getItem("startDate");
+    const storedEnd = localStorage.getItem("endDate");
+    
+    if (storedStart && storedEnd) {
+      setStartDate(storedStart);
+      setEndDate(storedEnd);
+    }
+  }, []);
+
   useEffect(() => {
     const fetchLoanData = async () => {
       try {
-        const result = await fetchLoans(); 
-        setLoanCount(result.length);
-
+        const result = await fetchLoans();
+        
         // Define a type for loan objects
         type Loan = {
           loanDataStatus?: Record<string, any>;
+          createdAt: string;
           [key: string]: any;
         };
 
-        const notAppliedCount = result.filter(
+        // Filter loans by date range if dates are selected
+        const filteredLoans = result.filter((loan: Loan) => {
+          if (startDate && endDate) {
+            const createdDate = new Date(loan.createdAt).toISOString().split('T')[0];
+            return createdDate >= startDate && createdDate <= endDate;
+          }
+          return true; // Include all loans if no date range is selected
+        });
+
+        setLoanCount(filteredLoans.length);
+
+        const notAppliedCount = filteredLoans.filter(
           (loan: Loan) =>
             !loan.loanDataStatus ||
             Object.keys(loan.loanDataStatus).length === 0
@@ -48,7 +73,7 @@ const OverviewChart = ({
     };
 
     fetchLoanData();
-  }, []);
+  }, [startDate, endDate]);
 
   const Applied = Math.max(loanCount - notApplied, 0);
   const series = [Applied, notApplied];

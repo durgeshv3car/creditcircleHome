@@ -104,24 +104,24 @@ export const updateSliderImage = async (
     }
   };
 
-export const scheduleDeleteSliderImage = async (id: string, type: string, deletionDate: Date) => {
-    try {
-      const formDataSend = new FormData();
-      formDataSend.append("id", id);
-      formDataSend.append("type", type);
-      formDataSend.append("deletionDate", deletionDate.toISOString());
-  
-      const response = await fetch("/api/sliders", {
-        method: "PUT",
-        body: formDataSend,
-      });
-      const data = await response.json();
-  
-      return { success: response.ok, data };
-    } catch (error) {
-      console.error("Error scheduling delete:", error);
-      return { success: false };
-    }
-  };
+export const scheduleExpireSliderImage = async (id: string, expireDate: Date) => {
+  try {
+    const response = await fetch(`/api/sliders?id=${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ expireDate }), 
+    });
+
+    const data = await response.json();
+    console.log(data)
+
+    return { success: response.ok, data };
+  } catch (error) {
+    console.error("❌ Error scheduling delete:", error);
+    return { success: false };
+  }
+};
 
 

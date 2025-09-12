@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 import { columnsCategory } from "./columnsCategory";
 import type { Categorys } from "./columnsCategory";
 import type { ColumnDef } from "@tanstack/react-table";
+import { createLogs } from "@/app/(protected)/services/userLogs/api";
 
 // Dynamic imports
 const ExampleTwo = dynamic(() => import("../../../adminTable"), {
@@ -24,18 +25,56 @@ function Category({
   role: string;
   permissions: any;
 }) {
- 
-
   const router = useRouter();
   const [data, setData] = useState<Categorys[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refresh, setRefresh] = useState<boolean>(false);
+  const [dateRange, setDateRange] = useState<string>("1d");
+  const [startDate, setStartDate] = React.useState<Date>(new Date());
+  const [endDate, setEndDate] = React.useState<Date>(new Date());
+  const [date, setDate] = React.useState<Date>();
+  const [startDateRange, setStartDateRange] = React.useState<string>("");
+  const [endDateRange, setEndDateRange] = React.useState<string>("");
+
+  const handleDateRangeChange = (value: string) => {
+    setDateRange(value);
+    const now = new Date();
+    now.setHours(23, 59, 59, 999);
+    setEndDate(now);
+
+    let start = new Date();
+    start.setHours(0, 0, 0, 0);
+
+    switch (value) {
+      case "1w":
+        start = new Date(now);
+        start.setDate(now.getDate() - 7);
+        start.setHours(0, 0, 0, 0);
+        break;
+      case "1m":
+        start = new Date(now);
+        start.setMonth(now.getMonth() - 1);
+        start.setHours(0, 0, 0, 0);
+        break;
+      case "6m":
+        start = new Date(now);
+        start.setMonth(now.getMonth() - 6);
+        start.setHours(0, 0, 0, 0);
+        break;
+      default: // "1d"
+        start = new Date(now);
+        start.setHours(0, 0, 0, 0);
+        break;
+    }
+    setStartDate(start);
+  };
 
   const type = "api";
 
   const fetchData = async () => {
     try {
       const result = await fetchApis();
+      // const logs=await createLogs("User view api-management section list")
       setData(result);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -47,9 +86,41 @@ function Category({
   useEffect(() => {
     fetchData();
   }, [refresh]);
+  function getYearRange(
+    start?: string | Date,
+    end?: string | Date,
+    date?: string | Date
+  ) {
+    if (date) {
+      const currentDate=new Date();
+      const oldDate = new Date(date);
+      const formattedStart = currentDate.toISOString().split("T")[0];
+      const formattedEnd = oldDate.toISOString().split("T")[0];
 
-  if (loading)
-    return <Loader2 className="me-2 h-4 w-4 animate-spin" />;
+      setStartDateRange(formattedStart);
+      setEndDateRange(formattedEnd);
+    } else {
+      const formatDate = (d?: string | Date): string | null => {
+        if (!d) return null;
+        const date = new Date(d);
+        return date.toISOString().split("T")[0]; 
+      };
+
+      const formattedStart = formatDate(start);
+      const formattedEnd = formatDate(end);
+
+      setStartDateRange(formattedStart ?? "");
+      setEndDateRange(formattedEnd ?? "");
+    }
+  }
+
+  useEffect(() => {
+    getYearRange(startDate, endDate, date);
+  }, [dateRange, startDate, endDate, date]);
+
+  console.log("Start:", startDateRange, "End:", endDateRange);
+
+  if (loading) return <Loader2 className="me-2 h-4 w-4 animate-spin" />;
 
   return (
     <>
@@ -57,14 +128,22 @@ function Category({
         <ExampleTwo
           tableHeading="Api List"
           tableData={data}
-          tableColumns={columnsCategory({
-            fetchData,
-            router,
-          }) as ColumnDef<Categorys>[]} 
+          tableColumns={
+            columnsCategory({
+              fetchData,
+              router,
+              startDateRange,
+              endDateRange,
+            }) as ColumnDef<Categorys>[]
+          }
           setRefresh={setRefresh}
           type={type}
           role={role}
           permissions={permissions}
+          setDateRange={handleDateRangeChange}
+          dateRange={dateRange}
+          date={date}
+          setDate={setDate}
         />
       </div>
     </>

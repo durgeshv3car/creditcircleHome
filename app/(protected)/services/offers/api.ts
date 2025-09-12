@@ -120,3 +120,23 @@ export const deleteOffer = async (id: string) => {
     return { success: false };
   }
 };
+
+export const scheduleExpireOffer = async (id: string, expireDate: Date) => {
+  try {
+    const response = await fetch(`/api/offers?id=${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ expireDate }), 
+    });
+
+    const data = await response.json();
+    console.log(data)
+
+    return { success: response.ok, data };
+  } catch (error) {
+    console.error("❌ Error scheduling delete:", error);
+    return { success: false };
+  }
+};

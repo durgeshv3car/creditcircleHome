@@ -137,3 +137,45 @@ export async function DELETE(req: NextRequest) {
     );
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const token = await getToken();
+
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json({ error: "ID is required" }, { status: 400 });
+    }
+
+
+    const body = await req.json();
+    const { expireDate } = body; 
+
+    const res = await fetch(`${BASE_URL}/offers/expire/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token || "",
+      },
+      body: JSON.stringify({ expireDate }),
+    });
+
+    if (!res.ok) {
+      return NextResponse.json(
+        { error: "Failed to patch banner" },
+        { status: res.status }
+      );
+    }
+
+    const data = await res.json();
+    return NextResponse.json(data, { status: res.status });
+  } catch (error) {
+    console.error("❌ Patch Error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}

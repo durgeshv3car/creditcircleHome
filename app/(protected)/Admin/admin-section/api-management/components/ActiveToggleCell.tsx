@@ -5,16 +5,37 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { updateApi } from "@/app/(protected)/services/apiManagement/api";
 
-const ActiveToggleCell = ({ row,refreshData }: { row: any,refreshData:()=>void }) => {
+const ActiveToggleCell = ({
+  row,
+  refreshData,
+}: {
+  row: any;
+  refreshData: () => void;
+}) => {
   const [isActive, setIsActive] = React.useState(row.original.isActive);
+  const Web_DIMENSIONS = { width: 1920, height: 970 };
+  const Mobile_DIMENSIONS = { width: 365, height: 140 };
+  const dimensions = {
+    web: Web_DIMENSIONS,
+    mobile: Mobile_DIMENSIONS,
+  };
 
   const handleToggle = async (value: boolean) => {
     try {
-      const result = await updateApi(row.original.id,row.original.name, value);
+      const result = await updateApi(
+        row.original.id,
+        dimensions,
+        row.original.name,
+        value,
+        null,
+        row.original.mobileUrl || "",
+      );
       if (result.success) {
-        toast.success(`Api-Management ${value ? "activated" : "deactivated"} successfully`);
+        toast.success(
+          `Api-Management ${value ? "activated" : "deactivated"} successfully`
+        );
         setIsActive(value);
-        refreshData()
+        refreshData();
       } else {
         toast.error("Failed to update status");
       }
