@@ -54,6 +54,7 @@ import {
 import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Categorys } from "../admin-section/user-management/components/columnsCategory";
+import { HeaderDateRange } from "../admin-section/api-management/components/header-date-range";
 
 type ModalType = "api" | "logs" | "user";
 
@@ -123,12 +124,8 @@ interface TableProps {
   type: ModalType;
   role: string;
   permissions: [];
-  setDateRange: (value: string) => void;
-  dateRange: string;
-  date?: Date;
-  setDate: (date: Date | undefined) => void;
-}
 
+}
 
 const ExampleTwo = ({
   tableHeading,
@@ -138,10 +135,6 @@ const ExampleTwo = ({
   type,
   role,
   permissions,
-  setDateRange,
-  dateRange,
-  date,
-  setDate
 }: TableProps) => {
   const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
@@ -232,57 +225,21 @@ const ExampleTwo = ({
           <div className="text-xl font-medium text-gray-600">
             {tableHeading}
           </div>
-          {type == "api" ? (
-            <Button
-              onClick={createPage}
-              className="bg-gray-600 hover:bg-gray-700 text-white h-8 text-xs rounded-md shadow-sm transition-all px-6"
-            >
-              Add {tableHeading}
-            </Button>
-          ) : (
-            <></>
-          )}
         </div>
 
         <div className="flex items-center gap-4">
           {
             <>
               {type === "api" && (
-                <div className="flex flex-row gap-4 max-w-sm">
-                  {/* Dropdown */}
-                  <Select onValueChange={(val) => setDateRange(val)} value={dateRange}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select Range" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1d">1 Day</SelectItem>
-                      <SelectItem value="1w">1 Week</SelectItem>
-                      <SelectItem value="1m">1 Month</SelectItem>
-                      <SelectItem value="6m">6 Months</SelectItem>
-                      <SelectItem value="custom">Custom Date</SelectItem>
-                    </SelectContent>
-                  </Select>
-
-                  {/* Calendar if custom date selected */}
-                  {dateRange === "custom" && (
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <button className="w-full flex items-center justify-between rounded-lg border px-3 py-2 text-left text-sm">
-                          Pick a date
-                          <CalendarIcon className="h-4 w-4 opacity-50" />
-                        </button>
-                      </PopoverTrigger>
-                      <PopoverContent className="p-0">
-                        <Calendar
-                          mode="single"
-                          selected={date}
-                          onSelect={setDate}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  )}
-                </div>
+                <>
+                  <Button
+                    onClick={createPage}
+                    className="bg-gray-600 hover:bg-gray-700 text-white h-8 text-xs rounded-md shadow-sm transition-all px-6"
+                  >
+                    Add {tableHeading}
+                  </Button>
+                  <HeaderDateRange />
+                </>
               )}
             </>
           }
