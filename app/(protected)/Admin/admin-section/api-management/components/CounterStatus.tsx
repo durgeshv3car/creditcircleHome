@@ -27,7 +27,7 @@ function CounterStatus({
   endDate: string;
 }) {
   type FilterResponse = {
-    pendingFiltered?: { count: number; createdAt: string }[];
+    duplicateFiltered?: { count: number; createdAt: string }[];
     approvedFiltered?: { count: number; createdAt: string }[];
     rejectedFiltered?: { count: number; createdAt: string }[];
   };
@@ -47,7 +47,7 @@ function CounterStatus({
       )) as FilterResponse;
 
       setCounts({
-        duplicate: response.pendingFiltered?.length ?? 0,
+        duplicate: response.duplicateFiltered?.length ?? 0,
         approved: response.approvedFiltered?.length ?? 0,
         rejected: response.rejectedFiltered?.length ?? 0,
       });
@@ -64,7 +64,7 @@ function CounterStatus({
 
   const statusItems = [
     {
-      label: "Pending",
+      label: "Duplicate",
       count: counts.duplicate,
       icon: Clock,
       bgColor: "bg-gradient-to-br from-amber-50 to-yellow-50",
@@ -135,7 +135,7 @@ function CounterStatus({
 
         <div className="flex justify-between text-xs text-gray-600">
           <span>{statusItems[1].percentage}% Approved</span>
-          <span>{statusItems[0].percentage}% Pending</span>
+          <span>{statusItems[0].percentage}% Duplicate</span>
           <span>{statusItems[2].percentage}% Rejected</span>
         </div>
       </div>
