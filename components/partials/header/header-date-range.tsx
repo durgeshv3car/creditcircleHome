@@ -4,6 +4,8 @@ import React from 'react';
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { DateRange } from "react-day-picker";
 import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function HeaderDateRange() {
   const [dateRange, setDateRange] = React.useState<DateRange | undefined>(undefined);
@@ -19,8 +21,14 @@ export function HeaderDateRange() {
         to: new Date(endDate)
       });
     }
-    
   }, [dateRange]);
+
+  // Calculate the duration of current range in days
+  const getRangeDuration = () => {
+    if (!dateRange?.from || !dateRange?.to) return 0;
+    const diffTime = Math.abs(dateRange.to.getTime() - dateRange.from.getTime());
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
 
   const handleDateRangeChange = (range: DateRange | undefined) => {
     setDateRange(range);
@@ -49,6 +57,40 @@ export function HeaderDateRange() {
     }
   };
 
+  // Shift date range backward (decrement)
+  const decrementRange = () => {
+    if (!dateRange?.from || !dateRange?.to) return;
+    
+    const duration = getRangeDuration();
+    const newFrom = new Date(dateRange.from);
+    const newTo = new Date(dateRange.to);
+    
+    // Move both dates backward by the duration + 1 day
+    newFrom.setDate(newFrom.getDate() - duration - 1);
+    newTo.setDate(newTo.getDate() - duration - 1);
+    
+    const newRange = { from: newFrom, to: newTo };
+    handleDateRangeChange(newRange);
+    window.location.reload();
+  };
+
+  // Shift date range forward (increment)
+  const incrementRange = () => {
+    if (!dateRange?.from || !dateRange?.to) return;
+    
+    const duration = getRangeDuration();
+    const newFrom = new Date(dateRange.from);
+    const newTo = new Date(dateRange.to);
+    
+    // Move both dates forward by the duration + 1 day
+    newFrom.setDate(newFrom.getDate() + duration + 1);
+    newTo.setDate(newTo.getDate() + duration + 1);
+    
+    const newRange = { from: newFrom, to: newTo };
+    handleDateRangeChange(newRange);
+    window.location.reload();
+  };
+
   const handleReset = () => {
     localStorage.removeItem('startDate');
     localStorage.removeItem('endDate');
@@ -58,14 +100,48 @@ export function HeaderDateRange() {
 
   return (
     <div className="flex items-center gap-2">
+     
+
+      {/* Date Range Picker */}
       <DateRangePicker 
         className="w-auto"
         onDateRangeChange={handleDateRangeChange}
         value={dateRange}
       />
+
+       {/* Decrement Button */}
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={decrementRange}
+        disabled={!dateRange?.from || !dateRange?.to}
+        className={cn("shrink-0", {
+          "opacity-50 cursor-not-allowed": !dateRange?.from || !dateRange?.to,
+        })}
+        title="Previous date range"
+      >
+        <ChevronLeft className="h-4 w-4" />
+      </Button>
+
+      {/* Increment Button */}
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={incrementRange}
+        disabled={!dateRange?.from || !dateRange?.to}
+        className={cn("shrink-0", {
+          "opacity-50 cursor-not-allowed": !dateRange?.from || !dateRange?.to,
+        })}
+        title="Next date range"
+      >
+        <ChevronRight className="h-4 w-4" />
+      </Button>
+
+      {/* Reset Button */}
       <Button
         variant="outline"
         size="sm"
+        disabled={!dateRange?.from || !dateRange?.to}
         onClick={handleReset}
         className="whitespace-nowrap"
       >
