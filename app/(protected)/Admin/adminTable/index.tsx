@@ -54,7 +54,7 @@ import {
 import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Categorys } from "../admin-section/user-management/components/columnsCategory";
-import { HeaderDateRange } from "../admin-section/api-management/components/header-date-range";
+
 
 type ModalType = "api" | "logs" | "user";
 
@@ -224,10 +224,7 @@ const ExampleTwo = ({
         <div className="flex items-center gap-16">
           <div className="text-xl font-medium text-gray-600">
             {tableHeading}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4">
+          </div>{" "}
           {
             <>
               {type === "api" && (
@@ -238,11 +235,13 @@ const ExampleTwo = ({
                   >
                     Add {tableHeading}
                   </Button>
-                  <HeaderDateRange />
                 </>
               )}
             </>
           }
+        </div>
+
+        <div className="flex items-center gap-4">
           {/* Select for Rows per Page */}
           <label className="text-sm text-gray-600">Rows per page:</label>
           <Select
