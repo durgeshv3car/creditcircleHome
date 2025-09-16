@@ -31,45 +31,8 @@ function Category({
   const [refresh, setRefresh] = useState<boolean>(false);
   const [open, setOpen] = useState(false);
   const [permissionList, setPermissionList] = useState<string[]>([]);
-  const [dateRange, setDateRange] = useState<string>("1d");
-  const [startDate, setStartDate] = React.useState<Date>(new Date());
-  const [endDate, setEndDate] = React.useState<Date>(new Date());
-  const [date, setDate] = React.useState<Date>();
-  const [startDateRange, setStartDateRange] = React.useState<string>("");
-  const [endDateRange, setEndDateRange] = React.useState<string>("");
 
-  const handleDateRangeChange = (value: string) => {
-    setDateRange(value);
-    const now = new Date();
-    now.setHours(23, 59, 59, 999);
-    setEndDate(now);
 
-    let start = new Date();
-    start.setHours(0, 0, 0, 0);
-
-    switch (value) {
-      case "1w":
-        start = new Date(now);
-        start.setDate(now.getDate() - 7);
-        start.setHours(0, 0, 0, 0);
-        break;
-      case "1m":
-        start = new Date(now);
-        start.setMonth(now.getMonth() - 1);
-        start.setHours(0, 0, 0, 0);
-        break;
-      case "6m":
-        start = new Date(now);
-        start.setMonth(now.getMonth() - 6);
-        start.setHours(0, 0, 0, 0);
-        break;
-      default: // "1d"
-        start = new Date(now);
-        start.setHours(0, 0, 0, 0);
-        break;
-    }
-    setStartDate(start);
-  };
   const type = "user";
 
   const fetchData = async () => {
@@ -111,10 +74,7 @@ function Category({
           type={type}
           role={role}
           permissions={permissions}
-          setDateRange={handleDateRangeChange}
-          dateRange={dateRange}
-          date={date}
-          setDate={setDate}
+
         />
       </div>
     </>

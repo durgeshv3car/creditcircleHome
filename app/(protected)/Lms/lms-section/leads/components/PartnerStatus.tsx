@@ -119,56 +119,60 @@ function PartnerStatusModal({ open, onOpenChange, phoneNumber }: PartnerStatusMo
   }, [phoneNumber, open]);
 
   // Memoized loan grouping
-  const { groupedLoans, loanTypes } = useMemo(() => {
-    console.log("Processing loans:", loans);
-    const grouped = loans.reduce((acc, data) => {
-      if (!data.loanDataStatus) {
-        console.log("No loanDataStatus for:", data);
-        return acc;
+const { groupedLoans, loanTypes } = useMemo(() => {
+  console.log("Processing loans:", loans);
+  const grouped = loans.reduce((acc, data) => {
+    if (!data.loanDataStatus) {
+      console.log("No loanDataStatus for:", data);
+      return acc;
+    }
+
+    Object.entries(data.loanDataStatus).forEach(([key, value]) => {
+      const type = key.toLowerCase();
+      if (!acc[type]) {
+        acc[type] = [];
+      }
+      if (!acc["all"]) {
+        acc["all"] = []; // ensure "all" group exists
       }
 
-      Object.entries(data.loanDataStatus).forEach(([key, value]) => {
-        const type = key.toLowerCase();
-        if (!acc[type]) {
-          acc[type] = [];
+      let status = "Pending";
+      let loanDetails: LoanDataStatus | null = null;
+
+      console.log(`Processing ${type} loan:`, value);
+
+      if (typeof value === "object" && value !== null) {
+        loanDetails = value as LoanDataStatus;
+        if ("status" in value && typeof value.status === "string") {
+          status = value.status;
         }
-
-        let status = "Pending";
-        let loanDetails: LoanDataStatus | null = null;
-
-        console.log(`Processing ${type} loan:`, value);
-
-        if (typeof value === "object" && value !== null) {
-          loanDetails = value as LoanDataStatus;
-          if ("status" in value && typeof value.status === "string") {
-            status = value.status;
-          }
-        } else if (typeof value === "string") {
-          if (value.includes("User")) {
-            status = value;
-          } else {
-            status = "Approved";
-          }
+      } else if (typeof value === "string") {
+        if (value.includes("User")) {
+          status = value;
+        } else {
+          status = "Approved";
         }
+      }
 
-        acc[type].push({
-          id: data.id,
-          name: key,
-          status,
-          details: loanDetails,
-        });
-      });
-      return acc;
-    }, {} as Record<string, Partner[]>);
+      const loanItem = {
+        id: data.id,
+        name: key,
+        status,
+        details: loanDetails,
+      };
 
-    console.log("Grouped loans:", grouped);
-    console.log("Loan types:", Object.keys(grouped));
+      acc[type].push(loanItem);
+      acc["all"].push(loanItem); // add loan to "all" as well
+    });
+    return acc;
+  }, {} as Record<string, Partner[]>);
 
-    return {
-      groupedLoans: grouped,
-      loanTypes: Object.keys(grouped)
-    };
-  }, [loans]);
+  return {
+    groupedLoans: grouped,
+    loanTypes: ["all", ...Object.keys(grouped).filter(k => k !== "all")],
+  };
+}, [loans]);
+
 
   const selectedLoans = useMemo(() => 
     selected ? groupedLoans[selected.toLowerCase()] || [] : []
@@ -206,7 +210,7 @@ function PartnerStatusModal({ open, onOpenChange, phoneNumber }: PartnerStatusMo
                   value={selected}
                   onChange={handleSelectChange}
                 >
-                  <option value="">Select Loan Type</option>
+                  <option value="">Select Partner Type</option>
                   {loanTypes.map((type) => (
                     <option key={type} value={type}>
                       {type.toUpperCase()}

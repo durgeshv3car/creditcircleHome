@@ -29,45 +29,20 @@ function Category({
   const [data, setData] = useState<Categorys[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refresh, setRefresh] = useState<boolean>(false);
-  const [dateRange, setDateRange] = useState<string>("1d");
-  const [startDate, setStartDate] = React.useState<Date>(new Date());
-  const [endDate, setEndDate] = React.useState<Date>(new Date());
-  const [date, setDate] = React.useState<Date>();
-  const [startDateRange, setStartDateRange] = React.useState<string>("");
-  const [endDateRange, setEndDateRange] = React.useState<string>("");
 
-  const handleDateRangeChange = (value: string) => {
-    setDateRange(value);
-    const now = new Date();
-    now.setHours(23, 59, 59, 999);
-    setEndDate(now);
+  const [startDate, setStartDate] = React.useState<string>("");
+  const [endDate, setEndDate] = React.useState<string>("");
 
-    let start = new Date();
-    start.setHours(0, 0, 0, 0);
+  // Load dates from localStorage
+  useEffect(() => {
+    const storedStart = localStorage.getItem("startDateApi");
+    const storedEnd = localStorage.getItem("endDateApi");
 
-    switch (value) {
-      case "1w":
-        start = new Date(now);
-        start.setDate(now.getDate() - 7);
-        start.setHours(0, 0, 0, 0);
-        break;
-      case "1m":
-        start = new Date(now);
-        start.setMonth(now.getMonth() - 1);
-        start.setHours(0, 0, 0, 0);
-        break;
-      case "6m":
-        start = new Date(now);
-        start.setMonth(now.getMonth() - 6);
-        start.setHours(0, 0, 0, 0);
-        break;
-      default: // "1d"
-        start = new Date(now);
-        start.setHours(0, 0, 0, 0);
-        break;
+    if (storedStart && storedEnd) {
+      setStartDate(storedStart);
+      setEndDate(storedEnd);
     }
-    setStartDate(start);
-  };
+  }, []);
 
   const type = "api";
 
@@ -86,39 +61,8 @@ function Category({
   useEffect(() => {
     fetchData();
   }, [refresh]);
-  function getYearRange(
-    start?: string | Date,
-    end?: string | Date,
-    date?: string | Date
-  ) {
-    if (date) {
-      const currentDate=new Date();
-      const oldDate = new Date(date);
-      const formattedStart = currentDate.toISOString().split("T")[0];
-      const formattedEnd = oldDate.toISOString().split("T")[0];
 
-      setStartDateRange(formattedStart);
-      setEndDateRange(formattedEnd);
-    } else {
-      const formatDate = (d?: string | Date): string | null => {
-        if (!d) return null;
-        const date = new Date(d);
-        return date.toISOString().split("T")[0]; 
-      };
-
-      const formattedStart = formatDate(start);
-      const formattedEnd = formatDate(end);
-
-      setStartDateRange(formattedStart ?? "");
-      setEndDateRange(formattedEnd ?? "");
-    }
-  }
-
-  useEffect(() => {
-    getYearRange(startDate, endDate, date);
-  }, [dateRange, startDate, endDate, date]);
-
-  console.log("Start:", startDateRange, "End:", endDateRange);
+  console.log("Start:", startDate, "End:", endDate);
 
   if (loading) return <Loader2 className="me-2 h-4 w-4 animate-spin" />;
 
@@ -132,18 +76,14 @@ function Category({
             columnsCategory({
               fetchData,
               router,
-              startDateRange,
-              endDateRange,
+              startDate,
+              endDate,
             }) as ColumnDef<Categorys>[]
           }
           setRefresh={setRefresh}
           type={type}
           role={role}
           permissions={permissions}
-          setDateRange={handleDateRangeChange}
-          dateRange={dateRange}
-          date={date}
-          setDate={setDate}
         />
       </div>
     </>

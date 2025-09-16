@@ -87,7 +87,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
 
-    const { sms, email, whatsApp } = await req.json();
+    const { sms, email, whatsapp } = await req.json();
 
     const res = await fetch(`${BASE_URL}/otp/pause-service/${id}`, {
       method: "PATCH",
@@ -95,7 +95,7 @@ export async function PATCH(req: NextRequest) {
         "Content-Type": "application/json",
         Authorization: token || "",
       },
-      body: JSON.stringify({ sms,email,whatsApp }),
+      body: JSON.stringify({ sms,email,whatsapp }),
     });
 
     if (!res.ok) {

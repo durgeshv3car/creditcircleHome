@@ -12,8 +12,8 @@ export function HeaderDateRange() {
 
   // Load saved dates from localStorage on component mount
   React.useEffect(() => {
-    const startDate = localStorage.getItem('startDate');
-    const endDate = localStorage.getItem('endDate');
+    const startDate = localStorage.getItem('startDateApi');
+    const endDate = localStorage.getItem('endDateApi');
     
     if (startDate && endDate && !dateRange) {
       setDateRange({
@@ -46,8 +46,8 @@ export function HeaderDateRange() {
       };
 
       // Store in localStorage
-      localStorage.setItem('startDate', formatDate(range.from));
-      localStorage.setItem('endDate', formatDate(range.to));
+      localStorage.setItem('startDateApi', formatDate(range.from));
+      localStorage.setItem('endDateApi', formatDate(range.to));
 
       console.log('Selected date range:', {
         from: formatDate(range.from),
@@ -92,8 +92,8 @@ export function HeaderDateRange() {
   };
 
   const handleReset = () => {
-    localStorage.removeItem('startDate');
-    localStorage.removeItem('endDate');
+    localStorage.removeItem('startDateApi');
+    localStorage.removeItem('endDateApi');
     setDateRange(undefined);
     window.location.reload(); 
   };

@@ -32,15 +32,13 @@ export interface Categorys {
 interface ColumnsCategoryProps {
   fetchData: () => void;
   router: AppRouterInstance;
-  startDateRange: string;
-  endDateRange: string;
+
 }
 
 export const columnsCategory = ({
   fetchData,
   router,
-  startDateRange,
-  endDateRange,
+
 }: ColumnsCategoryProps): ColumnDef<Categorys>[] => [
   {
     id: "select",

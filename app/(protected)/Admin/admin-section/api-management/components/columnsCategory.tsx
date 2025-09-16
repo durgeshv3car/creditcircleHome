@@ -35,15 +35,15 @@ export interface Categorys {
 interface ColumnsCategoryProps {
   fetchData: () => void;
   router: AppRouterInstance;
-  startDateRange: string;
-  endDateRange: string;
+  startDate: string;
+  endDate: string;
 }
 
 export const columnsCategory = ({
   fetchData,
   router,
-  startDateRange,
-  endDateRange,
+  startDate,
+  endDate,
 }: ColumnsCategoryProps): ColumnDef<Categorys>[] => [
   {
     id: "select",
@@ -121,7 +121,7 @@ export const columnsCategory = ({
      
      
 
-      return <CounterStatusModal name={row.original.name} startDate={startDateRange} endDate={endDateRange} />;
+      return <CounterStatusModal name={row.original.name} startDate={startDate} endDate={endDate} />;
     },
   },
 
