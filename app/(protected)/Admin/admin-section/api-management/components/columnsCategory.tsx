@@ -118,10 +118,20 @@ export const columnsCategory = ({
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-     
-     
+      if (!endDate) {
+        endDate = new Date().toISOString().split("T")[0];
+      }
+      if (!startDate) {
+        startDate = new Date().toISOString().split("T")[0];
+      }
 
-      return <CounterStatusModal name={row.original.name} startDate={startDate} endDate={endDate} />;
+      return (
+        <CounterStatusModal
+          name={row.original.name}
+          startDate={startDate}
+          endDate={endDate}
+        />
+      );
     },
   },
 
