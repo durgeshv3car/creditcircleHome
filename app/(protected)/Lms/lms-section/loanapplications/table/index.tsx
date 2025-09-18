@@ -66,7 +66,10 @@ const ExampleTwo: React.FC<ExampleTwoProps> = ({ selectedValues, setSelectedValu
   const searchParams = useSearchParams();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+   const [columnVisibility, setColumnVisibility] =
+      React.useState<VisibilityState>({
+        time:false,
+      });
   const [selectedColumn, setSelectedColumn] = React.useState<string | undefined>();
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
   const [pageSize, setPageSize] = React.useState<number>(20); // Default to 20 rows per page

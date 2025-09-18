@@ -19,7 +19,7 @@ function HeaderGreet({ admin }: { admin: string }) {
 
   return (
     <>
-      {greeting}, {admin}
+      {greeting}, {admin.charAt(0).toUpperCase() + admin.slice(1)}
     </>
   );
 }

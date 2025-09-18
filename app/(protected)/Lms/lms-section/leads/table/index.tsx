@@ -101,6 +101,7 @@ const ExampleTwo = <TData extends Record<string, any>>({
   );
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({
+      time:false,
       liveWith: false,
       ownsFourWheeler: false,
       ownsTwoWheeler: false,

@@ -5,7 +5,7 @@ import { colors } from "@/lib/colors";
 import { useTheme } from "next-themes";
 import { useConfig } from "@/hooks/use-config";
 import { fetchLoans } from "../../services/loans/api";
-import { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 
 interface OverviewChartProps {
   height?: number;
@@ -26,11 +26,12 @@ const OverviewChart = ({
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
 
+  const chartRef = useRef<any>(null);
+
   // Load dates from localStorage
   useEffect(() => {
     const storedStart = localStorage.getItem("startDate");
     const storedEnd = localStorage.getItem("endDate");
-    
     if (storedStart && storedEnd) {
       setStartDate(storedStart);
       setEndDate(storedEnd);
@@ -41,22 +42,20 @@ const OverviewChart = ({
     const fetchLoanData = async () => {
       try {
         const result = await fetchLoans();
-        
-        // Define a type for loan objects
         type Loan = {
           loanDataStatus?: Record<string, any>;
           createdAt: string;
           [key: string]: any;
         };
 
-        // Filter loans by date range if dates are selected
         const filteredLoans = result.filter((loan: Loan) => {
           if (startDate && endDate) {
             const createdDate = new Date(loan.createdAt).toISOString().split('T')[0];
             return createdDate >= startDate && createdDate <= endDate;
           }
-          return true; // Include all loans if no date range is selected
+          return true; 
         });
+
 
         setLoanCount(filteredLoans.length);
 
@@ -75,43 +74,35 @@ const OverviewChart = ({
     fetchLoanData();
   }, [startDate, endDate]);
 
-  const Applied = Math.max(loanCount - notApplied, 0);
-  const series = [Applied, notApplied];
+const Applied = Math.max(loanCount - notApplied, 0);
+const totalCount = loanCount || 1;
 
-  const options: any = {
+const series = useMemo(() => {
+  const appliedPct = (Applied / totalCount) * 100;
+  const notAppliedPct = (notApplied / totalCount) * 100;
+  return [Math.round(appliedPct), Math.round(notAppliedPct)];
+}, [Applied, notApplied, totalCount]);
+
+const options: any = useMemo(
+  () => ({
     chart: {
-      toolbar: {
-        show: false,
-      },
-    },
-    stroke: {
-      curve: "smooth",
-      width: 6,
+      toolbar: { show: false },
     },
     plotOptions: {
       radialBar: {
         dataLabels: {
-          name: {
-            fontSize: "22px",
-          },
+          name: { fontSize: "22px" },
           value: {
             fontSize: "16px",
             fontWeight: 700,
-            color:
-              mode === "light" ? colors["default-600"] : colors["default-300"],
+            color: mode === "light" ? colors["default-600"] : colors["default-300"],
+            formatter: (val: number) => `${val}%`, 
           },
           total: {
             show: true,
             label: "Total",
-            color:
-              mode === "light" ? colors["default-600"] : colors["default-300"],
-            formatter: function (w: any) {
-              const total = w.globals.seriesTotals.reduce(
-                (a: number, b: number) => a + b,
-                0
-              );
-              return total.toString();
-            },
+            color: mode === "light" ? colors["default-600"] : colors["default-300"],
+            formatter: () => String(loanCount), 
           },
         },
       },
@@ -120,17 +111,36 @@ const OverviewChart = ({
     labels: labels,
     tooltip: {
       theme: mode === "dark" ? "dark" : "light",
+      y: {
+        formatter: (val: number, { seriesIndex }: any) => {
+          if (seriesIndex === 0) {
+            return `${Applied} loans (${val}%)`;
+          }
+          return `${notApplied} loans (${val}%)`;
+        },
+      },
     },
-    padding: {
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0,
-    },
-  };
+  }),
+  [mode, labels, loanCount, Applied, notApplied]
+);
+
+
+  useEffect(() => {
+    if (chartRef.current && chartRef.current.chart) {
+      try {
+        chartRef.current.chart.updateOptions(options, false, false);
+        chartRef.current.chart.updateSeries(series, true);
+      } catch (e) {
+        console.warn("chart update failed, remount fallback may be used", e);
+      }
+    }
+  }, [options, series]);
 
   return (
+
     <Chart
+      key={`chart-${totalCount}-${Applied}-${notApplied}-${mode}`} 
+      ref={chartRef}
       options={options}
       series={series}
       type={chartType}

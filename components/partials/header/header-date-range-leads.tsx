@@ -5,18 +5,18 @@ import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { DateRange } from "react-day-picker";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { TimerReset } from "lucide-react";
+import { TimerReset } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
-export function HeaderDateRangeApi() {
+export function HeaderDateRangeLead() {
   const [dateRange, setDateRange] = React.useState<DateRange | undefined>(
     undefined
   );
 
   // Load saved dates from localStorage on component mount
   React.useEffect(() => {
-    const startDate = localStorage.getItem("startDateApi");
-    const endDate = localStorage.getItem("endDateApi");
+    const startDate = localStorage.getItem("startDateLead");
+    const endDate = localStorage.getItem("endDateLead");
 
     if (startDate && endDate && !dateRange) {
       setDateRange({
@@ -51,8 +51,8 @@ export function HeaderDateRangeApi() {
       };
 
       // Store in localStorage
-      localStorage.setItem("startDateApi", formatDate(range.from));
-      localStorage.setItem("endDateApi", formatDate(range.to));
+      localStorage.setItem("startDateLead", formatDate(range.from));
+      localStorage.setItem("endDateLead", formatDate(range.to));
 
       console.log("Selected date range:", {
         from: formatDate(range.from),
@@ -97,8 +97,8 @@ export function HeaderDateRangeApi() {
   };
 
   const handleReset = () => {
-    localStorage.removeItem("startDateApi");
-    localStorage.removeItem("endDateApi");
+    localStorage.removeItem("startDateLead");
+    localStorage.removeItem("endDateLead");
     setDateRange(undefined);
     window.location.reload();
   };
@@ -112,6 +112,7 @@ export function HeaderDateRangeApi() {
         value={dateRange}
       />
 
+      {/* Decrement Button */}
       <ChevronLeft
         onClick={decrementRange}
         className={cn(
@@ -133,15 +134,17 @@ export function HeaderDateRangeApi() {
         )}
       />
 
-      <TimerReset
-        onClick={handleReset}
-        className={cn(
-          "h-6 w-6 rounded-full border border-gray-300 p-1 cursor-pointer text-red-600 hover:bg-gray-100",
-          {
-            "opacity-50 cursor-not-allowed": !dateRange?.from || !dateRange?.to,
-          }
-        )}
-      />
+      {/* Reset Button */}
+         <TimerReset
+  onClick={handleReset}
+  className={cn(
+    "h-6 w-6 rounded-full border border-gray-300 p-1 cursor-pointer text-red-600 hover:bg-gray-100",
+    {
+      "opacity-50 cursor-not-allowed": !dateRange?.from || !dateRange?.to,
+    }
+  )}
+ 
+/>
     </div>
   );
 }

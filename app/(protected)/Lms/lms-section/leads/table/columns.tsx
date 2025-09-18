@@ -56,6 +56,8 @@ export type DataProps = {
   LoanApplication?: {
     profession?: string;
     loanType?: string;
+  } & {
+    createdAt?: string;
   };
 };
 // Define columns dynamically
@@ -104,6 +106,24 @@ export const columns = ({
       return <span>{total - row.index}</span>;
     },
   },
+  {
+    id: "date",
+    header: "Date",
+    cell: ({ row }) => {
+      const createdAt = String(row.original.createdAt ?? "");
+      const date = createdAt.split("T")[0];
+      return <span>{date}</span>;
+    },
+  },
+  {
+    id: "time",
+    header: "Time",
+    cell: ({ row }) => {
+      const createdAt = String(row.original.createdAt ?? "");
+      const time = createdAt.split("T")[1]?.split(".")[0] ?? "";
+      return <span>{time}</span>;
+    },
+  },
 
   ...fields.map((key) => ({
     accessorKey: key,
@@ -112,7 +132,7 @@ export const columns = ({
       <span>{String(row.original[key] ?? "-")}</span>
     ),
   })),
- 
+
   {
     accessorKey: "pauseSms",
     header: "pauseSms",
@@ -129,7 +149,7 @@ export const columns = ({
     cell: ({ row }) => <PauseWhatsapp row={row} refreshData={fetchData} />,
   },
 
-   {
+  {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
@@ -140,7 +160,7 @@ export const columns = ({
       const handleClick = () => {
         const id = String(row.original.id ?? "");
         const phoneNumber = Number(row.original.phoneNumber) || 0;
-        
+
         console.log("Clicked status button:", { id, phoneNumber });
         setSelectedUser({ id, phoneNumber });
         setIsModalOpen(true);

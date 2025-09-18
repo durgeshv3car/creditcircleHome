@@ -56,7 +56,7 @@ const CategoryMultiSelect = ({
       <PopoverTrigger asChild>
         <Button variant="outline" className="w-full justify-start flex-wrap">
           {safeSelectedIds.length === 0 ? (
-             (label=="dob")?<span>age</span>:<span>{label}</span>
+             (label=="dob")?<span>Age</span>:<span>{label.charAt(0).toUpperCase() + label.slice(1)}</span>
         
           ) : (
             <>

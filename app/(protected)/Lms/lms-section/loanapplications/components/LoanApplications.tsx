@@ -79,6 +79,19 @@ const LeadPage = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [refresh, setRefresh] = useState<boolean>(false);
   const [selectedRow, setSelectedRow] = useState<DataProps | null>(null);
+   const [startDate, setStartDate] = useState<string | null>(null);
+    const [endDate, setEndDate] = useState<string | null>(null);
+  
+    // Load dates from localStorage
+    useEffect(() => {
+      const storedStart = localStorage.getItem("startDateLoan");
+      const storedEnd = localStorage.getItem("endDateLoan");
+  
+      if (storedStart && storedEnd) {
+        setStartDate(storedStart);
+        setEndDate(storedEnd);
+      }
+    }, []);
 
   useEffect(() => {
     const loadColumns = async () => {
@@ -96,7 +109,19 @@ const LeadPage = () => {
   const fetchData = async () => {
     try {
       const result = await fetchLoans();
-      setData(Array.isArray(result) ? result : [result]);
+       type Lead = {
+          createdAt: string;
+          [key: string]: any;
+        };
+        const filteredLoans = result.filter((lead:Lead) => {
+          if (startDate && endDate) {
+            const createdDate = new Date(lead.createdAt).toISOString().split('T')[0];
+            return createdDate >= startDate && createdDate <= endDate;
+          }
+          return true; 
+        });
+      
+        setData(Array.isArray(filteredLoans) ? filteredLoans : [filteredLoans]);
     } catch (error) {
       console.error("Error fetching data:", error);
       setData([]);
@@ -107,7 +132,7 @@ const LeadPage = () => {
 
   useEffect(() => {
     fetchData();
-  }, [refresh]);
+  }, [refresh,startDate,endDate]);
 
   const incomeRanges = [
     { min: 0, max: 14999, label: "Under 15000" },
