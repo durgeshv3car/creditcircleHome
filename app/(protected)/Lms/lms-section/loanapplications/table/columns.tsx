@@ -104,6 +104,24 @@ export const columns = ({
     return <span>{total - row.index}</span>;
   },
 },
+ {
+    id: "date",
+    header: "Date",
+    cell: ({ row }) => {
+      const createdAt = String(row.original.createdAt ?? "");
+      const date = createdAt.split("T")[0];
+      return <span>{date}</span>;
+    },
+  },
+  {
+    id: "time",
+    header: "Time",
+    cell: ({ row }) => {
+      const createdAt = String(row.original.createdAt ?? "");
+      const time = createdAt.split("T")[1]?.split(".")[0] ?? "";
+      return <span>{time}</span>;
+    },
+  },
   ...fields.map((key) => ({
     accessorKey: key,
     header: key.replace(/([A-Z])/g, " $1").trim(),
