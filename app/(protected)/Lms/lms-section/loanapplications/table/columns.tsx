@@ -106,7 +106,7 @@ export const columns = ({
 },
  {
     id: "date",
-    header: "Date",
+    header: "Application Date",
     cell: ({ row }) => {
       const createdAt = String(row.original.createdAt ?? "");
       const date = createdAt.split("T")[0];
