@@ -72,7 +72,6 @@ export const columns = ({
   setIsModalOpen: (val: boolean) => void;
   setSelectedRow: (row: DataProps | null) => void;
 }): ColumnDef<DataProps>[] => [
-
   {
     id: "select",
     header: ({ table }) => (
@@ -97,14 +96,14 @@ export const columns = ({
   },
 
   {
-  id: "index",
-  header: "ID",
-  cell: ({ row, table }) => {
-    const total = table.options.data.length; // all rows in dataset
-    return <span>{total - row.index}</span>;
+    id: "index",
+    header: "ID",
+    cell: ({ row, table }) => {
+      const total = table.options.data.length; // all rows in dataset
+      return <span>{total - row.index}</span>;
+    },
   },
-},
- {
+  {
     id: "date",
     header: "Application Date",
     cell: ({ row }) => {
@@ -117,11 +116,19 @@ export const columns = ({
     id: "time",
     header: "Time",
     cell: ({ row }) => {
-      const createdAt = String(row.original.createdAt ?? "");
-      const time = createdAt.split("T")[1]?.split(".")[0] ?? "";
+      const createdAt = row.original.createdAt as string | undefined;
+      if (!createdAt) return <span>-</span>;
+
+      const date = new Date(createdAt);
+      const time = date.toLocaleTimeString("en-GB", {
+        hour12: false,
+        timeZone: "Asia/Kolkata",
+      });
+
       return <span>{time}</span>;
     },
   },
+
   ...fields.map((key) => ({
     accessorKey: key,
     header: key.replace(/([A-Z])/g, " $1").trim(),
@@ -139,7 +146,7 @@ export const columns = ({
       };
       const status = "blue";
       const statusStyles = statusColors[status];
-      
+
       const handleClick = () => {
         setSelectedRow(row.original);
         setIsModalOpen(true);

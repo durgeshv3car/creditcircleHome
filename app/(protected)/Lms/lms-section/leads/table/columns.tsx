@@ -119,8 +119,15 @@ export const columns = ({
     id: "time",
     header: "Time",
     cell: ({ row }) => {
-      const createdAt = String(row.original.createdAt ?? "");
-      const time = createdAt.split("T")[1]?.split(".")[0] ?? "";
+      const createdAt = row.original.createdAt as string | undefined;
+      if (!createdAt) return <span>-</span>;
+
+      const date = new Date(createdAt);
+      const time = date.toLocaleTimeString("en-GB", {
+        hour12: false,
+        timeZone: "Asia/Kolkata",
+      });
+
       return <span>{time}</span>;
     },
   },
