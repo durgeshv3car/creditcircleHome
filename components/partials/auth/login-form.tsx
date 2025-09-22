@@ -67,9 +67,11 @@ const LoginForm = ({ token }: { token: string }) => {
         localStorage.removeItem('endDate');
         localStorage.removeItem('endDateApi');
         localStorage.removeItem('endDateLoan');
+        localStorage.removeItem('endDateLead');
         localStorage.removeItem('startDate');
         localStorage.removeItem('startDateApi');
         localStorage.removeItem('startDateLoan');
+        localStorage.removeItem('startDateLead');
 
         if (!!response.error) {
           toast("Event has been created", {
