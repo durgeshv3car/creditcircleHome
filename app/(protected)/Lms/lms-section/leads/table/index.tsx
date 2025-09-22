@@ -13,6 +13,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 import { Button } from "@/components/ui/button";
 const EditModal = dynamic(() => import("../components/EditModal"), {
@@ -76,6 +78,7 @@ import { ColumnDef } from "@tanstack/react-table";
 // import { SelectedValues } from "../page";
 import { DataProps } from "./columns";
 import { SelectedValues } from "../components/Leads";
+import { toast } from "sonner";
 
 interface ExampleTwoProps {
   selectedValues: SelectedValues;
@@ -101,7 +104,7 @@ const ExampleTwo = <TData extends Record<string, any>>({
   );
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({
-      time:false,
+      time: false,
       liveWith: false,
       ownsFourWheeler: false,
       ownsTwoWheeler: false,
@@ -111,7 +114,7 @@ const ExampleTwo = <TData extends Record<string, any>>({
       shoppingFrequency: false,
       rewardInterests: false,
       exploreIndiaFrequency: false,
-      travelAbroadFrequency: false
+      travelAbroadFrequency: false,
     });
   const [selectedColumn, setSelectedColumn] = React.useState<
     string | undefined
@@ -127,6 +130,8 @@ const ExampleTwo = <TData extends Record<string, any>>({
   const [selectedRowsData, setSelectedRowsData] = React.useState<DataProps[]>(
     []
   );
+  const [globalFilter, setGlobalFilter] = React.useState("");
+
   const [type, setType] = React.useState<string | null>(null);
   const [selectedOffer, setSelectedOffer] = React.useState<any>(null);
   const [pagination, setPagination] = React.useState<PaginationState>({
@@ -142,7 +147,7 @@ const ExampleTwo = <TData extends Record<string, any>>({
     setIsModalOpen(!!leadId);
   }, [leadId]);
 
-    // Persist column visibility settings
+  // Persist column visibility settings
   React.useEffect(() => {
     const defaultHiddenColumns = {
       liveWith: false,
@@ -154,11 +159,11 @@ const ExampleTwo = <TData extends Record<string, any>>({
       shoppingFrequency: false,
       rewardInterests: false,
       exploreIndiaFrequency: false,
-      travelAbroadFrequency: false
+      travelAbroadFrequency: false,
     };
-    setColumnVisibility(prev => ({
+    setColumnVisibility((prev) => ({
       ...defaultHiddenColumns,
-      ...prev
+      ...prev,
     }));
   }, []);
 
@@ -184,12 +189,14 @@ const ExampleTwo = <TData extends Record<string, any>>({
     onColumnVisibilityChange: setColumnVisibility,
     onPaginationChange: setPagination,
     onRowSelectionChange: setRowSelection,
+    onGlobalFilterChange: setGlobalFilter,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
       pagination,
+      globalFilter,
     },
   });
 
@@ -210,6 +217,44 @@ const ExampleTwo = <TData extends Record<string, any>>({
     }
   }, [searchParams]);
 
+  const options = [
+    { value: "all", label: "All" },
+    { value: "phoneNumber", label: "PhoneNumber" },
+    { value: "firstName", label: "FirstName" },
+    { value: "email", label: "Email" },
+  ];
+
+  const [selected, setSelected] = React.useState<string>("all");
+  const [query, setQuery] = React.useState("");
+
+  const handleSelectChange = (val: string) => {
+    setSelected(val);
+    table.resetColumnFilters();
+    setQuery("");
+  };
+
+  const handleSearch = () => {
+    const start = localStorage.getItem("startDateLead");
+    const end = localStorage.getItem("endDateLead");
+    if (start && end) {
+      toast.error("Reset Date Please For Search");
+      return;
+    }
+
+    if (selected === "all") {
+      setGlobalFilter(query);
+    } else {
+      const column = table.getColumn(selected);
+      if (column) {
+        column.setFilterValue(query || undefined);
+      }
+    }
+  };
+
+  const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
+    if (e.key === "Enter") handleSearch();
+  };
+
   return (
     <div className="w-full">
       {/* Header & Filter Section */}
@@ -229,6 +274,56 @@ const ExampleTwo = <TData extends Record<string, any>>({
       <div className="py-4 px-5 bg-whit rounded-md">
         <div className="flex items-center justify-between">
           <div className="text-xl font-medium text-default-900">Users Data</div>
+          <div className="flex items-center ">
+            {/* Left: Select (fixed width) */}
+            <div className="flex-none w-30">
+              <Select value={selected} onValueChange={handleSelectChange}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select" />
+                </SelectTrigger>
+                <SelectContent>
+                  {options.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Right: Search bar (fills remaining space) */}
+            <div className="flex-1 flex items-center">
+              <div className="relative w-full">
+                <Input
+                  id="search-input"
+                  placeholder={
+                    selected === "all"
+                      ? "Search"
+                      : `Search ${
+                          selected.charAt(0).toUpperCase() + selected.slice(1)
+                        }`
+                  }
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="pr-12"
+                />
+
+                {/* Lens icon button on the right */}
+                <div className="absolute inset-y-0 right-0 flex items-center pr-1">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={handleSearch}
+                    aria-label="Search"
+                    className="w-10 h-10"
+                  >
+                    <Search className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="flex items-center gap-4">
             {/* Select for Rows per Page */}
             <React.Suspense fallback={<div>Loading...</div>}>

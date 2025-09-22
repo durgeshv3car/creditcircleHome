@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 import PauseSms from "../components/PauseSms";
 import PauseEmail from "../components/PauseEmail";
 import PauseWhatsapp from "../components/PauseWhatsapp";
-import PartnerStatusModal from "../components/PartnerStatus";
+
 
 // Define all fields explicitly
 const fields = [

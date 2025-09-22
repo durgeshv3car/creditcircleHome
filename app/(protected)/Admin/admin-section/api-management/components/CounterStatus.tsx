@@ -27,9 +27,11 @@ function CounterStatus({
   endDate: string;
 }) {
   type FilterResponse = {
-    duplicateFiltered?: { count: number; createdAt: string }[];
-    approvedFiltered?: { count: number; createdAt: string }[];
-    rejectedFiltered?: { count: number; createdAt: string }[];
+    data: {
+      duplicateFiltered?: { count: number; createdAt: string }[];
+      approvedFiltered?: { count: number; createdAt: string }[];
+      rejectedFiltered?: { count: number; createdAt: string }[];
+    };
   };
 
   const [counts, setCounts] = useState({
@@ -45,11 +47,13 @@ function CounterStatus({
         startDate,
         endDate
       )) as FilterResponse;
+      const sumCounts = (arr: any[] = []) =>
+        arr.reduce((sum, cnt) => sum + (cnt.count || 0), 0);
 
       setCounts({
-        duplicate: response.duplicateFiltered?.length ?? 0,
-        approved: response.approvedFiltered?.length ?? 0,
-        rejected: response.rejectedFiltered?.length ?? 0,
+        duplicate: sumCounts(response.data.duplicateFiltered),
+        approved: sumCounts(response.data.approvedFiltered),
+        rejected: sumCounts(response.data.rejectedFiltered),
       });
     } catch (error) {
       console.error("Error fetching counts:", error);
