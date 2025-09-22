@@ -64,7 +64,12 @@ const LoginForm = ({ token }: { token: string }) => {
     startTransition(async () => {
       try {
         const response = await loginUser(data);
-        console.log(response, "loginData");
+        localStorage.removeItem('endDate');
+        localStorage.removeItem('endDateApi');
+        localStorage.removeItem('endDateLoan');
+        localStorage.removeItem('startDate');
+        localStorage.removeItem('startDateApi');
+        localStorage.removeItem('startDateLoan');
 
         if (!!response.error) {
           toast("Event has been created", {

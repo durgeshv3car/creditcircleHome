@@ -47,11 +47,13 @@ function CounterStatus({
         startDate,
         endDate
       )) as FilterResponse;
+      const sumCounts = (arr: any[] = []) =>
+        arr.reduce((sum, cnt) => sum + (cnt.count || 0), 0);
 
       setCounts({
-        duplicate: response.data.duplicateFiltered?.length ?? 0,
-        approved: response.data.approvedFiltered?.length ?? 0,
-        rejected: response.data.rejectedFiltered?.length ?? 0,
+        duplicate: sumCounts(response.data.duplicateFiltered),
+        approved: sumCounts(response.data.approvedFiltered),
+        rejected: sumCounts(response.data.rejectedFiltered),
       });
     } catch (error) {
       console.error("Error fetching counts:", error);
