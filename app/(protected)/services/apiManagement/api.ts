@@ -87,7 +87,7 @@ export const fetchApiFilter = async (
   name: string,
   startDate: string,
   endDate: string
-) => {
+): Promise<any> => {
   try {
     const response = await fetch(`/api/apiManagement`, {
       method: "POST",
