@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "@/lib/getToken";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL as string;
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-export async function GET() {
+export async function GET(req:NextRequest) {
   try {
-    const token = await getToken();
+    const token = await getToken(req);
+
+    console.log("🚀",token)
     const res = await fetch(`${BASE_URL}/otp/get-all-profile`, {
        headers: {
         Authorization: token || "",
