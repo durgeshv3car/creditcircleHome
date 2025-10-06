@@ -237,7 +237,7 @@ const ExampleTwo = <TData extends Record<string, any>>({
     const start = localStorage.getItem("startDateLead");
     const end = localStorage.getItem("endDateLead");
     if (start && end) {
-      toast.error("Reset Date Please For Search");
+      toast.error("Please Reset Date For Search");
       return;
     }
 
