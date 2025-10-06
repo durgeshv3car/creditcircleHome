@@ -38,6 +38,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
     redirect("/");
   }
 
+
   
 
   return (
