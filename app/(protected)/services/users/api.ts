@@ -9,6 +9,7 @@ export const fetchUsers = async () => {
   }
 };
 
+
 export const updateUser = async (id: string, data: object) => {
   try {
     const response = await fetch(`/api/users?id=${id}`, {
