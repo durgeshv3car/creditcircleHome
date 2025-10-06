@@ -14,9 +14,6 @@ export async function GET(req:NextRequest) {
       );
     }
     const res = await fetch(`${BASE_URL}/otp/get-all-profile`, {
-       headers: {
-        Authorization: `Bearer ${token}` || "",
-      },
       cache: "no-store"
     });
     const data = await res.json();
