@@ -20,26 +20,36 @@ function Category({
   adminId,
   role,
   permissions,
+  token
 }: {
   adminId: string;
   role: string;
   permissions: any;
+  token: string;
 }) {
   const router = useRouter();
   const [data, setData] = useState<Categorys[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refresh, setRefresh] = useState<boolean>(false);
   const [open, setOpen] = useState(false);
+    const [pageSize, setPageSize] = React.useState(0);
+    const [totalPages, setTotalPages] = React.useState(0);
+    const [currentPage, setCurrentPage] = React.useState(1);
+  
+  
   const [permissionList, setPermissionList] = useState<string[]>([]);
+  
 
 
   const type = "user";
 
   const fetchData = async () => {
     try {
-      const result = await fetchUsers();
+      const result = await fetchUsers(token);
       // const logs=await createLogs("User view list of admin-user section")
-      setData(result);
+      setData(result.data);
+      setTotalPages(result.totalPages);
+      setPageSize(result.totalRecords >= 20 ? 20 : result.totalRecords);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -68,12 +78,20 @@ function Category({
               setOpen,
               permissionList,
               setPermissionList,
+              token
             }) as ColumnDef<Categorys>[]
           }
           setRefresh={setRefresh}
           type={type}
           role={role}
           permissions={permissions}
+          token={token}
+          pageSize={pageSize}
+          setPageSize={setPageSize}
+          totalPages={totalPages}
+          setTotalPages={setTotalPages}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
 
         />
       </div>

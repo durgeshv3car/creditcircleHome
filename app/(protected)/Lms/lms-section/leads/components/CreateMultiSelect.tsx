@@ -15,11 +15,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { useState } from "react";
-import { Span } from "next/dist/trace";
 
-interface CategoryOption {
-  id: string;
-  title: string;
+interface CategoryMultiSelectProps {
+  label: string;
+  selectedIds: string[];
+  onChange: (newValues: string[]) => void;
+  options: string[];
 }
 
 const CategoryMultiSelect = ({
@@ -27,60 +28,63 @@ const CategoryMultiSelect = ({
   selectedIds,
   onChange,
   options,
-}: {
-  label: string;
-  selectedIds: string[];
-  onChange: (newValues: string[]) => void;
-  options: CategoryOption[];
-}) => {
+}: CategoryMultiSelectProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const maxSelectedLabels = 1;
 
-  // Ensure selectedIds is always an array
+  // Ensure selectedIds and options are always arrays of strings
   const safeSelectedIds = Array.isArray(selectedIds) ? selectedIds : [];
+  const safeOptions = Array.isArray(options) 
+    ? options.filter(opt => opt != null && opt !== "").map(opt => String(opt))
+    : [];
 
-  const toggleValue = (id: string) => {
-    if (safeSelectedIds.includes(id)) {
-      onChange(safeSelectedIds.filter((i) => i !== id));
+  const toggleValue = (value: string) => {
+    if (safeSelectedIds.includes(value)) {
+      onChange(safeSelectedIds.filter((v) => v !== value));
     } else {
-      onChange([...safeSelectedIds, id]);
+      onChange([...safeSelectedIds, value]);
     }
   };
 
-  const filteredOptions = options.filter((cat) =>
-    cat.title.toLowerCase().includes(searchTerm.toLowerCase())
+  const clearAll = () => {
+    onChange([]);
+  };
+
+  const filteredOptions = safeOptions.filter((option) =>
+    String(option).toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const displayLabel = label === "dob" ? "Age" : label.charAt(0).toUpperCase() + label.slice(1);
 
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="w-full justify-start flex-wrap">
+        <Button variant="outline" className="w-full justify-start flex-wrap h-auto min-h-[40px]">
           {safeSelectedIds.length === 0 ? (
-             (label=="dob")?<span>Age</span>:<span>{label.charAt(0).toUpperCase() + label.slice(1)}</span>
-        
+            <span>{displayLabel}</span>
           ) : (
             <>
-              {options
-                .filter((o) => safeSelectedIds.includes(o.id))
-                .slice(0, maxSelectedLabels)
-                .map((o) => (
-                  <Badge
-                    key={o.id}
-                    className="mr-1 mb-1 flex items-center gap-1"
-                  >
-                    {o.title}
-                    <X
-                      size={16}
-                      className="cursor-pointer"
-                      onClick={(e) => {
-                        e.stopPropagation(); 
-                        onChange(safeSelectedIds.filter((id) => id !== o.id));
-                      }}
-                    />
-                  </Badge>
-                ))}
+              {safeSelectedIds.slice(0, maxSelectedLabels).map((value) => (
+                <Badge
+                  key={`badge-${value}`}
+                  className="mr-1 mb-1 flex items-center gap-1"
+                >
+                  {value}
+                  <X
+                    size={16}
+                    className="cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onChange(safeSelectedIds.filter((id) => id !== value));
+                    }}
+                  />
+                </Badge>
+              ))}
               {safeSelectedIds.length > maxSelectedLabels && (
-                <Badge className="mr-1 mb-1">
+                <Badge 
+                  className="mr-1 mb-1 cursor-pointer"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   +{safeSelectedIds.length - maxSelectedLabels} more
                 </Badge>
               )}
@@ -88,11 +92,11 @@ const CategoryMultiSelect = ({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full overflow-y-auto p-0">
+      <PopoverContent className="w-full overflow-y-auto p-0 max-h-[300px]">
         <Command>
           <div className="relative p-2 pb-0">
             <CommandInput
-              placeholder="Search categories..."
+              placeholder={`Search ${displayLabel.toLowerCase()}...`}
               value={searchTerm}
               onValueChange={setSearchTerm}
               className="pr-10"
@@ -106,21 +110,33 @@ const CategoryMultiSelect = ({
               </button>
             </PopoverClose>
           </div>
+          {safeSelectedIds.length > 0 && (
+            <div className="px-2 pt-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearAll}
+                className="w-full text-xs"
+              >
+                Clear all ({safeSelectedIds.length})
+              </Button>
+            </div>
+          )}
           <CommandList className="p-2">
             {filteredOptions.length > 0 ? (
-              filteredOptions.map((cat) => (
+              filteredOptions.map((option) => (
                 <CommandItem
-                  key={cat.id}
-                  onSelect={() => toggleValue(cat.id)}
-                  className="flex items-center gap-2"
+                  key={`option-${option}`}
+                  onSelect={() => toggleValue(option)}
+                  className="flex items-center gap-2 cursor-pointer"
                 >
-                  <Checkbox checked={safeSelectedIds.includes(cat.id)} />
-                  {cat.title}
+                  <Checkbox checked={safeSelectedIds.includes(option)} />
+                  {option}
                 </CommandItem>
               ))
             ) : (
               <div className="px-2 py-2 text-sm text-muted-foreground">
-                No categories found.
+                No options found.
               </div>
             )}
           </CommandList>

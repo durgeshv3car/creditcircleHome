@@ -18,6 +18,7 @@ export default async function MainPage() {
   let role = "";
   let id = "";
   let permissions: string[] = []; 
+  let token=""
 
   if (session?.user && "token" in session.user) {
     const decoded = jwtDecode<DecodedToken>(
@@ -25,8 +26,9 @@ export default async function MainPage() {
     );
     role = decoded.role;
     id = (session.user as any).id;
+    token=(session.user as { token: string }).token
     permissions = (session.user as any).permissions || [];
   }
 
-  return <Users adminId={id} permissions={permissions} role={role} />;
+  return <Users adminId={id} permissions={permissions} role={role} token={token} />;
 }

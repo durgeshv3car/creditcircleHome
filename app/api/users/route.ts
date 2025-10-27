@@ -2,28 +2,45 @@ import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "@/lib/getToken";
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL as string;
 
-
-export async function GET(req:NextRequest) {
+export async function GET(req: NextRequest) {
   try {
     const token = await getToken(req);
 
     if (!token) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const res = await fetch(`${BASE_URL}/otp/get-all-profile`, {
-      cache: "no-store"
-    });
+
+    // ✅ Get page & pageSize from query params, provide defaults
+    const page = Number(req.nextUrl.searchParams.get("page"));
+    const pageSize = Number(req.nextUrl.searchParams.get("pageSize"));
+
+    const res = await fetch(
+      `${BASE_URL}/otp/get-all-profile?page=${page}&pageSize=${pageSize}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token || "",
+        },
+        cache: "no-store",
+      }
+    );
+
     const data = await res.json();
+
     if (res.ok) {
       return NextResponse.json(data, { status: res.status });
     } else {
-      return NextResponse.json({ error: data?.error || "Failed to fetch users" }, { status: res.status });
+      return NextResponse.json(
+        { error: data?.error || "Failed to fetch users" },
+        { status: res.status }
+      );
     }
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch users" },
+      { status: 500 }
+    );
   }
 }
 
@@ -48,10 +65,16 @@ export async function PUT(req: NextRequest) {
     if (res.ok) {
       return NextResponse.json(data, { status: res.status });
     } else {
-      return NextResponse.json({ error: data?.error || "Failed to update user" }, { status: res.status });
+      return NextResponse.json(
+        { error: data?.error || "Failed to update user" },
+        { status: res.status }
+      );
     }
   } catch (error) {
-    return NextResponse.json({ error: "Failed to update user" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update user" },
+      { status: 500 }
+    );
   }
 }
 
@@ -73,13 +96,18 @@ export async function DELETE(req: NextRequest) {
     if (res.ok) {
       return NextResponse.json(data, { status: res.status });
     } else {
-      return NextResponse.json({ error: data?.error || "Failed to delete user" }, { status: res.status });
+      return NextResponse.json(
+        { error: data?.error || "Failed to delete user" },
+        { status: res.status }
+      );
     }
   } catch (error) {
-    return NextResponse.json({ error: "Failed to delete user" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to delete user" },
+      { status: 500 }
+    );
   }
 }
-
 
 export async function PATCH(req: NextRequest) {
   try {
@@ -100,7 +128,7 @@ export async function PATCH(req: NextRequest) {
         "Content-Type": "application/json",
         Authorization: token || "",
       },
-      body: JSON.stringify({ sms,email,whatsapp }),
+      body: JSON.stringify({ sms, email, whatsapp }),
     });
 
     if (!res.ok) {
@@ -120,4 +148,3 @@ export async function PATCH(req: NextRequest) {
     );
   }
 }
-

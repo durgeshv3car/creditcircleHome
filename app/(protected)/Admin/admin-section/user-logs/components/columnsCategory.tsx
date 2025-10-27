@@ -32,12 +32,14 @@ export interface Categorys {
 interface ColumnsCategoryProps {
   fetchData: () => void;
   router: AppRouterInstance;
+  token:string;
 
 }
 
 export const columnsCategory = ({
   fetchData,
   router,
+  token,
 
 }: ColumnsCategoryProps): ColumnDef<Categorys>[] => [
   {

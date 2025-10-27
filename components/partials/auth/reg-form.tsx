@@ -27,7 +27,7 @@ type Inputs = {
   role: string;
 };
 
-const RegForm = ({ roleType }: { roleType: string }) => {
+const RegForm = ({ roleType,token }: { roleType: string,token:string }) => {
   const {
     register,
     handleSubmit,
@@ -59,7 +59,7 @@ const RegForm = ({ roleType }: { roleType: string }) => {
     }
 
     try {
-      const response = await createUser(data);
+      const response = await createUser(data,token);
 
       if (response.data.user?.id) {
         toast.success("User created successfully");

@@ -30,7 +30,7 @@ export interface SelectedValues {
   studentIncome: (string | { name: string })[] | null;
 }
 
-const LeadPage = () => {
+const LeadPage = ({token}:{token:string}) => {
   const [selectedValues, setSelectedValues] = useState<SelectedValues>({
     phoneNumber: null,
     desiredLoanAmount: null,
@@ -79,19 +79,21 @@ const LeadPage = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [refresh, setRefresh] = useState<boolean>(false);
   const [selectedRow, setSelectedRow] = useState<DataProps | null>(null);
-   const [startDate, setStartDate] = useState<string | null>(null);
-    const [endDate, setEndDate] = useState<string | null>(null);
-  
-    // Load dates from localStorage
-    useEffect(() => {
-      const storedStart = localStorage.getItem("startDateLoan");
-      const storedEnd = localStorage.getItem("endDateLoan");
-  
-      if (storedStart && storedEnd) {
-        setStartDate(storedStart);
-        setEndDate(storedEnd);
-      }
-    }, []);
+  const [startDate, setStartDate] = useState<string | null>(null);
+  const [endDate, setEndDate] = useState<string | null>(null);
+  const [pageSize, setPageSize] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  // Load dates from localStorage
+  useEffect(() => {
+    const storedStart = localStorage.getItem("startDateLoan");
+    const storedEnd = localStorage.getItem("endDateLoan");
+
+    if (storedStart && storedEnd) {
+      setStartDate(storedStart);
+      setEndDate(storedEnd);
+    }
+  }, []);
 
   useEffect(() => {
     const loadColumns = async () => {
@@ -107,21 +109,17 @@ const LeadPage = () => {
   }, [isModalOpen]);
 
   const fetchData = async () => {
+    const params: any = {
+      page: currentPage,
+      pageSize: pageSize,
+    };
     try {
-      const result = await fetchLoans();
-       type Lead = {
-          createdAt: string;
-          [key: string]: any;
-        };
-        const filteredLoans = result.filter((lead:Lead) => {
-          if (startDate && endDate) {
-            const createdDate = new Date(lead.createdAt).toISOString().split('T')[0];
-            return createdDate >= startDate && createdDate <= endDate;
-          }
-          return true; 
-        });
-      
-        setData(Array.isArray(filteredLoans) ? filteredLoans : [filteredLoans]);
+      if (startDate) params.startDate = startDate;
+      if (endDate) params.endDate = endDate;
+      const result = await fetchLoans(params);
+      setData(result.data);
+      setTotalPages(result.totalPages);
+      setPageSize(result.totalRecords >= 20 ? 20 : result.totalRecords);
     } catch (error) {
       console.error("Error fetching data:", error);
       setData([]);
@@ -132,7 +130,7 @@ const LeadPage = () => {
 
   useEffect(() => {
     fetchData();
-  }, [refresh,startDate,endDate]);
+  }, [refresh, startDate, endDate,currentPage, pageSize]);
 
   const incomeRanges = [
     { min: 0, max: 14999, label: "Under 15000" },
@@ -205,7 +203,6 @@ const LeadPage = () => {
       return fieldValue == value;
     });
   });
-  
 
   return (
     <div>
@@ -214,6 +211,13 @@ const LeadPage = () => {
         setSelectedValues={setSelectedValues}
         tableData={filteredData}
         tableColumns={columns}
+        token={token}
+        pageSize={pageSize}
+        setPageSize={setPageSize}
+        totalPages={totalPages}
+        setTotalPages={setTotalPages}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
       />
       {isModalOpen && selectedRow && (
         <PartnerStatus

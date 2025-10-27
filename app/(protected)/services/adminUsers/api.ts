@@ -1,41 +1,46 @@
-export const deleteUser = async (id: string, adminId: string) => {
+import axios from "axios";
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+// Fetch all users directly from backend
+export const fetchUsers = async (token: string) => {
   try {
-    const response = await fetch(
-      `/api/adminUsers?id=${id}&adminId=${adminId}`,
-      {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-    const data = await response.json();
-    return { success: response.ok, data };
-  } catch (error) {
-    console.error("Error deleting user:", error);
+    const res = await axios.get(`${BASE_URL}/auth/user`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  } catch (error: any) {
+    console.error("Error fetching users:", error.message || error);
+    return [];
+  }
+};
+
+// Create a new user
+export const createUser = async (user: any, token: string) => {
+  try {
+    const res = await axios.post(`${BASE_URL}/auth/register`, user, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return { success: res.status === 200 || res.status === 201, data: res.data };
+  } catch (error: any) {
+    console.error("Error creating user:", error.message || error);
     return { success: false };
   }
 };
 
-export const createUser = async (user:any) => {
-  try {
-    const response = await fetch(`/api/adminUsers`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(user),
-    });
-    const data = await response.json();
-    return { success: response.ok, data };
-  } catch (error) {
-    console.error("Error creating user:", error);
-    return { success: false };
-  }
-}
-
+// Update a user
 export const updateUser = async (
   id: string,
   name?: string,
   email?: string,
   role?: string,
-  permissions?: any
+  permissions?: any,
+  token?: string,
 ) => {
   try {
     const updatePayload: any = {};
@@ -43,26 +48,31 @@ export const updateUser = async (
     if (email !== undefined) updatePayload.email = email;
     if (role !== undefined) updatePayload.role = role;
     if (permissions !== undefined) updatePayload.permissions = permissions;
-    const response = await fetch(`/api/adminUsers?id=${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatePayload),
+    const res = await axios.put(`${BASE_URL}/auth/update/${id}`, updatePayload, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     });
-    const data = await response.json();
-    return { success: response.ok, data };
-  } catch (error) {
-    console.error("Error updating user:", error);
+    return { success: res.status === 200, data: res.data };
+  } catch (error: any) {
+    console.error("Error updating user:", error.message || error);
     return { success: false };
   }
 };
 
-export const fetchUsers = async () => {
+// Delete a user
+export const deleteUser = async (id: string, adminId: string, token: string) => {
   try {
-    const response = await fetch(`/api/adminUsers`, {});
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    return [];
+    const res = await axios.delete(`${BASE_URL}/auth/user/${adminId}/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return { success: res.status === 200, data: res.data };
+  } catch (error: any) {
+    console.error("Error deleting user:", error.message || error);
+    return { success: false };
   }
 };
+

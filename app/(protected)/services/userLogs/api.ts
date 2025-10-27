@@ -1,14 +1,55 @@
-export const fetchLogs = async () => {
+import axios from "axios";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+export const fetchLogs = async (
+  page: number = 1,
+  limit: number = 10,
+  startDate?: string,
+  endDate?: string,
+  token?: string
+) => {
   try {
-    const response = await fetch(`/api/userLogs`);
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching user logs:", error);
-    return [];
+    console.log(startDate,endDate)
+    const response = await axios.get(`${BASE_URL}/logs?page=${page}&limit=${limit}&startdate=${startDate}&enddate=${endDate}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+ 
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error(
+      "Error fetching user logs:",
+      error.response?.data || error.message
+    );
+    return { data: [], totalRecords: 0 };
   }
 };
+export const fetchLogsWithDate = async (
+  page: number = 1,
+  limit: number = 10,
+  startdate?: string,
+  enddate?: string,
+  token?: string
+) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/logs?page=${page}&limit=${limit}&startdate=${startdate}&enddate=${enddate}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+ 
+    });
 
+    return response.data;
+  } catch (error: any) {
+    console.error(
+      "Error fetching user logs:",
+      error.response?.data || error.message
+    );
+    return { data: [], totalRecords: 0 };
+  }
+};
 
 export const createLogs = async (action: string) => {
   try {
@@ -17,7 +58,7 @@ export const createLogs = async (action: string) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ action }), 
+      body: JSON.stringify({ action }),
     });
 
     if (!response.ok) {

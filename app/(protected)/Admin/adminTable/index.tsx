@@ -55,7 +55,6 @@ import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Categorys } from "../admin-section/user-management/components/columnsCategory";
 
-
 type ModalType = "api" | "logs" | "user";
 
 // Define the props interface for the edit modal components
@@ -64,6 +63,7 @@ interface EditModalProps<Categorys> {
   onClose: () => void;
   tableData: Categorys[];
   setRefresh: React.Dispatch<React.SetStateAction<boolean>>;
+  token: string;
 }
 
 // Define the props interface for the create modal components
@@ -72,6 +72,7 @@ interface CreateModalProps {
   setRefresh: React.Dispatch<React.SetStateAction<boolean>>;
   columnsField: string[];
   type: ModalType;
+  token: string;
 }
 
 // Type for modal components
@@ -124,7 +125,13 @@ interface TableProps {
   type: ModalType;
   role: string;
   permissions: [];
-
+  token: string;
+  pageSize: number;
+  setPageSize: React.Dispatch<React.SetStateAction<number>>;
+  totalPages: number;
+  setTotalPages: React.Dispatch<React.SetStateAction<number>>;
+  currentPage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const ExampleTwo = ({
@@ -135,6 +142,13 @@ const ExampleTwo = ({
   type,
   role,
   permissions,
+  token,
+  pageSize,
+  setPageSize,
+  totalPages,
+  setTotalPages,
+  currentPage,
+  setCurrentPage,
 }: TableProps) => {
   const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
@@ -157,9 +171,9 @@ const ExampleTwo = ({
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnsField, setColumnsField] = React.useState<string[]>([]);
-  const [pageSize, setPageSize] = React.useState(20);
+
   const [pagination, setPagination] = React.useState<PaginationState>({
-    pageIndex: 0,
+    pageIndex: 1,
     pageSize,
   });
 
@@ -373,7 +387,11 @@ const ExampleTwo = ({
           )}
         </TableBody>
       </Table>
-      <TablePagination table={table} />
+      <TablePagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={(page) => setCurrentPage(page)}
+      />
 
       {/* Create Modal */}
       <React.Suspense fallback={<div>Loading...</div>}>
@@ -383,6 +401,7 @@ const ExampleTwo = ({
             columnsField={columnsField}
             setRefresh={setRefresh}
             type={type}
+            token={token}
           />
         )}
       </React.Suspense>
@@ -397,6 +416,7 @@ const ExampleTwo = ({
             setRefresh={setRefresh}
             role={role}
             permissions={permissions}
+            token={token}
           />
         )}
       </React.Suspense>
