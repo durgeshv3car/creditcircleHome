@@ -67,7 +67,7 @@ const Register = async () => {
                     Create an account to start using Dashcode
                   </div>
                 </div>
-                <RegForm roleType={role} />
+                <RegForm roleType={role} token={token} />
                 {/* <div className=" relative border-b-[#9AA2AF] border-opacity-[16%] border-b pt-6">
                   <div className=" absolute inline-block  bg-default-50 dark:bg-default-100 left-1/2 top-1/2 transform -translate-x-1/2 px-4 min-w-max text-sm  text-default-500  font-normal ">
                     Or continue with

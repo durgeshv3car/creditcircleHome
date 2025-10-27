@@ -20,16 +20,21 @@ function Category({
   adminId,
   role,
   permissions,
+  token
 }: {
   adminId: string;
   role: string;
   permissions: any;
+  token:string
 }) {
   const router = useRouter();
   const [data, setData] = useState<Categorys[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refresh, setRefresh] = useState<boolean>(false);
 
+    const [pageSize, setPageSize] = React.useState(0);
+    const [totalPages, setTotalPages] = React.useState(0);
+    const [currentPage, setCurrentPage] = React.useState(1);
   const [startDate, setStartDate] = React.useState<string>("");
   const [endDate, setEndDate] = React.useState<string>("");
 
@@ -50,7 +55,10 @@ function Category({
     try {
       const result = await fetchApis();
       // const logs=await createLogs("User view api-management section list")
-      setData(result);
+      setData(result.data);
+      setTotalPages(result.totalPages);
+      setPageSize(result.totalRecords >= 20 ? 20 : result.totalRecords);
+
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -58,11 +66,12 @@ function Category({
     }
   };
 
+
   useEffect(() => {
     fetchData();
   }, [refresh]);
 
-  console.log("Start:", startDate, "End:", endDate);
+
 
   if (loading) return <Loader2 className="me-2 h-4 w-4 animate-spin" />;
 
@@ -84,6 +93,13 @@ function Category({
           type={type}
           role={role}
           permissions={permissions}
+          token={token}
+          pageSize={pageSize}
+          setPageSize={setPageSize}
+          totalPages={totalPages}
+          setTotalPages={setTotalPages}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
         />
       </div>
     </>

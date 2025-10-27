@@ -1,13 +1,36 @@
-export const fetchLoans = async () => {
+import axios from "axios";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+export const fetchLoans = async (params: any) => {
   try {
-    const response = await fetch(`/api/loans`);
-    const data = await response.json();
-    return data;
+    const response = await axios.get(`${BASE_URL}/all-loan-application`, { params });
+    return response.data;
   } catch (error) {
     console.error("Error fetching loans:", error);
     throw error;
   }
 };
+
+export const fetchLoansLength = async (
+  startdate: string,
+  enddate: string,
+) => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/all-loan-application-length?startdate=${startdate}&enddate=${enddate}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching loans:", error.message || error);
+    throw error;
+  }
+};
+
 
 export const singleLoans=async(phoneNumber:string)=>{
    try {

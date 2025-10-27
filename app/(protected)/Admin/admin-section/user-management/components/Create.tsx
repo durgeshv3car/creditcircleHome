@@ -9,6 +9,7 @@ interface CreateModalProps {
   columnsField: string[];
   setRefresh: React.Dispatch<React.SetStateAction<boolean>>;
   type: string;
+  token: string;
 }
 
 const CreateModal: React.FC<CreateModalProps> = ({
@@ -16,6 +17,7 @@ const CreateModal: React.FC<CreateModalProps> = ({
   columnsField,
   setRefresh,
   type,
+  token
 }) => {
   const [title, setTitle] = useState("");
 

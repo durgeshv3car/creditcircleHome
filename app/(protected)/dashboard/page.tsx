@@ -2,13 +2,11 @@
 
 import { StatisticsBlock } from "@/components/blocks/statistics-block";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import DashboardDropdown from "@/components/dashboard-dropdown";
 import dynamic from "next/dynamic";
 import { fetchApis } from "../services/apiManagement/api";
 import { useEffect, useState, useCallback } from "react";
-import { fetchUsers } from "../services/users/api";
-import { fetchLoans } from "../services/loans/api";
-import { DateRange } from "react-day-picker";
+import {  fetchUsersLength } from "../services/users/api";
+import { fetchLoansLength } from "../services/loans/api";
 
 const RevinueBarChart = dynamic(
   () => import("@/components/revenue-bar-chart"),
@@ -27,45 +25,32 @@ const DashboardPage = () => {
   const lengthApi = useCallback(async () => {
     try {
       const result = await fetchApis();
-      setApiCount(result.length.toString());
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  }, []);
-
-  const lengthUser = useCallback(async () => {
-    try {
-      const result = await fetchUsers();
-      if (startDate && endDate) {
-        const filteredUsers = result.filter((user: any) => {
-          const createdDate = new Date(user.createdAt).toISOString().split('T')[0];
-          return createdDate >= startDate && createdDate <= endDate;
-        });
-        setUserCount(filteredUsers.length.toString());
-      } else {
-        setUserCount(result.length.toString());
-      }
+      setApiCount(result.data.length);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   }, [startDate, endDate]);
 
-  const lengthLoan = useCallback(async () => {
-    try {
-      const result = await fetchLoans();
-      if (startDate && endDate) {
-        const filteredLoans = result.filter((loan: any) => {
-          const createdDate = new Date(loan.createdAt).toISOString().split('T')[0];
-          return createdDate >= startDate && createdDate <= endDate;
-        });
-        setLoanCount(filteredLoans.length.toString());
-      } else {
-        setLoanCount(result.length.toString());
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  }, [startDate, endDate]);
+const lengthUser = useCallback(async (startDate:string,endDate:string) => {
+  try {
+    const result = await fetchUsersLength(startDate || "", endDate || "");
+    setUserCount(result.data);
+
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+}, [startDate, endDate]);
+
+
+ const lengthLoan = useCallback(async (startDate:string,endDate:string) => {
+  try {
+    const result = await fetchLoansLength(startDate || "", endDate || "");
+    setLoanCount(result.data);
+
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+}, []);
 
   useEffect(() => {
     const storedStart = localStorage.getItem("startDate");
@@ -75,13 +60,12 @@ const DashboardPage = () => {
       setStartDate(storedStart);
       setEndDate(storedEnd);
     }
+    lengthApi();
+    lengthUser(storedStart || "", storedEnd || "");
+    lengthLoan(storedStart || "", storedEnd || "");
   }, []);
   
-  useEffect(() => {
-    lengthApi();
-    lengthUser();
-    lengthLoan();
-  }, [lengthApi, lengthUser, lengthLoan]);
+ 
   return (
     <div>
       <div className="grid grid-cols-12 items-center gap-5 mb-5">

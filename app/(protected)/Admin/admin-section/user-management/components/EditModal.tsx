@@ -19,6 +19,7 @@ interface EditModalProps<T> {
   adminId: string;
   role: string;
   permissions: string[];
+  token: string;
 }
 
 const EditModal = <T extends Record<string, any>>({
@@ -28,6 +29,7 @@ const EditModal = <T extends Record<string, any>>({
   setRefresh,
   role,
   permissions,
+  token
 }: EditModalProps<T>) => {
   const router = useRouter();
   const [editedData, setEditedData] = useState<Record<string, any>>({});
@@ -68,7 +70,8 @@ const EditModal = <T extends Record<string, any>>({
         editedData.name,
         editedData.email,
         editedData.role,
-        selectedPermissions
+        selectedPermissions,
+        token
       );
       if (result.success) {
         toast.success("User data updated successfully.");

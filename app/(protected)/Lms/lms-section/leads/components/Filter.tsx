@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { SelectedValues } from "./Leads";
-
 import { DataProps } from "../table/columns";
 import CategoryMultiSelect from "./CreateMultiSelect";
 
@@ -8,7 +7,7 @@ interface FilterProps {
   selectedValues: SelectedValues;
   setSelectedValues: React.Dispatch<React.SetStateAction<SelectedValues>>;
   data: DataProps[];
-  allFilterOptions: Record<string, Set<string>>;
+  allFilterOptions: Record<string, string[]>;
 }
 
 export default function Filter({
@@ -17,20 +16,6 @@ export default function Filter({
   data,
   allFilterOptions,
 }: FilterProps) {
-  const [dropdownOptions, setDropdownOptions] = useState<
-    Record<string, { id: string; title: string }[]>
-  >({});
-
-  useEffect(() => {
-    const newDropdowns: Record<string, { id: string; title: string }[]> = {};
-    for (const field in allFilterOptions) {
-      newDropdowns[field] = Array.from(allFilterOptions[field])
-        .sort()
-        .map((value) => ({ id: value, title: value }));
-    }
-    setDropdownOptions(newDropdowns);
-  }, [allFilterOptions]);
-
   const handleSelectChange = (field: string, newValues: string[]) => {
     setSelectedValues((prev) => ({
       ...prev,
@@ -46,7 +31,7 @@ export default function Filter({
             label={field}
             selectedIds={selectedValues[field] || []}
             onChange={(newValues) => handleSelectChange(field, newValues)}
-            options={dropdownOptions[field] || []}
+            options={allFilterOptions[field] || []}
           />
         </div>
       ))}

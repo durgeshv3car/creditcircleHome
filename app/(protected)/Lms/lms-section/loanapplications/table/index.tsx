@@ -15,6 +15,8 @@ import {
 } from "@tanstack/react-table";
 import { RowSelectionState, ColumnDef } from "@tanstack/react-table";
 import { columns } from "./columns";
+import { Search } from "lucide-react";
+import { toast } from "sonner";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -56,36 +58,63 @@ import { useSearchParams } from "next/navigation";
 import { SelectedValues } from "../components/LoanApplications";
 
 interface ExampleTwoProps {
-  selectedValues:SelectedValues;
+  selectedValues: SelectedValues;
   setSelectedValues: React.Dispatch<React.SetStateAction<SelectedValues>>;
   tableData: any[];
   tableColumns: ColumnDef<any, any>[];
+  token: string;
+  pageSize: number;
+  setPageSize: React.Dispatch<React.SetStateAction<number>>;
+  totalPages: number;
+  setTotalPages: React.Dispatch<React.SetStateAction<number>>;
+  currentPage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const ExampleTwo: React.FC<ExampleTwoProps> = ({ selectedValues, setSelectedValues, tableData, tableColumns }) => {
+const ExampleTwo: React.FC<ExampleTwoProps> = ({
+  selectedValues,
+  setSelectedValues,
+  tableData,
+  tableColumns,
+   token,
+  pageSize,
+  setPageSize,
+  totalPages,
+  setTotalPages,
+  currentPage,
+  setCurrentPage,
+}) => {
   const searchParams = useSearchParams();
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-   const [columnVisibility, setColumnVisibility] =
-      React.useState<VisibilityState>({
-        time:false,
-      });
-  const [selectedColumn, setSelectedColumn] = React.useState<string | undefined>();
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({
+      time: false,
+    });
+  const [selectedColumn, setSelectedColumn] = React.useState<
+    string | undefined
+  >();
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
-  const [pageSize, setPageSize] = React.useState<number>(20); // Default to 20 rows per page
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const [selectedOffer, setSelectedOffer] = React.useState<any>(null);
   const [selectedRowsData, setSelectedRowsData] = React.useState<any[]>([]);
-  const [isCreatingNotification, setIsCreatingNotification] = React.useState<boolean>(false);
+  const [isCreatingNotification, setIsCreatingNotification] =
+    React.useState<boolean>(false);
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize,
   });
 
   const [type, setType] = React.useState<string | null>(null);
+  const [visibleData, setVisibleData] = React.useState(tableData);
+  React.useEffect(() => {
+    setVisibleData(tableData);
+  }, [tableData]);
 
   const table = useReactTable({
-    data: tableData,
+    data: visibleData,
     columns: tableColumns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -122,13 +151,72 @@ const ExampleTwo: React.FC<ExampleTwoProps> = ({ selectedValues, setSelectedValu
     }
   }, [searchParams]);
 
-     React.useEffect(() => {
-       setPagination((prev) => ({
-         ...prev,
-         pageIndex: 0,
-         pageSize: Number(pageSize),
-       }));
-     }, [pageSize]);
+  React.useEffect(() => {
+    setPagination((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      pageSize: Number(pageSize),
+    }));
+  }, [pageSize]);
+  const [selected, setSelected] = React.useState<string>("all");
+  const [selectedStatus, setSelectedStatus] =
+    React.useState<string>("approved");
+  const [selectedStatusPartner, setSelectedStatusPartner] =
+    React.useState<string>("Cashe");
+  const [query, setQuery] = React.useState("");
+
+  const handleSelectChange = (val: string) => {
+    setSelected(val);
+    table.resetColumnFilters();
+    setQuery("");
+  };
+  const handleSelectChangeStatusPartner = (val: string) => {
+    setSelectedStatusPartner(val);
+    table.resetColumnFilters();
+    setQuery("");
+  };
+  const handleSelectChangeStatus = (val: string) => {
+    setSelectedStatus(val);
+    table.resetColumnFilters();
+    setQuery("");
+  };
+const handleSearch = () => {
+  const start = localStorage.getItem("startDateLead");
+  const end = localStorage.getItem("endDateLead");
+
+  if (start && end) {
+    toast.error("Please Reset Date For Search");
+    return;
+  }
+
+  if (selectedStatusPartner) {
+ 
+    const filteredUsers = tableData.filter((loan) => {
+      const statusValue = loan.loanDataStatus[selectedStatusPartner];
+
+      // Case 1: Object → Rejected
+      if (typeof statusValue === "object" && statusValue !== null) {
+        return statusValue.status?.toLowerCase() === selectedStatus.toLowerCase();
+      }
+
+      // Case 2: String with URL → Approved
+      if (typeof statusValue === "string" && statusValue.includes("http")) {
+        return selectedStatus.toLowerCase() === "approved";
+      }
+
+      // Case 3: String without URL → Exist / Pending / Other
+      if (typeof statusValue === "string") {
+        return statusValue.toLowerCase().includes(selectedStatus.toLowerCase());
+      }
+
+      return false;
+    });
+    console.log("Filtered Users:", filteredUsers)
+
+    setVisibleData(filteredUsers);
+  }
+};
+
 
   return (
     <div className="w-full">
@@ -145,7 +233,51 @@ const ExampleTwo: React.FC<ExampleTwoProps> = ({ selectedValues, setSelectedValu
 
       <div className="py-4 px-5 bg-whit rounded-md">
         <div className="flex items-center justify-between">
-          <div className="text-xl font-medium text-default-900">LoanApplications Data</div>
+          <div className="text-xl font-medium text-default-900">
+            LoanApplications Data
+          </div>
+          <div className="flex items-center ">
+            {/* Left: Select (fixed width) */}
+
+            {/* Right: Search bar (fills remaining space) */}
+
+            <>
+              <Select
+                value={selectedStatusPartner}
+                onValueChange={handleSelectChangeStatusPartner}
+              >
+                <SelectTrigger className="mt-2">
+                  <SelectValue placeholder="Select Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Cashe">Cashe</SelectItem>
+                  <SelectItem value="Mpocket">Mpocket</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select
+                value={selectedStatus}
+                onValueChange={handleSelectChangeStatus}
+              >
+                <SelectTrigger className="mt-2">
+                  <SelectValue placeholder="Select Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="approved">Approved</SelectItem>
+                  <SelectItem value="rejected">Rejected</SelectItem>
+                  <SelectItem value="Exist">Exist</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={handleSearch}
+                aria-label="Search"
+                className="w-10 h-10"
+              >
+                <Search className="w-4 h-4" />
+              </Button>
+            </>
+          </div>
           <div className="flex items-center gap-4">
             {/* Select for Rows per Page */}
             <label className="text-sm text-gray-600">Rows per page:</label>
@@ -157,7 +289,7 @@ const ExampleTwo: React.FC<ExampleTwoProps> = ({ selectedValues, setSelectedValu
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {[20, 50, 100,200,500].map((value) => (
+                {[20, 50, 100, 200, 500].map((value) => (
                   <SelectItem key={value} value={String(value)}>
                     {value}
                   </SelectItem>
@@ -300,7 +432,11 @@ const ExampleTwo: React.FC<ExampleTwoProps> = ({ selectedValues, setSelectedValu
       </div>
 
       {/* Pagination Component */}
-      <TablePagination table={table} />
+         <TablePagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={(page) => setCurrentPage(page)}
+      />
       {isModalOpen && (
         <OfferSelectionModal
           selectedRowsData={selectedRowsData}

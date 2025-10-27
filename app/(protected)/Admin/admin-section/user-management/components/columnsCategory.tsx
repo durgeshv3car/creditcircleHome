@@ -30,6 +30,7 @@ export interface Categorys {
   thumbnail:string;
   role: string;
   permissions:[]
+  token?:string;
 }
 
 
@@ -41,6 +42,7 @@ interface ColumnsCategoryProps {
   setOpen: (val: boolean) => void;
   permissionList: string[];
   setPermissionList: (val: string[]) => void;
+  token: string;
   
 }
 
@@ -52,6 +54,7 @@ export const columnsCategory = ({
   setOpen,
   permissionList,
   setPermissionList,
+  token
   
 }: ColumnsCategoryProps): ColumnDef<Categorys>[] => [
   
@@ -177,7 +180,7 @@ export const columnsCategory = ({
     cell: ({ row }) => {
       const handleDelete = async (id: string, adminId: string) => {
         try {
-          const result = await deleteUser(id, adminId);
+          const result = await deleteUser(id, adminId,token);
           if (result.success) {
             toast.success("User data deleted");
             fetchData();

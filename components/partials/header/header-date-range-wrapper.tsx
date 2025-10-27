@@ -5,6 +5,7 @@ import { HeaderDateRange } from "./header-date-range";
 import { HeaderDateRangeApi } from "./header-date-range-api";
 import { HeaderDateRangeLead } from "./header-date-range-leads";
 import { HeaderDateRangeLoan } from "./header-date-range-loans";
+import { HeaderDateRangeLogs } from "./header-date-range-logs";
 
 export function HeaderDateRangeWrapper() {
   const pathname = usePathname();
@@ -20,6 +21,9 @@ export function HeaderDateRangeWrapper() {
   }
     if (pathname === "/Lms/lms-section/loanapplications"){
     return <HeaderDateRangeLoan />;
+  }
+  if (pathname === "/Admin/admin-section/user-logs"){
+    return <HeaderDateRangeLogs />;
   }
 
   return null;

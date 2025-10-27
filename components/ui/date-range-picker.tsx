@@ -32,6 +32,7 @@ export function DateRangePicker({
   const handleSelect = (newDate: DateRange | undefined) => {
     setTempDate(newDate);
   };
+  console.log("Temp Date:", tempDate);
 
   const handleApply = () => {
     setDate(tempDate);

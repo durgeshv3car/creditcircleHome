@@ -4,7 +4,7 @@ const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 import { colors } from "@/lib/colors";
 import { useTheme } from "next-themes";
 import { useConfig } from "@/hooks/use-config";
-import { fetchLoans } from "../../services/loans/api";
+import { fetchLoans, fetchLoansLength } from "../../services/loans/api";
 import React, { useEffect, useState, useMemo, useRef } from "react";
 
 interface OverviewChartProps {
@@ -41,31 +41,16 @@ const OverviewChart = ({
   useEffect(() => {
     const fetchLoanData = async () => {
       try {
-        const result = await fetchLoans();
-        type Loan = {
-          loanDataStatus?: Record<string, any>;
-          createdAt: string;
-          [key: string]: any;
-        };
+        const result = await fetchLoansLength(startDate || "", endDate || "");
+        setLoanCount(result.data);
+    
 
-        const filteredLoans = result.filter((loan: Loan) => {
-          if (startDate && endDate) {
-            const createdDate = new Date(loan.createdAt).toISOString().split('T')[0];
-            return createdDate >= startDate && createdDate <= endDate;
-          }
-          return true; 
-        });
+     
 
 
-        setLoanCount(filteredLoans.length);
+     
 
-        const notAppliedCount = filteredLoans.filter(
-          (loan: Loan) =>
-            !loan.loanDataStatus ||
-            Object.keys(loan.loanDataStatus).length === 0
-        ).length;
-
-        setNotApplied(notAppliedCount);
+        setNotApplied(result.notAppliedLoans);
       } catch (error) {
         console.error("Error fetching loan data:", error);
       }

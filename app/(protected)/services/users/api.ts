@@ -1,10 +1,39 @@
-export const fetchUsers = async () => {
+import axios from "axios";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+export const fetchUsers = async (params:any) => {
   try {
-    const response = await fetch(`/api/users`);
-    const data = await response.json();
-    return data;
+     const response = await axios.get(`${BASE_URL}/otp/get-all-profile`, {
+      params, 
+    });
+    
+    return response.data;
   } catch (error) {
     console.error("Error fetching users:", error);
+    throw error;
+  }
+};
+
+export const fetchUserFilters = async (params:any) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/otp/filters`, {
+      params, // ✅ THIS sends ?state=Haryana&city=Gurgaon...
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    throw error;
+  }
+};
+
+
+
+
+export const fetchUsersLength = async (startdate: string, enddate: string) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/otp/get-all-profile-length?startdate=${startdate}&enddate=${enddate}`);
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching users:", error.message || error);
     throw error;
   }
 };

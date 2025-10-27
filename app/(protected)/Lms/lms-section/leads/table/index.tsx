@@ -87,6 +87,13 @@ interface ExampleTwoProps {
   tableColumns: ColumnDef<DataProps, any>[];
   setRefresh: React.Dispatch<React.SetStateAction<boolean>>;
   allFilterOptions: Record<string, any>;
+  token: string;
+  pageSize: number;
+  setPageSize: React.Dispatch<React.SetStateAction<number>>;
+  totalPages: number;
+  setTotalPages: React.Dispatch<React.SetStateAction<number>>;
+  currentPage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const ExampleTwo = <TData extends Record<string, any>>({
@@ -96,6 +103,13 @@ const ExampleTwo = <TData extends Record<string, any>>({
   tableColumns,
   setRefresh,
   allFilterOptions,
+  token,
+  pageSize,
+  setPageSize,
+  totalPages,
+  setTotalPages,
+  currentPage,
+  setCurrentPage,
 }: ExampleTwoProps) => {
   const searchParams = useSearchParams();
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -121,7 +135,7 @@ const ExampleTwo = <TData extends Record<string, any>>({
   >();
 
   const [isModalOpenOffer, setIsModalOpenOffer] = React.useState(false);
-  const [pageSize, setPageSize] = React.useState(20);
+
 
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [rowSelection, setRowSelection] = React.useState<
@@ -131,6 +145,7 @@ const ExampleTwo = <TData extends Record<string, any>>({
     []
   );
   const [globalFilter, setGlobalFilter] = React.useState("");
+  const [showInput, setShowInput] = React.useState(false);
 
   const [type, setType] = React.useState<string | null>(null);
   const [selectedOffer, setSelectedOffer] = React.useState<any>(null);
@@ -176,9 +191,13 @@ const ExampleTwo = <TData extends Record<string, any>>({
       pageSize: Number(pageSize),
     }));
   }, [pageSize]);
+  const [visibleData, setVisibleData] = React.useState<DataProps[]>(tableData);
+  React.useEffect(() => {
+    setVisibleData(tableData);
+  }, [tableData]);
 
   const table = useReactTable({
-    data: tableData,
+    data: visibleData,
     columns: tableColumns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -222,13 +241,28 @@ const ExampleTwo = <TData extends Record<string, any>>({
     { value: "phoneNumber", label: "PhoneNumber" },
     { value: "firstName", label: "FirstName" },
     { value: "email", label: "Email" },
+    { value: "status", label: "Status" },
   ];
 
   const [selected, setSelected] = React.useState<string>("all");
+  const [selectedStatus, setSelectedStatus] =
+    React.useState<string>("approved");
+  const [selectedStatusPartner, setSelectedStatusPartner] =
+    React.useState<string>("Cashe");
   const [query, setQuery] = React.useState("");
 
   const handleSelectChange = (val: string) => {
     setSelected(val);
+    table.resetColumnFilters();
+    setQuery("");
+  };
+  const handleSelectChangeStatusPartner = (val: string) => {
+    setSelectedStatusPartner(val);
+    table.resetColumnFilters();
+    setQuery("");
+  };
+  const handleSelectChangeStatus = (val: string) => {
+    setSelectedStatus(val);
     table.resetColumnFilters();
     setQuery("");
   };
@@ -241,7 +275,42 @@ const ExampleTwo = <TData extends Record<string, any>>({
       return;
     }
 
+    if (selected === "status" && selectedStatusPartner) {
+      const filteredUsers = tableData.filter((user) => {
+        if (!Array.isArray(user?.LoanApplications)) return false;
+
+        return user.LoanApplications.some((loan) => {
+          const statusValue = loan?.loanDataStatus?.[selectedStatusPartner];
+
+          // ✅ Case 1: Object → Rejected
+          if (typeof statusValue === "object" && statusValue !== null) {
+            return (
+              statusValue.status?.toLowerCase() === selectedStatus.toLowerCase()
+            );
+          }
+
+          // ✅ Case 2: String with URL → Approved
+          if (typeof statusValue === "string" && statusValue.includes("http")) {
+            return selectedStatus.toLowerCase() === "approved";
+          }
+
+          // ✅ Case 3: String without URL → Exist / Pending / Other
+          if (typeof statusValue === "string") {
+            return statusValue
+              .toLowerCase()
+              .includes(selectedStatus.toLowerCase());
+          }
+
+          return false;
+        });
+      });
+
+      setVisibleData(filteredUsers);
+      return;
+    }
+
     if (selected === "all") {
+      setVisibleData(tableData);
       setGlobalFilter(query);
     } else {
       const column = table.getColumn(selected);
@@ -276,6 +345,7 @@ const ExampleTwo = <TData extends Record<string, any>>({
           <div className="text-xl font-medium text-default-900">Users Data</div>
           <div className="flex items-center ">
             {/* Left: Select (fixed width) */}
+
             <div className="flex-none w-30">
               <Select value={selected} onValueChange={handleSelectChange}>
                 <SelectTrigger className="w-full">
@@ -292,37 +362,79 @@ const ExampleTwo = <TData extends Record<string, any>>({
             </div>
 
             {/* Right: Search bar (fills remaining space) */}
-            <div className="flex-1 flex items-center">
-              <div className="relative w-full">
-                <Input
-                  id="search-input"
-                  placeholder={
-                    selected === "all"
-                      ? "Search"
-                      : `Search ${
-                          selected.charAt(0).toUpperCase() + selected.slice(1)
-                        }`
-                  }
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  className="pr-12"
-                />
+            {selected !== "status" ? (
+              <>
+                <div className="flex-1 flex items-center">
+                  <div className="relative w-full">
+                    <Input
+                      id="search-input"
+                      placeholder={
+                        selected === "all"
+                          ? "Search"
+                          : `Search ${
+                              selected.charAt(0).toUpperCase() +
+                              selected.slice(1)
+                            }`
+                      }
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      className="pr-12"
+                    />
 
-                {/* Lens icon button on the right */}
-                <div className="absolute inset-y-0 right-0 flex items-center pr-1">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={handleSearch}
-                    aria-label="Search"
-                    className="w-10 h-10"
-                  >
-                    <Search className="w-4 h-4" />
-                  </Button>
+                    {/* Lens icon button on the right */}
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-1">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={handleSearch}
+                        aria-label="Search"
+                        className="w-10 h-10"
+                      >
+                        <Search className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </>
+            ) : (
+              <>
+                <Select
+                  value={selectedStatusPartner}
+                  onValueChange={handleSelectChangeStatusPartner}
+                >
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Cashe">Cashe</SelectItem>
+                    <SelectItem value="Mpocket">Mpocket</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select
+                  value={selectedStatus}
+                  onValueChange={handleSelectChangeStatus}
+                >
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="approved">Approved</SelectItem>
+                    <SelectItem value="rejected">Rejected</SelectItem>
+                    <SelectItem value="Exist">Exist</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={handleSearch}
+                  aria-label="Search"
+                  className="w-10 h-10"
+                >
+                  <Search className="w-4 h-4" />
+                </Button>
+              </>
+            )}
           </div>
           <div className="flex items-center gap-4">
             {/* Select for Rows per Page */}
@@ -477,7 +589,11 @@ const ExampleTwo = <TData extends Record<string, any>>({
 
       {/* Pagination Component */}
       <React.Suspense fallback={<div>Loading...</div>}>
-        <TablePagination table={table} />
+          <TablePagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={(page) => setCurrentPage(page)}
+      />
       </React.Suspense>
       <React.Suspense fallback={<div>Loading...</div>}>
         {isModalOpenOffer && (
