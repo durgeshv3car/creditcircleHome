@@ -269,59 +269,57 @@ const ExampleTwo = <TData extends Record<string, any>>({
 
   };
 
-  const handleSearch = () => {
-    const start = localStorage.getItem("startDateLead");
-    const end = localStorage.getItem("endDateLead");
-    if (start && end) {
-      toast.error("Please Reset Date For Search");
-      return;
-    }
+  // const handleSearch = () => {
+  //   const start = localStorage.getItem("startDateLead");
+  //   const end = localStorage.getItem("endDateLead");
+  //   if (start && end) {
+  //     toast.error("Please Reset Date For Search");
+  //     return;
+  //   }
 
-    if (selected === "status" && selectedStatusPartner) {
-      const filteredUsers = tableData.filter((user) => {
-        if (!Array.isArray(user?.LoanApplications)) return false;
+  //   if (selected === "status" && selectedStatusPartner) {
+  //     const filteredUsers = tableData.filter((user) => {
+  //       if (!Array.isArray(user?.LoanApplications)) return false;
 
-        return user.LoanApplications.some((loan) => {
-          const statusValue = loan?.loanDataStatus?.[selectedStatusPartner];
+  //       return user.LoanApplications.some((loan) => {
+  //         const statusValue = loan?.loanDataStatus?.[selectedStatusPartner];
 
-          // ✅ Case 1: Object → Rejected
-          if (typeof statusValue === "object" && statusValue !== null) {
-            return (
-              statusValue.status?.toLowerCase() === selectedStatus.toLowerCase()
-            );
-          }
+  //         // ✅ Case 1: Object → Rejected
+  //         if (typeof statusValue === "object" && statusValue !== null) {
+  //           return (
+  //             statusValue.status?.toLowerCase() === selectedStatus.toLowerCase()
+  //           );
+  //         }
 
-          // ✅ Case 2: String with URL → Approved
-          if (typeof statusValue === "string" && statusValue.includes("http")) {
-            return selectedStatus.toLowerCase() === "approved";
-          }
+  //         // ✅ Case 2: String with URL → Approved
+  //         if (typeof statusValue === "string" && statusValue.includes("http")) {
+  //           return selectedStatus.toLowerCase() === "approved";
+  //         }
 
-          // ✅ Case 3: String without URL → Exist / Pending / Other
-          if (typeof statusValue === "string") {
-            return statusValue
-              .toLowerCase()
-              .includes(selectedStatus.toLowerCase());
-          }
+  //         // ✅ Case 3: String without URL → Exist / Pending / Other
+  //         if (typeof statusValue === "string") {
+  //           return statusValue
+  //             .toLowerCase()
+  //             .includes(selectedStatus.toLowerCase());
+  //         }
 
-          return false;
-        });
-      });
+  //         return false;
+  //       });
+  //     });
 
-      setVisibleData(filteredUsers);
-      return;
-    }
+  //     setVisibleData(filteredUsers);
+  //     return;
+  //   }
 
-    if (selected === "all") {
-      setSelected("all")
-    } else {
-      setSelectedColumn(selected);
-      setQuery(query);
-    }
-  };
+  //   if (selected === "all") {
+  //     setSelected("all")
+  //   } else {
+  //     setSelectedColumn(selected);
+  //     setQuery(query);
+  //   }
+  // };
 
-  const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
-    if (e.key === "Enter") handleSearch();
-  };
+
 
   return (
     <div className="w-full">
@@ -377,22 +375,11 @@ const ExampleTwo = <TData extends Record<string, any>>({
                       }
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
-                      onKeyDown={handleKeyDown}
                       className="pr-12"
                     />
 
                     {/* Lens icon button on the right */}
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-1">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={handleSearch}
-                        aria-label="Search"
-                        className="w-10 h-10"
-                      >
-                        <Search className="w-4 h-4" />
-                      </Button>
-                    </div>
+                
                   </div>
                 </div>
               </>
@@ -426,7 +413,7 @@ const ExampleTwo = <TData extends Record<string, any>>({
                 <Button
                   size="icon"
                   variant="ghost"
-                  onClick={handleSearch}
+                  onClick={()=>console.log("Search Clicked")}
                   aria-label="Search"
                   className="w-10 h-10"
                 >
