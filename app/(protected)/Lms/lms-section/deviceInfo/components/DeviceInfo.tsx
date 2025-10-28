@@ -13,19 +13,21 @@ export type SelectedValues = {
   [key: string]: string[]; // ✅ This enables dynamic keys
 };
 
-
-const LeadPage = () => {
+const LeadPage = ({ token }: { token: string }) => {
   const [selectedValues, setSelectedValues] = useState<SelectedValues>({
     phoneNumber: [],
     brand: [],
   });
 
-  const fields: (keyof SelectedValues)[] = ["phoneNumber", "brand"];
+
 
   const [columns, setColumns] = useState<any[]>([]);
   const [data, setData] = useState<DataProps[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refresh, setRefresh] = useState<boolean>(false);
+  const [pageSize, setPageSize] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // New state for filter options
   const [allFilterOptions, setAllFilterOptions] = useState<{
@@ -47,22 +49,22 @@ const LeadPage = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const result = await fetchDevices();
-      const fetchedData = Array.isArray(result) ? result : [result];
-      setData(fetchedData);
+      const activeFilters = {
+        page: currentPage,
+        pageSize: pageSize,
+        phoneNumber: selectedValues.phoneNumber,
+        brand: selectedValues.brand,
+      };
 
-      // Build filter options dynamically
-      const phoneNumbersSet = new Set<string>();
-      const brandsSet = new Set<string>();
-
-      fetchedData.forEach((item) => {
-        if (item.phoneNumber) phoneNumbersSet.add(item.phoneNumber.toString());
-        if (item.brand) brandsSet.add(item.brand.toString());
-      });
-
+      const result = await fetchDevices(activeFilters);
+      setData(result.data);
+      setTotalPages(result.pagination.totalPages);
+      setPageSize(
+        result.pagination.totalRecords >= 20 ? 20 : result.pagination.totalRecords
+      );
       setAllFilterOptions({
-        phoneNumber: Array.from(phoneNumbersSet),
-        brand: Array.from(brandsSet),
+        phoneNumber: result.filters.phoneNumbers,
+        brand: result.filters.brands,
       });
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -75,37 +77,28 @@ const LeadPage = () => {
 
   useEffect(() => {
     fetchData();
-  }, [refresh]);
+  }, [refresh, currentPage, pageSize,JSON.stringify(selectedValues)]);
+
+ 
 
   // Filter data based on selectedValues
-  const filteredData = data.filter((item) => {
-    return fields.every((field) => {
-      const value = selectedValues[field];
-      if (!value || value.length === 0) return true;
-
-      const fieldValue = item[field as keyof DataProps];
-
-      return value.some((v) => {
-        const compareValue =
-          typeof v === "string" ? v : (v as { name: string })?.name?.toString() ?? "";
-
-        return (
-          typeof fieldValue === "string" &&
-          fieldValue.toLowerCase().includes(compareValue.toLowerCase())
-        );
-      });
-    });
-  });
 
   return (
     <div>
-  
       <ExampleTwo
+     
         selectedValues={selectedValues}
         setSelectedValues={setSelectedValues}
-        tableData={filteredData}
+        tableData={data}
         tableColumns={columns}
-        allFilterOptions={allFilterOptions} 
+        allFilterOptions={allFilterOptions}
+        token={token}
+        pageSize={pageSize}
+        setPageSize={setPageSize}
+        totalPages={totalPages}
+        setTotalPages={setTotalPages}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
       />
     </div>
   );

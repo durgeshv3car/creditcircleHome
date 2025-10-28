@@ -56,31 +56,57 @@ import { useSearchParams } from "next/navigation";
 import { SelectedValues } from "../components/DeviceInfo";
 
 interface ExampleTwoProps {
-  selectedValues:SelectedValues;
+  selectedValues: SelectedValues;
   setSelectedValues: React.Dispatch<React.SetStateAction<SelectedValues>>;
   tableData: any[];
   tableColumns: ColumnDef<any, any>[];
   allFilterOptions: Record<string, any>;
+  token: string;
+  pageSize: number;
+  setPageSize: React.Dispatch<React.SetStateAction<number>>;
+  totalPages: number;
+  setTotalPages: React.Dispatch<React.SetStateAction<number>>;
+  currentPage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const ExampleTwo: React.FC<ExampleTwoProps> = ({ selectedValues, setSelectedValues, tableData, tableColumns,  allFilterOptions }) => {
+const ExampleTwo: React.FC<ExampleTwoProps> = ({
+  selectedValues,
+  setSelectedValues,
+  tableData,
+  tableColumns,
+  allFilterOptions,
+  token,
+  pageSize,
+  setPageSize,
+  totalPages,
+  setTotalPages,
+  currentPage,
+  setCurrentPage,
+}) => {
   const searchParams = useSearchParams();
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
-  const [selectedColumn, setSelectedColumn] = React.useState<string | undefined>();
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
+  const [selectedColumn, setSelectedColumn] = React.useState<
+    string | undefined
+  >();
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
-  const [pageSize, setPageSize] = React.useState<number>(20); // Default to 20 rows per page
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const [selectedOffer, setSelectedOffer] = React.useState<any>(null);
   const [selectedRowsData, setSelectedRowsData] = React.useState<any[]>([]);
-  const [isCreatingNotification, setIsCreatingNotification] = React.useState<boolean>(false);
+  const [isCreatingNotification, setIsCreatingNotification] =
+    React.useState<boolean>(false);
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize,
   });
 
   const [type, setType] = React.useState<string | null>(null);
+
 
   const table = useReactTable({
     data: tableData,
@@ -120,31 +146,33 @@ const ExampleTwo: React.FC<ExampleTwoProps> = ({ selectedValues, setSelectedValu
     }
   }, [searchParams]);
 
-     React.useEffect(() => {
-       setPagination((prev) => ({
-         ...prev,
-         pageIndex: 0,
-         pageSize: Number(pageSize),
-       }));
-     }, [pageSize]);
+  React.useEffect(() => {
+    setPagination((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      pageSize: Number(pageSize),
+    }));
+  }, [pageSize]);
 
   return (
     <div className="w-full">
       {/* Header & Filter Section */}
       <div className="py-4 px-5 mb-6 bg-white rounded-md">
-      <Filter
-            selectedValues={selectedValues}
-            setSelectedValues={setSelectedValues}
-            data={tableData}
-            allFilterOptions={allFilterOptions}
-          />
+        <Filter
+          selectedValues={selectedValues}
+          setSelectedValues={setSelectedValues}
+          data={tableData}
+          allFilterOptions={allFilterOptions}
+        />
       </div>
 
       {/* Display Selected Values */}
 
       <div className="py-4 px-5 bg-whit rounded-md">
         <div className="flex items-center justify-between">
-          <div className="text-xl font-medium text-default-900">LoanApplications Data</div>
+          <div className="text-xl font-medium text-default-900">
+            LoanApplications Data
+          </div>
           <div className="flex items-center gap-4">
             {/* Select for Rows per Page */}
             <label className="text-sm text-gray-600">Rows per page:</label>
@@ -299,7 +327,11 @@ const ExampleTwo: React.FC<ExampleTwoProps> = ({ selectedValues, setSelectedValu
       </div>
 
       {/* Pagination Component */}
-      <TablePagination table={table} />
+      <TablePagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={(page) => setCurrentPage(page)}
+      />
       {isModalOpen && (
         <OfferSelectionModal
           selectedRowsData={selectedRowsData}
