@@ -94,6 +94,12 @@ interface ExampleTwoProps {
   setTotalPages: React.Dispatch<React.SetStateAction<number>>;
   currentPage: number;
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  options: { value: string; label: string }[];
+  query: string;
+  setQuery: React.Dispatch<React.SetStateAction<string>>;
+  selected: string;
+  setSelected: React.Dispatch<React.SetStateAction<string>>;
+
 }
 
 const ExampleTwo = <TData extends Record<string, any>>({
@@ -110,6 +116,11 @@ const ExampleTwo = <TData extends Record<string, any>>({
   setTotalPages,
   currentPage,
   setCurrentPage,
+  options,
+  query,
+  setQuery,
+  selected,
+  setSelected,
 }: ExampleTwoProps) => {
   const searchParams = useSearchParams();
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -135,7 +146,6 @@ const ExampleTwo = <TData extends Record<string, any>>({
   >();
 
   const [isModalOpenOffer, setIsModalOpenOffer] = React.useState(false);
-
 
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [rowSelection, setRowSelection] = React.useState<
@@ -236,35 +246,27 @@ const ExampleTwo = <TData extends Record<string, any>>({
     }
   }, [searchParams]);
 
-  const options = [
-    { value: "all", label: "All" },
-    { value: "phoneNumber", label: "PhoneNumber" },
-    { value: "firstName", label: "FirstName" },
-    { value: "email", label: "Email" },
-    { value: "status", label: "Status" },
-  ];
 
-  const [selected, setSelected] = React.useState<string>("all");
+
   const [selectedStatus, setSelectedStatus] =
     React.useState<string>("approved");
   const [selectedStatusPartner, setSelectedStatusPartner] =
     React.useState<string>("Cashe");
-  const [query, setQuery] = React.useState("");
 
   const handleSelectChange = (val: string) => {
     setSelected(val);
-    table.resetColumnFilters();
-    setQuery("");
+
+
   };
   const handleSelectChangeStatusPartner = (val: string) => {
     setSelectedStatusPartner(val);
-    table.resetColumnFilters();
-    setQuery("");
+
+
   };
   const handleSelectChangeStatus = (val: string) => {
     setSelectedStatus(val);
-    table.resetColumnFilters();
-    setQuery("");
+    
+
   };
 
   const handleSearch = () => {
@@ -310,13 +312,10 @@ const ExampleTwo = <TData extends Record<string, any>>({
     }
 
     if (selected === "all") {
-      setVisibleData(tableData);
-      setGlobalFilter(query);
+      setSelected("all")
     } else {
-      const column = table.getColumn(selected);
-      if (column) {
-        column.setFilterValue(query || undefined);
-      }
+      setSelectedColumn(selected);
+      setQuery(query);
     }
   };
 
@@ -589,11 +588,11 @@ const ExampleTwo = <TData extends Record<string, any>>({
 
       {/* Pagination Component */}
       <React.Suspense fallback={<div>Loading...</div>}>
-          <TablePagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={(page) => setCurrentPage(page)}
-      />
+        <TablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
       </React.Suspense>
       <React.Suspense fallback={<div>Loading...</div>}>
         {isModalOpenOffer && (

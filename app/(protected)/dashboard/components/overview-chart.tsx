@@ -23,50 +23,50 @@ const OverviewChart = ({
 
   const [loanCount, setLoanCount] = useState(0);
   const [notApplied, setNotApplied] = useState(0);
+  const [applied, setApplied] = useState(0);
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
 
   const chartRef = useRef<any>(null);
 
   // Load dates from localStorage
-  useEffect(() => {
-    const storedStart = localStorage.getItem("startDate");
-    const storedEnd = localStorage.getItem("endDate");
-    if (storedStart && storedEnd) {
-      setStartDate(storedStart);
-      setEndDate(storedEnd);
+const [isDateLoaded, setIsDateLoaded] = useState(false);
+
+useEffect(() => {
+  const storedStart = localStorage.getItem("startDate");
+  const storedEnd = localStorage.getItem("endDate");
+  if (storedStart && storedEnd) {
+    setStartDate(storedStart);
+    setEndDate(storedEnd);
+  }
+  setIsDateLoaded(true);
+}, []);
+
+useEffect(() => {
+  if (!isDateLoaded) return; // ✅ Wait until localStorage is loaded
+
+  const fetchLoanData = async () => {
+    try {
+      const result = await fetchLoansLength(startDate || "", endDate || "");
+      setLoanCount(result.data);
+      setNotApplied(result.notAppliedLoans);
+      setApplied(result.appliedLoans);
+    } catch (error) {
+      console.error("Error fetching loan data:", error);
     }
-  }, []);
+  };
 
-  useEffect(() => {
-    const fetchLoanData = async () => {
-      try {
-        const result = await fetchLoansLength(startDate || "", endDate || "");
-        setLoanCount(result.data);
-    
-
-     
+  fetchLoanData();
+}, [isDateLoaded, startDate, endDate]);
 
 
-     
-
-        setNotApplied(result.notAppliedLoans);
-      } catch (error) {
-        console.error("Error fetching loan data:", error);
-      }
-    };
-
-    fetchLoanData();
-  }, [startDate, endDate]);
-
-const Applied = Math.max(loanCount - notApplied, 0);
-const totalCount = loanCount || 1;
+const totalCount = applied+notApplied || 1;
 
 const series = useMemo(() => {
-  const appliedPct = (Applied / totalCount) * 100;
+  const appliedPct = (applied / totalCount) * 100;
   const notAppliedPct = (notApplied / totalCount) * 100;
   return [Math.round(appliedPct), Math.round(notAppliedPct)];
-}, [Applied, notApplied, totalCount]);
+}, [applied, notApplied, totalCount]);
 
 const options: any = useMemo(
   () => ({
@@ -99,14 +99,14 @@ const options: any = useMemo(
       y: {
         formatter: (val: number, { seriesIndex }: any) => {
           if (seriesIndex === 0) {
-            return `${Applied} loans (${val}%)`;
+            return `${applied} loans (${val}%)`;
           }
           return `${notApplied} loans (${val}%)`;
         },
       },
     },
   }),
-  [mode, labels, loanCount, Applied, notApplied]
+  [mode, labels, loanCount, applied, notApplied]
 );
 
 
@@ -124,7 +124,7 @@ const options: any = useMemo(
   return (
 
     <Chart
-      key={`chart-${totalCount}-${Applied}-${notApplied}-${mode}`} 
+      key={`chart-${totalCount}-${applied}-${notApplied}-${mode}`} 
       ref={chartRef}
       options={options}
       series={series}

@@ -44,6 +44,16 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
   const [pageSize, setPageSize] = React.useState(0);
   const [totalPages, setTotalPages] = React.useState(0);
   const [currentPage, setCurrentPage] = React.useState(1);
+   const [query, setQuery] = React.useState("");
+   const [selected, setSelected] = React.useState<string>("all");
+  
+  const options = [
+    { value: "all", label: "All" },
+    { value: "phoneNumber", label: "PhoneNumber" },
+    { value: "firstName", label: "FirstName" },
+    { value: "email", label: "Email" },
+    { value: "status", label: "Status" },
+  ];
   const [allFilterOptions, setAllFilterOptions] = useState<
     Record<string, string[]>
   >({
@@ -158,7 +168,9 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
       if (startDate) params.startDate = startDate;
       if (endDate) params.endDate = endDate;
 
-      if (selectedValues.name) params.name = selectedValues.name;
+      if (selected=="firstName") params.firstName = query;
+      if (selected=="phoneNumber") params.phoneNumber = query;
+      if (selected=="email") params.email = query;
 
       if (selectedValues.state?.length) params.state = selectedValues.state;
 
@@ -191,7 +203,7 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
     } finally {
       setLoading(false);
     }
-  }, [selectedValues, startDate, endDate, currentPage, pageSize]);
+  }, [selectedValues, startDate, endDate, currentPage, pageSize,selected,query]);
 
   // Load table columns
   useEffect(() => {
@@ -239,6 +251,11 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
         setTotalPages={setTotalPages}
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
+        options={options}
+        query={query}
+        setQuery={setQuery}
+        selected={selected}
+        setSelected={setSelected}
       />
       {selectedUser && (
         <PartnerStatusModal
