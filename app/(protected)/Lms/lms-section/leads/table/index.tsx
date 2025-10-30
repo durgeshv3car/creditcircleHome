@@ -99,6 +99,8 @@ interface ExampleTwoProps {
   setQuery: React.Dispatch<React.SetStateAction<string>>;
   selected: string;
   setSelected: React.Dispatch<React.SetStateAction<string>>;
+  searchTerm: string;
+  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
 
 }
 
@@ -121,6 +123,8 @@ const ExampleTwo = <TData extends Record<string, any>>({
   setQuery,
   selected,
   setSelected,
+  searchTerm,
+  setSearchTerm
 }: ExampleTwoProps) => {
   const searchParams = useSearchParams();
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -327,10 +331,13 @@ const ExampleTwo = <TData extends Record<string, any>>({
       <div className="py-4 px-5 mb-6 bg-card text-card-foreground rounded-md">
         <React.Suspense fallback={<div>Loading...</div>}>
           <Filter
+          
             selectedValues={selectedValues}
             setSelectedValues={setSelectedValues}
             data={tableData}
             allFilterOptions={allFilterOptions}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
           />
         </React.Suspense>
       </div>

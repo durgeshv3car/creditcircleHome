@@ -21,6 +21,8 @@ interface CategoryMultiSelectProps {
   selectedIds: string[];
   onChange: (newValues: string[]) => void;
   options: string[];
+  searchTerm: string;
+  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const CategoryMultiSelect = ({
@@ -28,9 +30,12 @@ const CategoryMultiSelect = ({
   selectedIds,
   onChange,
   options,
+  searchTerm,
+  setSearchTerm
 }: CategoryMultiSelectProps) => {
-  const [searchTerm, setSearchTerm] = useState("");
+
   const maxSelectedLabels = 1;
+ 
 
   // Ensure selectedIds and options are always arrays of strings
   const safeSelectedIds = Array.isArray(selectedIds) ? selectedIds : [];
@@ -57,7 +62,7 @@ const CategoryMultiSelect = ({
   const displayLabel = label === "dob" ? "Age" : label.charAt(0).toUpperCase() + label.slice(1);
 
   return (
-    <Popover>
+    <Popover key={`${label}-${options.length}`}  >
       <PopoverTrigger asChild>
         <Button variant="outline" className="w-full justify-start flex-wrap h-auto min-h-[40px]">
           {safeSelectedIds.length === 0 ? (

@@ -29,6 +29,7 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
     loanType: [],
     profession: [],
   });
+  const [searchTerm, setSearchTerm] = useState("");
 
   const [data, setData] = useState<DataProps[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -97,6 +98,11 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
   const fetchFilters = useCallback(async () => {
     try {
       const params: any = {};
+      if(currentPage) params.page =currentPage
+      if(pageSize) params.pageSize =pageSize
+      if (searchTerm) params.pincodeSearch=searchTerm;
+       
+      
 
       if (selectedValues.state?.length)
         params.state = selectedValues.state.join(",");
@@ -112,6 +118,7 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
         params.loanType = selectedValues.loanType.join(",");
       if (selectedValues.profession?.length)
         params.profession = selectedValues.profession.join(",");
+
       const filterData = await fetchUserFilters(params);
 
       // Clean and deduplicate the data
@@ -153,7 +160,7 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
     } catch (error) {
       console.error("Error fetching filters:", error);
     }
-  }, [selectedValues]);
+  }, [selectedValues,searchTerm,currentPage,pageSize]);
 
   // Fetch user data
   const fetchData = useCallback(async (): Promise<void> => {
@@ -233,7 +240,7 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
   useEffect(() => {
     fetchData();
     fetchFilters();
-  }, [fetchData, fetchFilters, refresh]);
+  }, [searchTerm,fetchData, fetchFilters, refresh]);
 
   return (
     <div>
@@ -256,6 +263,8 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
         setQuery={setQuery}
         selected={selected}
         setSelected={setSelected}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
       />
       {selectedUser && (
         <PartnerStatusModal
