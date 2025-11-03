@@ -68,6 +68,10 @@ export const columns = ({
   router,
   selectedUser,
   setSelectedUser, // ✅ accept here
+  pageSize,
+  totalPages,
+  currentPage,
+  recordsCount,
 }: {
   isModalOpen: boolean;
   setIsModalOpen: (val: boolean) => void;
@@ -75,6 +79,10 @@ export const columns = ({
   router: AppRouterInstance;
   selectedUser: any;
   setSelectedUser: (val: { id: string; phoneNumber: number }) => void;
+  pageSize: number;
+  totalPages: number;
+  currentPage: number;
+  recordsCount: number;
 }): ColumnDef<DataProps>[] => [
   {
     id: "select",
@@ -98,14 +106,18 @@ export const columns = ({
     enableSorting: false,
     enableHiding: false,
   },
-  {
-    id: "index",
-    header: "ID",
-    cell: ({ row, table }) => {
-      const total = table.options.data.length; // all rows in dataset
-      return <span>{total - row.index}</span>;
-    },
+{
+  id: "index",
+  header: "ID",
+  cell: ({ row }) => {
+    const total = recordsCount; 
+    const currentIndex = row.index + 1; 
+    const globalIndex = (currentPage - 1) * pageSize + currentIndex;
+    const descendingNumber = total - globalIndex + 1;
+    return <span>{descendingNumber}</span>;
   },
+},
+
   {
     id: "date",
     header: "Registration Date",

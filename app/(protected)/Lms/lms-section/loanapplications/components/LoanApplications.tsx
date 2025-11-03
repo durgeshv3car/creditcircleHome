@@ -30,7 +30,7 @@ export interface SelectedValues {
   studentIncome: (string | { name: string })[] | null;
 }
 
-const LeadPage = ({token}:{token:string}) => {
+const LeadPage = ({ token }: { token: string }) => {
   const [selectedValues, setSelectedValues] = useState<SelectedValues>({
     phoneNumber: null,
     desiredLoanAmount: null,
@@ -81,9 +81,12 @@ const LeadPage = ({token}:{token:string}) => {
   const [selectedRow, setSelectedRow] = useState<DataProps | null>(null);
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
+  const [datesLoaded, setDatesLoaded] = useState(false);
   const [pageSize, setPageSize] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [recordsCount, setRecordsCount] = useState(0);
+  
   // Load dates from localStorage
   useEffect(() => {
     const storedStart = localStorage.getItem("startDateLoan");
@@ -93,6 +96,7 @@ const LeadPage = ({token}:{token:string}) => {
       setStartDate(storedStart);
       setEndDate(storedEnd);
     }
+    setDatesLoaded(true);
   }, []);
 
   useEffect(() => {
@@ -102,11 +106,15 @@ const LeadPage = ({token}:{token:string}) => {
         isModalOpen,
         setIsModalOpen,
         setSelectedRow,
+        pageSize,
+        totalPages,
+        currentPage,
+        recordsCount
       });
       setColumns(cols);
     };
     loadColumns();
-  }, [isModalOpen]);
+  }, [isModalOpen, pageSize, totalPages, currentPage, recordsCount]);
 
   const fetchData = async () => {
     const params: any = {
@@ -120,6 +128,7 @@ const LeadPage = ({token}:{token:string}) => {
       setData(result.data);
       setTotalPages(result.totalPages);
       setPageSize(result.totalRecords >= 20 ? 20 : result.totalRecords);
+      setRecordsCount(result.totalRecords);
     } catch (error) {
       console.error("Error fetching data:", error);
       setData([]);
@@ -129,8 +138,10 @@ const LeadPage = ({token}:{token:string}) => {
   };
 
   useEffect(() => {
-    fetchData();
-  }, [refresh, startDate, endDate,currentPage, pageSize]);
+    if (datesLoaded) {
+      fetchData();
+    }
+  }, [datesLoaded, refresh, startDate, endDate, currentPage, pageSize]);
 
   const incomeRanges = [
     { min: 0, max: 14999, label: "Under 15000" },

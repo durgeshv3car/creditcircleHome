@@ -29,6 +29,7 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
     loanType: [],
     profession: [],
   });
+  const [searchTerm, setSearchTerm] = useState("");
 
   const [data, setData] = useState<DataProps[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -41,12 +42,14 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
   } | null>(null);
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
+  const [datesLoaded, setDatesLoaded] = useState(false);
   const [pageSize, setPageSize] = React.useState(0);
   const [totalPages, setTotalPages] = React.useState(0);
   const [currentPage, setCurrentPage] = React.useState(1);
-   const [query, setQuery] = React.useState("");
-   const [selected, setSelected] = React.useState<string>("all");
-  
+  const [recordsCount, setRecordsCount] = useState(0);
+  const [query, setQuery] = React.useState("");
+  const [selected, setSelected] = React.useState<string>("all");
+
   const options = [
     { value: "all", label: "All" },
     { value: "phoneNumber", label: "PhoneNumber" },
@@ -77,6 +80,7 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
       setStartDate(storedStart);
       setEndDate(storedEnd);
     }
+    setDatesLoaded(true);
   }, []);
 
   type Lead = {
@@ -97,6 +101,9 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
   const fetchFilters = useCallback(async () => {
     try {
       const params: any = {};
+      if (currentPage) params.page = currentPage;
+      if (pageSize) params.pageSize = pageSize;
+      if (searchTerm) params.pincodeSearch = searchTerm;
 
       if (selectedValues.state?.length)
         params.state = selectedValues.state.join(",");
@@ -112,6 +119,7 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
         params.loanType = selectedValues.loanType.join(",");
       if (selectedValues.profession?.length)
         params.profession = selectedValues.profession.join(",");
+
       const filterData = await fetchUserFilters(params);
 
       // Clean and deduplicate the data
@@ -153,7 +161,7 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
     } catch (error) {
       console.error("Error fetching filters:", error);
     }
-  }, [selectedValues]);
+  }, [selectedValues, searchTerm, currentPage, pageSize]);
 
   // Fetch user data
   const fetchData = useCallback(async (): Promise<void> => {
@@ -168,9 +176,9 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
       if (startDate) params.startDate = startDate;
       if (endDate) params.endDate = endDate;
 
-      if (selected=="firstName") params.firstName = query;
-      if (selected=="phoneNumber") params.phoneNumber = query;
-      if (selected=="email") params.email = query;
+      if (selected == "firstName") params.firstName = query;
+      if (selected == "phoneNumber") params.phoneNumber = query;
+      if (selected == "email") params.email = query;
 
       if (selectedValues.state?.length) params.state = selectedValues.state;
 
@@ -197,13 +205,22 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
       setData(result.data);
       setTotalPages(result.totalPages);
       setPageSize(result.totalRecords >= 20 ? 20 : result.totalRecords);
+      setRecordsCount(result.totalRecords);
     } catch (error) {
       console.error("Error fetching data:", error);
       setData([]);
     } finally {
       setLoading(false);
     }
-  }, [selectedValues, startDate, endDate, currentPage, pageSize,selected,query]);
+  }, [
+    selectedValues,
+    startDate,
+    endDate,
+    currentPage,
+    pageSize,
+    selected,
+    query,
+  ]);
 
   // Load table columns
   useEffect(() => {
@@ -218,6 +235,10 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
             router,
             selectedUser,
             setSelectedUser,
+            pageSize,
+            totalPages,
+            currentPage,
+            recordsCount,
           })
         );
       } catch (error) {
@@ -227,13 +248,23 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
     };
 
     loadColumns();
-  }, [fetchData, isModalOpen, router, selectedUser]);
+  }, [
+    fetchData,
+    isModalOpen,
+    router,
+    selectedUser,
+    pageSize,
+    totalPages,
+    currentPage,
+  ]);
 
-  // Initial data and filters fetch
+  // Initial data and filters fetch - only after dates are loaded
   useEffect(() => {
-    fetchData();
-    fetchFilters();
-  }, [fetchData, fetchFilters, refresh]);
+    if (datesLoaded) {
+      fetchData();
+      fetchFilters();
+    }
+  }, [datesLoaded, searchTerm, fetchData, fetchFilters, refresh, currentPage, pageSize]);
 
   return (
     <div>
@@ -256,6 +287,8 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
         setQuery={setQuery}
         selected={selected}
         setSelected={setSelected}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
       />
       {selectedUser && (
         <PartnerStatusModal
