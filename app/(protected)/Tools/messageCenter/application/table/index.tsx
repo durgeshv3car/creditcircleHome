@@ -48,7 +48,6 @@ interface FilterProps {
   selectedValues: SelectedValues;
   setSelectedValues: React.Dispatch<React.SetStateAction<SelectedValues>>;
   data: DataProps[];
- 
 }
 
 interface ExampleTwoProps {
@@ -57,16 +56,36 @@ interface ExampleTwoProps {
   tableData: DataProps[];
   tableColumns: any;
   setRefresh: React.Dispatch<React.SetStateAction<boolean>>;
+  pageSize: number;
+  setPageSize: React.Dispatch<React.SetStateAction<number>>;
+  totalPages: number;
+  setTotalPages: React.Dispatch<React.SetStateAction<number>>;
+  currentPage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const ExampleTwo: React.FC<ExampleTwoProps> = ({ selectedValues, setSelectedValues, tableData, tableColumns, setRefresh }) => {
+const ExampleTwo: React.FC<ExampleTwoProps> = ({
+  selectedValues,
+  setSelectedValues,
+  tableData,
+  tableColumns,
+  setRefresh,
+  pageSize,
+  setPageSize,
+  totalPages,
+  setTotalPages,
+  currentPage,
+  setCurrentPage,
+}) => {
   const router = useRouter();
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const [pageSize, setPageSize] = React.useState(20);
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize,
@@ -101,14 +120,22 @@ const ExampleTwo: React.FC<ExampleTwoProps> = ({ selectedValues, setSelectedValu
     }));
   }, [pageSize]);
 
-
-
   return (
     <div className="w-full">
       {/* Filter Section */}
       <div className="mt-5 flex items-center justify-between">
-        <Filter selectedValues={selectedValues} setSelectedValues={setSelectedValues} data={tableData} />
-        <Button onClick={() => router.push("/Lms/lms-section/leads?createnotification=true&&type=Notification")}>
+        <Filter
+          selectedValues={selectedValues}
+          setSelectedValues={setSelectedValues}
+          data={tableData}
+        />
+        <Button
+          onClick={() =>
+            router.push(
+              "/Lms/lms-section/leads?createnotification=true&&type=Notification"
+            )
+          }
+        >
           Create Notification
         </Button>
       </div>
@@ -127,7 +154,7 @@ const ExampleTwo: React.FC<ExampleTwoProps> = ({ selectedValues, setSelectedValu
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {[20, 50, 100,200,500].map((value) => (
+              {[20, 50, 100, 200, 500].map((value) => (
                 <SelectItem key={value} value={String(value)}>
                   {value}
                 </SelectItem>
@@ -162,8 +189,17 @@ const ExampleTwo: React.FC<ExampleTwoProps> = ({ selectedValues, setSelectedValu
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <TableHead key={header.id} className="cursor-pointer" onClick={header.column.getToggleSortingHandler()}>
-                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                <TableHead
+                  key={header.id}
+                  className="cursor-pointer"
+                  onClick={header.column.getToggleSortingHandler()}
+                >
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
                 </TableHead>
               ))}
             </TableRow>
@@ -173,9 +209,14 @@ const ExampleTwo: React.FC<ExampleTwoProps> = ({ selectedValues, setSelectedValu
         <TableBody>
           {table.getRowModel().rows.length ? (
             table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+              >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
                 ))}
               </TableRow>
             ))
@@ -190,7 +231,11 @@ const ExampleTwo: React.FC<ExampleTwoProps> = ({ selectedValues, setSelectedValu
       </Table>
 
       {/* Pagination Component */}
-      <TablePagination table={table} />
+       <TablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
     </div>
   );
 };

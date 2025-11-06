@@ -1,8 +1,12 @@
-export const fetchNotifications = async () => {
+import axios from "axios";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+export const fetchNotifications = async (params?: any) => {
   try {
-    const response = await fetch(`/api/notifications/app`);
-    const data = await response.json();
-    return data;
+     const response = await axios.get(`${BASE_URL}/getallnotifications`, {
+      params, 
+    });
+    return response.data;
   } catch (error) {
     console.error("Error fetching notifications:", error);
     throw error;

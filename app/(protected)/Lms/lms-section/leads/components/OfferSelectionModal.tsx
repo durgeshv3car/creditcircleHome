@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dropdown } from 'primereact/dropdown';
+import { Dropdown } from "primereact/dropdown";
 import { fetchOffers } from "@/app/(protected)/services/offers/api";
 import axios from "axios";
 import {
@@ -41,6 +41,7 @@ interface OfferSelectionModalProps {
   onClose: () => void;
   onSelectOffer: (offer: Offer) => void;
   selectedRowsData: DataProps[];
+  selected: string;
 }
 
 const OfferSelectionModal: React.FC<OfferSelectionModalProps> = ({
@@ -48,6 +49,7 @@ const OfferSelectionModal: React.FC<OfferSelectionModalProps> = ({
   onClose,
   onSelectOffer,
   selectedRowsData,
+  selected,
 }) => {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
@@ -58,28 +60,27 @@ const OfferSelectionModal: React.FC<OfferSelectionModalProps> = ({
   const type = searchParams?.get("type") || null;
 
   // Fetch offers when the modal opens
-useEffect(() => {
-  if (!isOpen) return;
+  useEffect(() => {
+    if (!isOpen) return;
 
-  const fetchOffersData = async () => {
-    try {
-      console.log("Fetching offers from API...");
-      const response = await fetchOffers();
+    const fetchOffersData = async () => {
+      try {
+        console.log("Fetching offers from API...");
+        const response = await fetchOffers();
 
-      const activeOffers = response.filter(
-        (offer: Offer) => offer.isActive === true
-      );
+        const activeOffers = response.filter(
+          (offer: Offer) => offer.isActive === true
+        );
 
-      console.log("Offers fetched successfully:", activeOffers);
-      setOffers(activeOffers);
-    } catch (error: any) {
-      console.error("Error fetching offers:", error.message);
-    }
-  };
+        console.log("Offers fetched successfully:", activeOffers);
+        setOffers(activeOffers);
+      } catch (error: any) {
+        console.error("Error fetching offers:", error.message);
+      }
+    };
 
-  fetchOffersData();
-}, [isOpen]);
-
+    fetchOffersData();
+  }, [isOpen]);
 
   // Handle offer selection (Dropdown stays open)
   const handleSelectOffer = (offer: Offer) => {
@@ -88,49 +89,55 @@ useEffect(() => {
   };
 
   // Submit the selected offer
- const handleSubmit = async () => {
-  
-  if (!selectedOffer || !selectedRowsData.length) return;
+  const handleSubmit = async () => {
+    if (!selectedOffer) return;
 
-  try {
-    setLoading(true);
-    console.log("Submitting selected offer:", selectedOffer);
-    console.log("Selected rows:", selectedRowsData);
+    try {
+      setLoading(true);
+      console.log("Submitting selected offer:", selectedOffer);
+ 
 
-    const sending = type === "Notification" ? "Application" : (type || "");
+      const sending = type === "Notification" ? "Application" : type || "";
 
-    const payload = {
-      offerIds: [selectedOffer.id],
-      userIds: selectedRowsData.map((row) => String(row.id)),
-      type: `${sending}_create`,
-    };
+      const payload = {
+        offerIds: [selectedOffer.id],
+        userIds:
+          selectedRowsData.length >= 1
+            ? selectedRowsData.map((row) => row.id)
+            : selected === "all"
+            ? "all"
+            : [],
+        type: `${sending}_create`,
+      };
 
-    const response = await createNotifications(payload);
+      const response = await createNotifications(payload);
 
-    console.log("Offer submitted successfully:", response?.data);
+      console.log("Offer submitted successfully:", response?.data);
 
-    // Redirect based on type
-    if (type === "Email") {
-      router.push("/Tools/messageCenter/email");
-    } else if (type === "Notification") {
-      router.push("/Tools/messageCenter/application");
-    } else if (type === "Sms") {
-      router.push("/Tools/messageCenter/sms");
-    } else if (type === "Whatsapp") {
-      router.push("/Tools/messageCenter/whatsapp");
+      // Redirect based on type
+      if (type === "Email") {
+        router.push("/Tools/messageCenter/email");
+      } else if (type === "Notification") {
+        router.push("/Tools/messageCenter/application");
+      } else if (type === "Sms") {
+        router.push("/Tools/messageCenter/sms");
+      } else if (type === "Whatsapp") {
+        router.push("/Tools/messageCenter/whatsapp");
+      }
+
+      onSelectOffer(selectedOffer);
+      onClose();
+    } catch (error: any) {
+      console.error(
+        "Error submitting offer:",
+        error?.response?.data || error.message
+      );
+      toast.error("Notification not sent");
+      onClose();
+    } finally {
+      setLoading(false);
     }
-
-    onSelectOffer(selectedOffer);
-    onClose();
-  } catch (error: any) {
-    console.error("Error submitting offer:", error?.response?.data || error.message);
-    toast.error("Notification not sent");
-    onClose();
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -148,7 +155,7 @@ useEffect(() => {
           optionLabel="title"
           placeholder="Select an Offer"
           className="w-full"
-          appendTo="self" 
+          appendTo="self"
           checkmark
           highlightOnSelect={false}
         />
