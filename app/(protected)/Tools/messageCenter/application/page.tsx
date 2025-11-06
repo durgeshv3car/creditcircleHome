@@ -31,16 +31,25 @@ const NotificationCenterPage = () => {
   const [data, setData] = useState<DataProps[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refresh, setRefresh] = useState<boolean>(false);
+   const [pageSize, setPageSize] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [currentPage, setCurrentPage] =useState(1);
 
   const fetchData = async () => {
     try {
-      const result = await fetchNotifications();
+      const params: any = {};
+      if (currentPage) params.page = currentPage;
+      if (pageSize) params.pageSize = pageSize;
+      params.type="application"
+      const result = await fetchNotifications(params);
       if (result.status === 404) {
         setData([]);
         return;
       }
       console.log("result", result);
-      setData(result);
+      setData(result.data);
+      setTotalPages(result.totalPages);
+      setPageSize(result.totalRecords >= 20 ? 20 : result.totalRecords);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -50,7 +59,7 @@ const NotificationCenterPage = () => {
 
   useEffect(() => {
     fetchData();
-  }, [refresh]);
+  }, [refresh, currentPage, pageSize]);
 
   const filteredData = data.filter((item) => {
     return (
@@ -75,6 +84,12 @@ const NotificationCenterPage = () => {
           tableData={filteredData}
           tableColumns={columns}
           setRefresh={setRefresh}
+           pageSize={pageSize}
+        setPageSize={setPageSize}
+        totalPages={totalPages}
+        setTotalPages={setTotalPages}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
         />
       </div>
     </>

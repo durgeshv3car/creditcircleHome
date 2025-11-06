@@ -1,34 +1,37 @@
-import { Button } from '@/components/ui/button';
-import { Table } from '@tanstack/react-table';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import React from 'react';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-interface DataTablePaginationProps {
-  table: Table<any>;
+interface TablePaginationProps {
+  currentPage: number;                  
+  totalPages: number;                   
+  onPageChange: (page: number) => void; 
 }
 
-const TablePagination = ({ table }: DataTablePaginationProps) => {
-  const currentPage = table.getState().pagination.pageIndex;
-  const totalPages = table.getPageCount();
-
-  // helper to generate a smart page window
+const TablePagination: React.FC<TablePaginationProps> = ({
+  currentPage,
+  totalPages,
+  onPageChange
+}) => {
   const getPageNumbers = () => {
     const pages: (number | 'dots')[] = [];
-    const delta = 2; // how many pages to show around current
+    const delta = 2;
 
-    // always show first
-    pages.push(0);
+    // always show first page
+    pages.push(1);
 
-    // add window around current
-    for (let i = Math.max(1, currentPage - delta); i <= Math.min(totalPages - 2, currentPage + delta); i++) {
-      if (i > 0 && i < totalPages - 1) {
-        pages.push(i);
-      }
+    // dynamic window around current page
+    for (
+      let i = Math.max(2, currentPage - delta);
+      i <= Math.min(totalPages - 1, currentPage + delta);
+      i++
+    ) {
+      pages.push(i);
     }
 
-    // always show last if more than 1 page
+    // always show last page
     if (totalPages > 1) {
-      pages.push(totalPages - 1);
+      pages.push(totalPages);
     }
 
     // insert dots where needed
@@ -48,17 +51,12 @@ const TablePagination = ({ table }: DataTablePaginationProps) => {
 
   return (
     <div className="flex items-center justify-end py-4 px-10">
-      <div className="flex-1 text-sm text-muted-foreground">
-        {table.getFilteredSelectedRowModel().rows.length} of{" "}
-        {table.getFilteredRowModel().rows.length} row(s) selected.
-      </div>
-
       <div className="flex items-center gap-2 flex-none">
         <Button
           variant="outline"
           size="icon"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1}
           className="w-8 h-8"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -72,12 +70,12 @@ const TablePagination = ({ table }: DataTablePaginationProps) => {
           ) : (
             <Button
               key={`page-${page}`}
-              onClick={() => table.setPageIndex(page)}
+              onClick={() => onPageChange(page)}
               size="icon"
               className="w-8 h-8"
               variant={currentPage === page ? 'default' : 'outline'}
             >
-              {page + 1}
+              {page}
             </Button>
           )
         )}
@@ -85,8 +83,8 @@ const TablePagination = ({ table }: DataTablePaginationProps) => {
         <Button
           variant="outline"
           size="icon"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
           className="w-8 h-8"
         >
           <ChevronRight className="w-4 h-4" />

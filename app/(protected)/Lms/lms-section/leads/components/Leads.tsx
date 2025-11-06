@@ -221,6 +221,7 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
     selected,
     query,
   ]);
+ 
 
   // Load table columns
   useEffect(() => {

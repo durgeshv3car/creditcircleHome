@@ -87,4 +87,24 @@ export const columns: ColumnDef<DataProps>[] = [
     },
   },
 
+  {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        const statusColors: Record<string, string> = {
+          sent: "bg-success/20 text-success",
+          failed: "bg-destructive/20 text-destructive"
+        };
+        const status = row.getValue<string>("status");
+        const statusStyles = statusColors[status] || "default";
+        return (
+          <Badge
+            className={cn("rounded-full px-5", statusStyles)}
+          >{status} </Badge>
+        );
+      }
+    },
+
+
+
 ];

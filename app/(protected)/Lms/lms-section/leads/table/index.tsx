@@ -175,6 +175,7 @@ const ExampleTwo = <TData extends Record<string, any>>({
   React.useEffect(() => {
     setIsModalOpen(!!leadId);
   }, [leadId]);
+ 
 
   // Persist column visibility settings
   React.useEffect(() => {
@@ -489,7 +490,7 @@ const ExampleTwo = <TData extends Record<string, any>>({
               {isCreatingNotification && (
                 <button
                   className="ml-auto bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-50"
-                  disabled={Object.keys(rowSelection).length === 0}
+             
                   onClick={() => setIsModalOpenOffer(true)}
                 >
                   Send {type}
@@ -595,6 +596,7 @@ const ExampleTwo = <TData extends Record<string, any>>({
             isOpen={isModalOpenOffer}
             onClose={() => setIsModalOpenOffer(false)}
             onSelectOffer={(offer) => setSelectedOffer(offer)}
+            selected={selected}
           />
         )}
       </React.Suspense>
