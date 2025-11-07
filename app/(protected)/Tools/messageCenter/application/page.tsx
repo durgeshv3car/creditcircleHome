@@ -31,7 +31,7 @@ const NotificationCenterPage = () => {
   const [data, setData] = useState<DataProps[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refresh, setRefresh] = useState<boolean>(false);
-   const [pageSize, setPageSize] = useState(0);
+   const [pageSize, setPageSize] = useState(20);
     const [totalPages, setTotalPages] = useState(0);
     const [currentPage, setCurrentPage] =useState(1);
 
@@ -49,7 +49,7 @@ const NotificationCenterPage = () => {
       console.log("result", result);
       setData(result.data);
       setTotalPages(result.totalPages);
-      setPageSize(result.totalRecords >= 20 ? 20 : result.totalRecords);
+      setPageSize(result.totalRecords >= 20 ? pageSize : result.totalRecords);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {

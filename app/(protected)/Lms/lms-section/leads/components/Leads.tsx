@@ -43,7 +43,7 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
   const [datesLoaded, setDatesLoaded] = useState(false);
-  const [pageSize, setPageSize] = React.useState(0);
+  const [pageSize, setPageSize] = React.useState(20);
   const [totalPages, setTotalPages] = React.useState(0);
   const [currentPage, setCurrentPage] = React.useState(1);
   const [recordsCount, setRecordsCount] = useState(0);
@@ -204,7 +204,7 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
       const result = await fetchUsers(params);
       setData(result.data);
       setTotalPages(result.totalPages);
-      setPageSize(result.totalRecords >= 20 ? 20 : result.totalRecords);
+      setPageSize(result.totalRecords >= 20 ? pageSize : result.totalRecords);
       setRecordsCount(result.totalRecords);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -221,6 +221,8 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
     selected,
     query,
   ]);
+
+  console.log(pageSize,"pageSize")
  
 
   // Load table columns
