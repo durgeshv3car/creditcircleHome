@@ -32,7 +32,7 @@ function Category({
   const [loading, setLoading] = useState<boolean>(true);
   const [refresh, setRefresh] = useState<boolean>(false);
 
-    const [pageSize, setPageSize] = React.useState(0);
+    const [pageSize, setPageSize] = React.useState(20);
     const [totalPages, setTotalPages] = React.useState(0);
     const [currentPage, setCurrentPage] = React.useState(1);
   const [startDate, setStartDate] = React.useState<string>("");
@@ -57,7 +57,7 @@ function Category({
       // const logs=await createLogs("User view api-management section list")
       setData(result.data);
       setTotalPages(result.totalPages);
-      setPageSize(result.totalRecords >= 20 ? 20 : result.totalRecords);
+      setPageSize(result.totalRecords >= 20 ? pageSize : result.totalRecords);
 
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -69,7 +69,7 @@ function Category({
 
   useEffect(() => {
     fetchData();
-  }, [refresh]);
+  }, [refresh, currentPage, pageSize]);
 
 
 

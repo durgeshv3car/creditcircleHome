@@ -82,7 +82,7 @@ const LeadPage = ({ token }: { token: string }) => {
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
   const [datesLoaded, setDatesLoaded] = useState(false);
-  const [pageSize, setPageSize] = useState(0);
+  const [pageSize, setPageSize] = useState(20);
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsCount, setRecordsCount] = useState(0);
@@ -127,7 +127,7 @@ const LeadPage = ({ token }: { token: string }) => {
       const result = await fetchLoans(params);
       setData(result.data);
       setTotalPages(result.totalPages);
-      setPageSize(result.totalRecords >= 20 ? 20 : result.totalRecords);
+      setPageSize(result.totalRecords >= 20 ? pageSize : result.totalRecords);
       setRecordsCount(result.totalRecords);
     } catch (error) {
       console.error("Error fetching data:", error);
