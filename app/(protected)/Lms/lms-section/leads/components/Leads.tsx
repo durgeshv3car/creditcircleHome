@@ -164,65 +164,81 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
   }, [selectedValues, searchTerm, currentPage, pageSize]);
 
   // Fetch user data
-  const fetchData = useCallback(async (): Promise<void> => {
-    setLoading(true);
-    try {
-      const params: any = {
-        page: currentPage,
-        pageSize: pageSize,
-      };
+const fetchData = useCallback(async (): Promise<void> => {
+  setLoading(true);
+  try {
+    const params: any = {
+      page: currentPage,
+      pageSize,
+    };
 
-      // Apply filters only if they have values
-      if (startDate) params.startDate = startDate;
-      if (endDate) params.endDate = endDate;
+    // ✅ Apply filters only if they have values
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
 
-      if (selected == "firstName") params.firstName = query;
-      if (selected == "phoneNumber") params.phoneNumber = query;
-      if (selected == "email") params.email = query;
+    if (selected === "firstName") params.firstName = query;
+    if (selected === "phoneNumber") params.phoneNumber = query;
+    if (selected === "email") params.email = query;
 
-      if (selectedValues.state?.length) params.state = selectedValues.state;
+    if (selectedValues.state?.length) params.state = selectedValues.state;
+    if (selectedValues.city?.length) params.city = selectedValues.city;
+    if (selectedValues.pincode?.length) params.pincode = selectedValues.pincode;
+    if (selectedValues.dob?.length) params.age = selectedValues.dob;
+    if (selectedValues.loanType?.length) params.loanType = selectedValues.loanType;
+    if (selectedValues.profession?.length) params.profession = selectedValues.profession;
+    if (selectedValues.netMonthlyIncome?.length) params.netMonthlyIncome = selectedValues.netMonthlyIncome;
+    if (selectedValues.loanDataStatus?.length) params.loanDataStatus = selectedValues.loanDataStatus;
 
-      if (selectedValues.city?.length) params.city = selectedValues.city;
+    // ✅ Fetch data
+    const result = await fetchUsers(params);
 
-      if (selectedValues.pincode?.length)
-        params.pincode = selectedValues.pincode;
+    // ✅ Update table data
+    setData(result?.data || []);
+    setTotalPages(result?.totalPages || 0);
+    setRecordsCount(result?.totalRecords || 0);
 
-      if (selectedValues.dob?.length) params.age = selectedValues.dob;
+    // ✅ Reset or adjust page size based on filter emptiness
+    const emptyFilters = [
+      selected === "firstName" ? query : null,
+      selected === "phoneNumber" ? query : null,
+      selected === "email" ? query : null,
+      selectedValues?.state,
+      selectedValues?.city,
+      selectedValues?.pincode,
+      selectedValues?.dob,
+      selectedValues?.netMonthlyIncome,
+      selectedValues?.loanType,
+      selectedValues?.profession,
+    ];
 
-      if (selectedValues.loanType?.length)
-        params.loanType = selectedValues.loanType;
-
-      if (selectedValues.profession?.length)
-        params.profession = selectedValues.profession;
-
-      if (selectedValues.netMonthlyIncome?.length)
-        params.netMonthlyIncome = selectedValues.netMonthlyIncome;
-
-      if (selectedValues.loanDataStatus?.length)
-        params.loanDataStatus = selectedValues.loanDataStatus;
-
-      const result = await fetchUsers(params);
-      setData(result.data);
-      setTotalPages(result.totalPages);
-      setPageSize(result.totalRecords >= 20 ? pageSize : result.totalRecords);
-      setRecordsCount(result.totalRecords);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      setData([]);
-    } finally {
-      setLoading(false);
+    if (emptyFilters.some((v) => !v || v.length === 0)) {
+      setPageSize(20);
+    } else {
+      // adjust pageSize based on result size
+      const newPageSize =
+        result?.totalRecords && result.totalRecords >= 20
+          ? pageSize
+          : result?.totalRecords || 20;
+      setPageSize(newPageSize);
     }
-  }, [
-    selectedValues,
-    startDate,
-    endDate,
-    currentPage,
-    pageSize,
-    selected,
-    query,
-  ]);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    setData([]);
+  } finally {
+    setLoading(false);
+  }
+}, [
+  currentPage,
+  pageSize,
+  startDate,
+  endDate,
+  query,
+  selected,
+  selectedValues,
+]);
 
-  console.log(pageSize,"pageSize")
+
+
  
 
   // Load table columns

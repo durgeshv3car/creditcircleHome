@@ -127,7 +127,6 @@ const ExampleTwo: React.FC<ExampleTwoProps> = ({
         <Filter
           selectedValues={selectedValues}
           setSelectedValues={setSelectedValues}
-          data={tableData}
         />
         <Button
           onClick={() =>

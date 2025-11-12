@@ -28,6 +28,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { DataProps } from "../table/columns";
 import { createNotifications } from "@/app/(protected)/services/notifications/app/api";
+import { SelectedValues } from "../components/Leads";
 
 // Define types for props
 interface Offer {
@@ -42,6 +43,7 @@ interface OfferSelectionModalProps {
   onSelectOffer: (offer: Offer) => void;
   selectedRowsData: DataProps[];
   selected: string;
+   selectedValues: SelectedValues;
 }
 
 const OfferSelectionModal: React.FC<OfferSelectionModalProps> = ({
@@ -50,6 +52,7 @@ const OfferSelectionModal: React.FC<OfferSelectionModalProps> = ({
   onSelectOffer,
   selectedRowsData,
   selected,
+  selectedValues,
 }) => {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
@@ -108,6 +111,7 @@ const OfferSelectionModal: React.FC<OfferSelectionModalProps> = ({
             ? "all"
             : [],
         type: `${sending}_create`,
+        selectedValues
       };
 
       const response = await createNotifications(payload);
