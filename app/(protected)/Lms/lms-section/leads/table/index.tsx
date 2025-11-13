@@ -597,6 +597,7 @@ const ExampleTwo = <TData extends Record<string, any>>({
             onClose={() => setIsModalOpenOffer(false)}
             onSelectOffer={(offer) => setSelectedOffer(offer)}
             selected={selected}
+            selectedValues={selectedValues}
           />
         )}
       </React.Suspense>

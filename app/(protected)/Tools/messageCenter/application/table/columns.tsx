@@ -31,13 +31,37 @@ export interface DataProps {
     [key: string]: any;
   };
   [key: string]: any;
+  pageSize: number;
+  totalPages: number;
+  currentPage: number;
+  recordsCount: number;
 }
-export const columns: ColumnDef<DataProps>[] = [
+export const columns = ({
+  pageSize,
+  totalPages,
+  currentPage,
+  recordsCount,
+}: {
+  pageSize: number;
+  totalPages: number;
+  currentPage: number;
+  recordsCount: number;
+}): ColumnDef<DataProps>[] => [
   {
-    id: "serialNumber",
+    id: "index",
     header: "ID",
-    cell: ({ row }) => <span>{row.index + 1}</span>,
-    enableSorting: false,
+    cell: ({ row }) => {
+      const total = recordsCount;
+      const currentIndex = row.index + 1;
+      const globalIndex = (currentPage - 1) * pageSize + currentIndex;
+      const descendingNumber = total - globalIndex + 1;
+      return <span>{descendingNumber}</span>;
+    },
+  },
+  {
+    accessorKey: "phoneNumber",
+    header: "Phone Number",
+    cell: ({ row }) => <span>{row.original?.user?.phoneNumber}</span>,
   },
   {
     accessorKey: "title",
@@ -86,25 +110,33 @@ export const columns: ColumnDef<DataProps>[] = [
       );
     },
   },
+  {
+    accessorKey: "time",
+    header: "Time",
+    cell: ({ row }) => {
+      const time = new Date(row.original.createdAt)
+        .toISOString()
+        .split("T")[1]
+        .split(".")[0];
+      return <span>{time}</span>;
+    },
+  },
 
   {
-      accessorKey: "status",
-      header: "Status",
-      cell: ({ row }) => {
-        const statusColors: Record<string, string> = {
-          sent: "bg-success/20 text-success",
-          failed: "bg-destructive/20 text-destructive"
-        };
-        const status = row.getValue<string>("status");
-        const statusStyles = statusColors[status] || "default";
-        return (
-          <Badge
-            className={cn("rounded-full px-5", statusStyles)}
-          >{status} </Badge>
-        );
-      }
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      const statusColors: Record<string, string> = {
+        sent: "bg-success/20 text-success",
+        failed: "bg-destructive/20 text-destructive",
+      };
+      const status = row.getValue<string>("status");
+      const statusStyles = statusColors[status] || "default";
+      return (
+        <Badge className={cn("rounded-full px-5", statusStyles)}>
+          {status}{" "}
+        </Badge>
+      );
     },
-
-
-
+  },
 ];

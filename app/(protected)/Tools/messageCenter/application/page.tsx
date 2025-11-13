@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import ExampleTwo from "./table";
 import { columns } from "./table/columns";
 import { fetchNotifications } from "../../../services/notifications/app/api";
-import {DataProps} from "./table/columns";
+import { DataProps } from "./table/columns";
 
 export type SelectedValues = {
   title: string | null;
@@ -14,13 +14,8 @@ export type SelectedValues = {
   phone: string | null;
 };
 
-
-
-
 const NotificationCenterPage = () => {
-  const [selectedValues, setSelectedValues] = useState<
-   SelectedValues
-  >({
+  const [selectedValues, setSelectedValues] = useState<SelectedValues>({
     title: null,
     status: null,
     category: null,
@@ -31,47 +26,97 @@ const NotificationCenterPage = () => {
   const [data, setData] = useState<DataProps[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refresh, setRefresh] = useState<boolean>(false);
-   const [pageSize, setPageSize] = useState(20);
-    const [totalPages, setTotalPages] = useState(0);
-    const [currentPage, setCurrentPage] =useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [recordsCount, setRecordsCount] = useState(0);
+  const [startDate, setStartDate] = useState<string | null>(null);
+  const [endDate, setEndDate] = useState<string | null>(null);
+  const [datesLoaded, setDatesLoaded] = useState(false);
 
-  const fetchData = async () => {
-    try {
-      const params: any = {};
+  useEffect(() => {
+    const storedStart = localStorage.getItem("startDateTools");
+    const storedEnd = localStorage.getItem("endDateTools");
+
+    if (storedStart && storedEnd) {
+      setStartDate(storedStart);
+      setEndDate(storedEnd);
+    }
+    setDatesLoaded(true);
+  }, []);
+
+
+ const fetchData = async () => {
+  try {
+    const params: any = {};
+
+    // ✅ Reset pagination when "All" is selected
+    if (selectedValues.title === "All" || selectedValues.status === "All") {
+      params.page = 1;
+      params.pageSize = 20;
+    } else {
       if (currentPage) params.page = currentPage;
       if (pageSize) params.pageSize = pageSize;
-      params.type="application"
-      const result = await fetchNotifications(params);
-      if (result.status === 404) {
-        setData([]);
-        return;
-      }
-      console.log("result", result);
-      setData(result.data);
-      setTotalPages(result.totalPages);
-      setPageSize(result.totalRecords >= 20 ? pageSize : result.totalRecords);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
     }
-  };
+
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+
+    if (selectedValues.title && selectedValues.title !== "All")
+      params.title = selectedValues.title;
+
+    if (selectedValues.status && selectedValues.status !== "All")
+      params.status = selectedValues.status;
+
+    params.type = "application";
+
+    const result = await fetchNotifications(params);
+
+    if (result.status === 404) {
+      setData([]);
+      return;
+    }
+
+
+
+    setData(result.data);
+    setTotalPages(result.totalPages);
+    setRecordsCount(result.totalRecords);
+
+    // ✅ Reset page size back to 20 when "All" is selected
+    if (selectedValues.title === "" || selectedValues.status === "") {
+      setPageSize(20);
+    } else {
+      setPageSize(result.totalRecords >= 20 ? pageSize : result.totalRecords);
+    }
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchData();
-  }, [refresh, currentPage, pageSize]);
+  }, [refresh, currentPage, pageSize, startDate, endDate, selectedValues]);
 
   const filteredData = data.filter((item) => {
     return (
       (!selectedValues.title ||
-        item.title.toLowerCase().includes(selectedValues.title.toLowerCase())) &&
+        item.title
+          .toLowerCase()
+          .includes(selectedValues.title.toLowerCase())) &&
       (!selectedValues.category ||
         (item.offer?.category &&
-          item.offer.category.toLowerCase().includes(selectedValues.category.toLowerCase()))) &&
+          item.offer.category
+            .toLowerCase()
+            .includes(selectedValues.category.toLowerCase()))) &&
       (!selectedValues.user ||
-        (item.user?.firstName && item.user.firstName === selectedValues.user)) &&
+        (item.user?.firstName &&
+          item.user.firstName === selectedValues.user)) &&
       (!selectedValues.phone ||
-        (item.user?.phoneNumber && item.user.phoneNumber.includes(selectedValues.phone)))
+        (item.user?.phoneNumber &&
+          item.user.phoneNumber.includes(selectedValues.phone)))
     );
   });
 
@@ -82,14 +127,19 @@ const NotificationCenterPage = () => {
           selectedValues={selectedValues}
           setSelectedValues={setSelectedValues}
           tableData={filteredData}
-          tableColumns={columns}
+          tableColumns={columns({
+            pageSize,
+            totalPages,
+            currentPage,
+            recordsCount,
+          })}
           setRefresh={setRefresh}
-           pageSize={pageSize}
-        setPageSize={setPageSize}
-        totalPages={totalPages}
-        setTotalPages={setTotalPages}
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
+          pageSize={pageSize}
+          setPageSize={setPageSize}
+          totalPages={totalPages}
+          setTotalPages={setTotalPages}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
         />
       </div>
     </>
