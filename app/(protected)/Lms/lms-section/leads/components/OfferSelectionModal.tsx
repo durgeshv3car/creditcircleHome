@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dropdown } from "primereact/dropdown";
@@ -35,6 +36,19 @@ interface Offer {
   id: string;
   title: string;
   isActive: boolean;
+  thumbnail?: {
+    mobile: string;
+    web: string;
+
+  }
+  offerBanner?: {
+    banner: string;
+  }
+  offerImage?: {
+    mobile: string;
+
+  }
+
 }
 
 interface OfferSelectionModalProps {
@@ -43,7 +57,7 @@ interface OfferSelectionModalProps {
   onSelectOffer: (offer: Offer) => void;
   selectedRowsData: DataProps[];
   selected: string;
-   selectedValues: SelectedValues;
+  selectedValues: SelectedValues;
 }
 
 const OfferSelectionModal: React.FC<OfferSelectionModalProps> = ({
@@ -61,6 +75,7 @@ const OfferSelectionModal: React.FC<OfferSelectionModalProps> = ({
   const router = useRouter();
   const searchParams = useSearchParams();
   const type = searchParams?.get("type") || null;
+  console.log(selectedOffer," Selected Offer State")
 
   // Fetch offers when the modal opens
   useEffect(() => {
@@ -98,7 +113,6 @@ const OfferSelectionModal: React.FC<OfferSelectionModalProps> = ({
     try {
       setLoading(true);
       console.log("Submitting selected offer:", selectedOffer);
- 
 
       const sending = type === "Notification" ? "Application" : type || "";
 
@@ -111,7 +125,7 @@ const OfferSelectionModal: React.FC<OfferSelectionModalProps> = ({
             ? "all"
             : [],
         type: `${sending}_create`,
-        selectedValues
+        selectedValues,
       };
 
       const response = await createNotifications(payload);
@@ -142,6 +156,36 @@ const OfferSelectionModal: React.FC<OfferSelectionModalProps> = ({
       setLoading(false);
     }
   };
+ // ✅ Template for dropdown item and selected value
+const offerTemplate = (offer: Offer) => {
+  if (!offer) return null;
+
+  const imageSrc =
+    offer?.thumbnail?.mobile ||
+    offer?.offerBanner?.banner ||
+    offer?.offerImage?.mobile || "/images/auth/credit_logo.png"
+
+
+
+  return (
+    <div className="flex items-center gap-3">
+      <Image
+        src={imageSrc}
+        alt={offer.title}
+        width={40}
+        height={40}
+        className="rounded-md object-cover border"
+      />
+      <span>{offer.title}</span>
+    </div>
+  );
+};
+const valueTemplate = (offer: Offer | null) => {
+  if (!offer) return <span className="text-gray-400">Select an Offer</span>;
+  return offerTemplate(offer);
+};
+
+
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -160,11 +204,14 @@ const OfferSelectionModal: React.FC<OfferSelectionModalProps> = ({
           placeholder="Select an Offer"
           className="w-full"
           appendTo="self"
+          itemTemplate={offerTemplate}
+          valueTemplate={valueTemplate}
           checkmark
           highlightOnSelect={false}
         />
 
         {/* Submit Button (Only active when an offer is selected) */}
+
         <Button
           className="mt-4 w-full"
           disabled={!selectedOffer || loading}
