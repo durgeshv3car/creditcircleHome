@@ -9,6 +9,7 @@ import { DataProps } from "./table/columns";
 export type SelectedValues = {
   title: string | null;
   status: string | null;
+  counter: string | null;
   category: string | null;
   user: string;
   phone: string | null;
@@ -18,6 +19,7 @@ const NotificationCenterPage = () => {
   const [selectedValues, setSelectedValues] = useState<SelectedValues>({
     title: null,
     status: null,
+    counter: null,
     category: null,
     user: "",
     phone: null,
@@ -45,56 +47,57 @@ const NotificationCenterPage = () => {
     setDatesLoaded(true);
   }, []);
 
+  const fetchData = async () => {
+    try {
+      const params: any = {};
 
- const fetchData = async () => {
-  try {
-    const params: any = {};
+      // ✅ Reset pagination when "All" is selected
+      if (selectedValues.title === "All" || selectedValues.status === "All") {
+        params.page = 1;
+        params.pageSize = 20;
+      } else {
+        if (currentPage) params.page = currentPage;
+        if (pageSize) params.pageSize = pageSize;
+      }
 
-    // ✅ Reset pagination when "All" is selected
-    if (selectedValues.title === "All" || selectedValues.status === "All") {
-      params.page = 1;
-      params.pageSize = 20;
-    } else {
-      if (currentPage) params.page = currentPage;
-      if (pageSize) params.pageSize = pageSize;
+      if (startDate) params.startDate = startDate;
+      if (endDate) params.endDate = endDate;
+
+      if (selectedValues.title && selectedValues.title !== "All")
+        params.title = selectedValues.title;
+
+      if (selectedValues.status && selectedValues.status !== "All")
+        params.status = selectedValues.status;
+
+      if (selectedValues.counter && selectedValues.counter!=="All") {
+        params.counter = selectedValues.counter;
+      }
+
+      params.type = "application";
+
+      const result = await fetchNotifications(params);
+
+      if (result.status === 404) {
+        setData([]);
+        return;
+      }
+
+      setData(result.data);
+      setTotalPages(result.totalPages);
+      setRecordsCount(result.totalRecords);
+
+      // ✅ Reset page size back to 20 when "All" is selected
+      if (selectedValues.title === "" || selectedValues.status === "" || selectedValues.counter==="") {
+        setPageSize(20);
+      } else {
+        setPageSize(result.totalRecords >= 20 ? pageSize : result.totalRecords);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
-
-    if (startDate) params.startDate = startDate;
-    if (endDate) params.endDate = endDate;
-
-    if (selectedValues.title && selectedValues.title !== "All")
-      params.title = selectedValues.title;
-
-    if (selectedValues.status && selectedValues.status !== "All")
-      params.status = selectedValues.status;
-
-    params.type = "application";
-
-    const result = await fetchNotifications(params);
-
-    if (result.status === 404) {
-      setData([]);
-      return;
-    }
-
-
-
-    setData(result.data);
-    setTotalPages(result.totalPages);
-    setRecordsCount(result.totalRecords);
-
-    // ✅ Reset page size back to 20 when "All" is selected
-    if (selectedValues.title === "" || selectedValues.status === "") {
-      setPageSize(20);
-    } else {
-      setPageSize(result.totalRecords >= 20 ? pageSize : result.totalRecords);
-    }
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   useEffect(() => {
     fetchData();

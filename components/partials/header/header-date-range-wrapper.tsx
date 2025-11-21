@@ -7,6 +7,7 @@ import { HeaderDateRangeLead } from "./header-date-range-leads";
 import { HeaderDateRangeLoan } from "./header-date-range-loans";
 import { HeaderDateRangeLogs } from "./header-date-range-logs";
 import {HeaderDateRangeTools} from "./header-date-range-tools"
+import {HeaderDateRangeToolsAna} from "./header-date-range-tools-ana"
 
 export function HeaderDateRangeWrapper() {
   const pathname = usePathname();
@@ -28,6 +29,9 @@ export function HeaderDateRangeWrapper() {
   }
   if (pathname === "/Tools/messageCenter/application"){
     return <HeaderDateRangeTools />;
+  }
+  if (pathname === "/Tools/Analytics"){
+    return <HeaderDateRangeToolsAna />;
   }
 
   return null;
