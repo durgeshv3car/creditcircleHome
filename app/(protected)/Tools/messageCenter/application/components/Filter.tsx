@@ -16,14 +16,17 @@ interface FilterProps {
 export default function Filter({ selectedValues, setSelectedValues }: FilterProps) {
   const [titles, setTitles] = React.useState<string[]>([]);
   const [statuses, setStatuses] = React.useState<string[]>([]);
+  const [counteres, setCounteres] = React.useState<string[]>([]);
   const [openFilter, setOpenFilter] = React.useState<string | null>(null);
 
   // ✅ Fetch unique filter options from API
   const fetchFilterOptions = async () => {
     try {
       const response = await fetchNotificationsFilters("application");
+      console.log(response)
       setTitles(response.titles || []);
       setStatuses(response.statuses || []);
+      setCounteres(response.counter || [])
     } catch (error) {
       console.error("❌ Error fetching filter options:", error);
     }
@@ -47,10 +50,11 @@ export default function Filter({ selectedValues, setSelectedValues }: FilterProp
   };
 
   // ✅ Define fields and map data correctly
-  const fields: (keyof SelectedValues)[] = ["title", "status"];
+  const fields: (keyof SelectedValues)[] = ["title", "status","counter"];
   const options: Record<string, string[]> = {
     title: titles,
     status: statuses,
+    counter:counteres
   };
 
   return (

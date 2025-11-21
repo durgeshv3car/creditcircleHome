@@ -1,9 +1,10 @@
-import React from 'react'
+import { notFound } from "next/navigation";
+import { checkRoute } from "@/app/(protected)/helper";
+import Users from "./components/Category"; 
 
-function AnalyticsPage() {
-  return (
-    <div> AnalyticsPage</div>
-  )
+export default async function MainPage() {
+  const allowed = await checkRoute("Category");
+  if (!allowed) notFound();
+
+  return <Users />;
 }
-
-export default AnalyticsPage

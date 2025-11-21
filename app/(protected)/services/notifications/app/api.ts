@@ -14,6 +14,17 @@ export const fetchNotifications = async (params?: any) => {
     throw error;
   }
 };
+export const fetchNotificationsCount = async (params?: any) => {
+  try {
+     const response = await axios.get(`${BASE_URL}/getallnotificationscount`, {
+      params, 
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    throw error;
+  }
+};
 
 export const fetchNotificationsFilters = async (type:string) => {
   try {
