@@ -14,11 +14,12 @@ import {
   ChevronDown,
   Loader2,
 } from "lucide-react";
-import { addcsv } from "@/app/(protected)/services/csv/api";
+import { addcsv, createOtp } from "@/app/(protected)/services/csv/api";
 import { toast } from "@/components/ui/use-toast";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataProps } from "../table/columns";
 import { SelectedValues } from "../components/Leads";
+import OtpModal from "./OtpModal";
 
 export interface ImportExportButtonsProps<TData> {
   setRefresh: React.Dispatch<React.SetStateAction<boolean>>;
@@ -38,6 +39,8 @@ const ImportExportButtons = <TData extends Record<string, any>>({
   selectedValues,
 }: ImportExportButtonsProps<TData>) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [openOtp, setOpenOtp] = useState(false);
+  const [exportType, setExportType] = useState<"csv" | "xlsx" | null>(null);
 
   const refreshData = () => {
     setRefresh((prev) => !prev);
@@ -131,64 +134,6 @@ const ImportExportButtons = <TData extends Record<string, any>>({
     input.click();
   };
 
-  // Function to extract exportable columns data
-  const getExportableColumns = () => {
-    return columns
-      .map((col) => {
-        const id = typeof col.id === "string" ? col.id : "";
-
-        // Get header
-        let header = "";
-        if (typeof col.header === "string") {
-          header = col.header;
-        } else if (
-          col.header === undefined &&
-          "accessorKey" in col &&
-          typeof col.accessorKey === "string"
-        ) {
-          header = col.accessorKey;
-        } else if (
-          "accessorFn" in col &&
-          typeof col.accessorFn === "function" &&
-          id
-        ) {
-          header = id;
-        }
-
-        // Get accessor key safely
-        const accessorKey =
-          "accessorKey" in col && typeof col.accessorKey === "string"
-            ? col.accessorKey
-            : id;
-
-        return { accessorKey, header };
-      })
-      .filter((col) => col.header && col.accessorKey);
-  };
-
-  // Function to safely extract data from a row
-  const extractRowData = (row: TData, accessorKey: string) => {
-    try {
-      // Handle nested properties using dot notation (e.g., "user.name")
-      if (accessorKey.includes(".")) {
-        const parts = accessorKey.split(".");
-        let value = row as any;
-        for (const part of parts) {
-          if (value === null || value === undefined) return "";
-          value = value[part];
-        }
-        return value !== undefined && value !== null ? value : "";
-      }
-
-      // Simple property access
-      const value = (row as any)[accessorKey];
-      return value !== undefined && value !== null ? value : "";
-    } catch (error) {
-      console.error(`Error extracting data for ${accessorKey}:`, error);
-      return "";
-    }
-  };
-
   const downloadCSV = async () => {
     try {
       const params = new URLSearchParams();
@@ -207,11 +152,14 @@ const ImportExportButtons = <TData extends Record<string, any>>({
           : selected === "all"
           ? "all"
           : [];
-      const response = await fetch(`${BASE_URL}/data/csv?${params.toString()}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userIds }),
-      });
+      const response = await fetch(
+        `${BASE_URL}/data/csv?${params.toString()}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userIds }),
+        }
+      );
 
       const data = await response.json();
 
@@ -243,117 +191,125 @@ const ImportExportButtons = <TData extends Record<string, any>>({
   };
 
   const downloadXLSX = async (selectedValues = {}) => {
-  try {
-    const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+    try {
+      const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-    /* 🔹 Build query params from selectedValues */
-    const params = new URLSearchParams();
+      /* 🔹 Build query params from selectedValues */
+      const params = new URLSearchParams();
 
-    Object.entries(selectedValues).forEach(([key, values]) => {
-      if (Array.isArray(values) && values.length > 0) {
-        values.forEach(value => params.append(key, value));
-      }
-    });
-       const userIds =
+      Object.entries(selectedValues).forEach(([key, values]) => {
+        if (Array.isArray(values) && values.length > 0) {
+          values.forEach((value) => params.append(key, value));
+        }
+      });
+      const userIds =
         selectedRowsData.length >= 1
           ? selectedRowsData.map((row) => row.id)
           : selected === "all"
           ? "all"
           : [];
 
-    const response = await fetch(
-      `${BASE_URL}/data/xlxs?${params.toString()}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userIds }),
+      const response = await fetch(
+        `${BASE_URL}/data/xlxs?${params.toString()}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userIds }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to download XLSX");
       }
-    );
 
-    if (!response.ok) {
-      throw new Error("Failed to download XLSX");
+      const data = await response.json();
+
+      if (!data.success) {
+        alert("Failed to generate Excel file");
+        return;
+      }
+
+      /* 🔁 Base64 → Uint8Array */
+      const binary = atob(data.blob);
+      const bytes = new Uint8Array(binary.length);
+
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+
+      /* 📦 Create XLSX Blob */
+      const blob = new Blob([bytes], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      /* ⬇ Trigger Download */
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = data.filename || "users.xlsx";
+
+      document.body.appendChild(link);
+      link.click();
+
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      console.log(`✅ XLSX downloaded (${data.rowCount} rows)`);
+    } catch (error) {
+      console.error("❌ XLSX download error:", error);
+      alert("Download failed");
     }
-
-    const data = await response.json();
-
-    if (!data.success) {
-      alert("Failed to generate Excel file");
-      return;
+  };
+  const onOtpVerified = async () => {
+    if (exportType === "csv") {
+      try {
+        await downloadCSV();
+        toast({
+          title: "Success",
+          description: "CSV file exported successfully",
+        });
+      } catch (error) {
+        console.error("Error exporting CSV:", error);
+        toast({
+          title: "Error",
+          description: "Failed to export CSV file",
+          variant: "destructive",
+        });
+      }
     }
+    if (exportType === "xlsx") {
+      try {
+        await downloadXLSX();
 
-    /* 🔁 Base64 → Uint8Array */
-    const binary = atob(data.blob);
-    const bytes = new Uint8Array(binary.length);
-
-    for (let i = 0; i < binary.length; i++) {
-      bytes[i] = binary.charCodeAt(i);
+        toast({
+          title: "Success",
+          description: "XLSX file exported successfully",
+        });
+      } catch (error) {
+        console.error("Error exporting XLSX:", error);
+        toast({
+          title: "Error",
+          description: "Failed to export XLSX file",
+          variant: "destructive",
+        });
+      }
     }
+  };
 
-    /* 📦 Create XLSX Blob */
-    const blob = new Blob([bytes], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
-
-    /* ⬇ Trigger Download */
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = data.filename || "users.xlsx";
-
-    document.body.appendChild(link);
-    link.click();
-
-    link.remove();
-    window.URL.revokeObjectURL(url);
-
-    console.log(`✅ XLSX downloaded (${data.rowCount} rows)`);
-  } catch (error) {
-    console.error("❌ XLSX download error:", error);
-    alert("Download failed");
-  }
+const handleExportCSV = async () => {
+  setExportType("csv");
+  await createOtp();      
+  setOpenOtp(true);       
 };
 
+const handleExportXLSX = async () => {
+  setExportType("xlsx");
+  await createOtp();
+  setOpenOtp(true);
+};
 
-  // Function to handle CSV export
-  const handleExportCSV = async () => {
-    try {
-      await downloadCSV();
-      toast({
-        title: "Success",
-        description: "CSV file exported successfully",
-      });
-    } catch (error) {
-      console.error("Error exporting CSV:", error);
-      toast({
-        title: "Error",
-        description: "Failed to export CSV file",
-        variant: "destructive",
-      });
-    }
-  };
-
-  // Function to handle XLSX export
-  const handleExportXLSX = async() => {
- 
-
-    try {
-      await downloadXLSX();
-
-      toast({
-        title: "Success",
-        description: "XLSX file exported successfully",
-      });
-    } catch (error) {
-      console.error("Error exporting XLSX:", error);
-      toast({
-        title: "Error",
-        description: "Failed to export XLSX file",
-        variant: "destructive",
-      });
-    }
-  };
 
   return (
     <div className="flex space-x-4">
@@ -392,14 +348,21 @@ const ImportExportButtons = <TData extends Record<string, any>>({
         <DropdownMenuContent>
           <DropdownMenuItem onClick={handleExportCSV}>
             <FileSpreadsheet className="mr-2 h-4 w-4" />
-            <span>Export CSV</span>
+            <span >Export CSV</span>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={handleExportXLSX}>
             <FileSpreadsheet className="mr-2 h-4 w-4" />
-            <span>Export XLSX</span>
+            <span >Export XLSX</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      {openOtp && (
+        <OtpModal
+          open={openOtp}
+          onClose={() => setOpenOtp(false)}
+          onVerified={onOtpVerified}
+        />
+      )}
     </div>
   );
 };
