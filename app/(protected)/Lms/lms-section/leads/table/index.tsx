@@ -101,7 +101,6 @@ interface ExampleTwoProps {
   setSelected: React.Dispatch<React.SetStateAction<string>>;
   searchTerm: string;
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
-
 }
 
 const ExampleTwo = <TData extends Record<string, any>>({
@@ -124,7 +123,7 @@ const ExampleTwo = <TData extends Record<string, any>>({
   selected,
   setSelected,
   searchTerm,
-  setSearchTerm
+  setSearchTerm,
 }: ExampleTwoProps) => {
   const searchParams = useSearchParams();
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -175,7 +174,6 @@ const ExampleTwo = <TData extends Record<string, any>>({
   React.useEffect(() => {
     setIsModalOpen(!!leadId);
   }, [leadId]);
- 
 
   // Persist column visibility settings
   React.useEffect(() => {
@@ -251,8 +249,6 @@ const ExampleTwo = <TData extends Record<string, any>>({
     }
   }, [searchParams]);
 
-
-
   const [selectedStatus, setSelectedStatus] =
     React.useState<string>("approved");
   const [selectedStatusPartner, setSelectedStatusPartner] =
@@ -260,18 +256,12 @@ const ExampleTwo = <TData extends Record<string, any>>({
 
   const handleSelectChange = (val: string) => {
     setSelected(val);
-
-
   };
   const handleSelectChangeStatusPartner = (val: string) => {
     setSelectedStatusPartner(val);
-
-
   };
   const handleSelectChangeStatus = (val: string) => {
     setSelectedStatus(val);
-    
-
   };
 
   // const handleSearch = () => {
@@ -324,15 +314,12 @@ const ExampleTwo = <TData extends Record<string, any>>({
   //   }
   // };
 
-
-
   return (
     <div className="w-full">
       {/* Header & Filter Section */}
       <div className="py-4 px-5 mb-6 bg-card text-card-foreground rounded-md">
         <React.Suspense fallback={<div>Loading...</div>}>
           <Filter
-          
             selectedValues={selectedValues}
             setSelectedValues={setSelectedValues}
             data={tableData}
@@ -387,7 +374,6 @@ const ExampleTwo = <TData extends Record<string, any>>({
                     />
 
                     {/* Lens icon button on the right */}
-                
                   </div>
                 </div>
               </>
@@ -421,7 +407,7 @@ const ExampleTwo = <TData extends Record<string, any>>({
                 <Button
                   size="icon"
                   variant="ghost"
-                  onClick={()=>console.log("Search Clicked")}
+                  onClick={() => console.log("Search Clicked")}
                   aria-label="Search"
                   className="w-10 h-10"
                 >
@@ -437,6 +423,9 @@ const ExampleTwo = <TData extends Record<string, any>>({
                 setRefresh={setRefresh}
                 filteredData={tableData}
                 columns={tableColumns}
+                selectedRowsData={selectedRowsData}
+                selected={selected}
+                selectedValues={selectedValues}
               />
             </React.Suspense>
             <label className="text-sm text-gray-600">Rows per page:</label>
@@ -490,7 +479,6 @@ const ExampleTwo = <TData extends Record<string, any>>({
               {isCreatingNotification && (
                 <button
                   className="ml-auto bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-50"
-             
                   onClick={() => setIsModalOpenOffer(true)}
                 >
                   Send {type}

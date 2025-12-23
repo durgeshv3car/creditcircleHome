@@ -164,82 +164,73 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
   }, [selectedValues, searchTerm, currentPage, pageSize]);
 
   // Fetch user data
-const fetchData = useCallback(async (): Promise<void> => {
-  setLoading(true);
-  try {
-    const params: any = {
-      page: currentPage,
-      pageSize,
-    };
+  const fetchData = useCallback(async (): Promise<void> => {
+    setLoading(true);
+    try {
+      const params: any = {
+        page: currentPage,
+        pageSize,
+      };
 
-    // ✅ Apply filters only if they have values
-    if (startDate) params.startDate = startDate;
-    if (endDate) params.endDate = endDate;
+      // ✅ Apply filters only if they have values
+      if (startDate) params.startDate = startDate;
+      if (endDate) params.endDate = endDate;
 
-    if (selected === "firstName") params.firstName = query;
-    if (selected === "phoneNumber") params.phoneNumber = query;
-    if (selected === "email") params.email = query;
+      if (selected === "firstName") params.firstName = query;
+      if (selected === "phoneNumber") params.phoneNumber = query;
+      if (selected === "email") params.email = query;
 
-    if (selectedValues.state?.length) params.state = selectedValues.state;
-    if (selectedValues.city?.length) params.city = selectedValues.city;
-    if (selectedValues.pincode?.length) params.pincode = selectedValues.pincode;
-    if (selectedValues.dob?.length) params.age = selectedValues.dob;
-    if (selectedValues.loanType?.length) params.loanType = selectedValues.loanType;
-    if (selectedValues.profession?.length) params.profession = selectedValues.profession;
-    if (selectedValues.netMonthlyIncome?.length) params.netMonthlyIncome = selectedValues.netMonthlyIncome;
-    if (selectedValues.loanDataStatus?.length) params.loanDataStatus = selectedValues.loanDataStatus;
+      if (selectedValues.state?.length) params.state = selectedValues.state;
+      if (selectedValues.city?.length) params.city = selectedValues.city;
+      if (selectedValues.pincode?.length)
+        params.pincode = selectedValues.pincode;
+      if (selectedValues.dob?.length) params.age = selectedValues.dob;
+      if (selectedValues.loanType?.length)
+        params.loanType = selectedValues.loanType;
+      if (selectedValues.profession?.length)
+        params.profession = selectedValues.profession;
+      if (selectedValues.netMonthlyIncome?.length)
+        params.netMonthlyIncome = selectedValues.netMonthlyIncome;
+      if (selectedValues.loanDataStatus?.length)
+        params.loanDataStatus = selectedValues.loanDataStatus;
 
-    // ✅ Fetch data
-    const result = await fetchUsers(params);
+      // ✅ Fetch data
+      const result = await fetchUsers(params);
 
-    // ✅ Update table data
-    setData(result?.data || []);
-    setTotalPages(result?.totalPages || 0);
-    setRecordsCount(result?.totalRecords || 0);
+      // ✅ Update table data
+      setData(result?.data || []);
+      setTotalPages(result?.totalPages || 0);
+      setRecordsCount(result?.totalRecords || 0);
 
-    // ✅ Reset or adjust page size based on filter emptiness
-    const emptyFilters = [
-      selected === "firstName" ? query : null,
-      selected === "phoneNumber" ? query : null,
-      selected === "email" ? query : null,
-      selectedValues?.state,
-      selectedValues?.city,
-      selectedValues?.pincode,
-      selectedValues?.dob,
-      selectedValues?.netMonthlyIncome,
-      selectedValues?.loanType,
-      selectedValues?.profession,
-    ];
+      // ✅ Reset or adjust page size based on filter emptiness
+      const emptyFilters = [
+        selected === "firstName" ? query : null,
+        selected === "phoneNumber" ? query : null,
+        selected === "email" ? query : null,
+        selectedValues?.state,
+        selectedValues?.city,
+        selectedValues?.pincode,
+        selectedValues?.dob,
+        selectedValues?.netMonthlyIncome,
+        selectedValues?.loanType,
+        selectedValues?.profession,
+      ];
 
-    if (emptyFilters.some((v) => !v || v.length === 0)) {
-      setPageSize(20);
-    } else {
-      // adjust pageSize based on result size
-      const newPageSize =
-        result?.totalRecords && result.totalRecords >= 20
-          ? pageSize
-          : result?.totalRecords || 20;
-      setPageSize(newPageSize);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setData([]);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    setData([]);
-  } finally {
-    setLoading(false);
-  }
-}, [
-  currentPage,
-  pageSize,
-  startDate,
-  endDate,
-  query,
-  selected,
-  selectedValues,
-]);
-
-
-
- 
+  }, [
+    currentPage,
+    pageSize,
+    startDate,
+    endDate,
+    query,
+    selected,
+    selectedValues,
+  ]);
 
   // Load table columns
   useEffect(() => {
@@ -283,7 +274,15 @@ const fetchData = useCallback(async (): Promise<void> => {
       fetchData();
       fetchFilters();
     }
-  }, [datesLoaded, searchTerm, fetchData, fetchFilters, refresh, currentPage, pageSize]);
+  }, [
+    datesLoaded,
+    searchTerm,
+    fetchData,
+    fetchFilters,
+    refresh,
+    currentPage,
+    pageSize,
+  ]);
 
   return (
     <div>
