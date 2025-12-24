@@ -134,134 +134,82 @@ const ImportExportButtons = <TData extends Record<string, any>>({
     input.click();
   };
 
-  const downloadCSV = async () => {
-    try {
-      const params = new URLSearchParams();
+ const downloadCSV = () => {
+  const params = new URLSearchParams();
 
-      Object.entries(selectedValues).forEach(([key, values]) => {
-        if (Array.isArray(values) && values.length > 0) {
-          values.forEach((value) => {
-            params.append(key, value);
-          });
-        }
-      });
-      const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-      const userIds =
-        selectedRowsData.length >= 1
-          ? selectedRowsData.map((row) => row.id)
-          : selected === "all"
-          ? "all"
-          : [];
-      const response = await fetch(
-        `${BASE_URL}/data/csv?${params.toString()}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userIds }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!data.success) {
-        alert("Failed to generate CSV");
-        return;
-      }
-
-      // Convert Base64 to Uint8Array
-      const csvBytes = Uint8Array.from(atob(data.blob), (c) => c.charCodeAt(0));
-      const blob = new Blob([csvBytes], { type: "text/csv" });
-
-      // Create URL and trigger download
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = data.filename; // e.g., "users.csv"
-      document.body.appendChild(link);
-      link.click();
-
-      // Cleanup
-      link.remove();
-      window.URL.revokeObjectURL(url);
-
-      console.log(`✅ CSV downloaded (${data.rowCount} rows)`);
-    } catch (err) {
-      console.error("❌ CSV download error:", err);
+  Object.entries(selectedValues).forEach(([key, values]) => {
+    if (Array.isArray(values) && values.length > 0) {
+      values.forEach((value) => params.append(key, value));
     }
-  };
+  });
 
-  const downloadXLSX = async (selectedValues = {}) => {
-    try {
-      const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-      /* 🔹 Build query params from selectedValues */
-      const params = new URLSearchParams();
+  const userIds =
+    selectedRowsData.length >= 1
+      ? selectedRowsData.map((row) => row.id)
+      : selected === "all"
+      ? "all"
+      : [];
 
-      Object.entries(selectedValues).forEach(([key, values]) => {
-        if (Array.isArray(values) && values.length > 0) {
-          values.forEach((value) => params.append(key, value));
-        }
-      });
-      const userIds =
-        selectedRowsData.length >= 1
-          ? selectedRowsData.map((row) => row.id)
-          : selected === "all"
-          ? "all"
-          : [];
+  // 🔥 Hidden form (POST + STREAM DOWNLOAD)
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = `${BASE_URL}/data/csv?${params.toString()}`;
 
-      const response = await fetch(
-        `${BASE_URL}/data/xlxs?${params.toString()}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ userIds }),
-        }
-      );
+  const input = document.createElement("input");
+  input.type = "hidden";
+  input.name = "userIds";
+  input.value = JSON.stringify(userIds);
 
-      if (!response.ok) {
-        throw new Error("Failed to download XLSX");
-      }
+  form.appendChild(input);
+  document.body.appendChild(form);
 
-      const data = await response.json();
+  form.submit();
+  document.body.removeChild(form);
+};
 
-      if (!data.success) {
-        alert("Failed to generate Excel file");
-        return;
-      }
 
-      /* 🔁 Base64 → Uint8Array */
-      const binary = atob(data.blob);
-      const bytes = new Uint8Array(binary.length);
+const downloadXLSX = (selectedValues = {}) => {
+  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-      for (let i = 0; i < binary.length; i++) {
-        bytes[i] = binary.charCodeAt(i);
-      }
+  /* 🔹 Build query params */
+  const params = new URLSearchParams();
 
-      /* 📦 Create XLSX Blob */
-      const blob = new Blob([bytes], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-
-      /* ⬇ Trigger Download */
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = data.filename || "users.xlsx";
-
-      document.body.appendChild(link);
-      link.click();
-
-      link.remove();
-      window.URL.revokeObjectURL(url);
-
-      console.log(`✅ XLSX downloaded (${data.rowCount} rows)`);
-    } catch (error) {
-      console.error("❌ XLSX download error:", error);
-      alert("Download failed");
+  Object.entries(selectedValues).forEach(([key, values]) => {
+    if (Array.isArray(values) && values.length > 0) {
+      values.forEach((value) => params.append(key, value));
     }
-  };
+  });
+
+  const userIds =
+    selectedRowsData.length >= 1
+      ? selectedRowsData.map((row) => row.id)
+      : selected === "all"
+      ? "all"
+      : [];
+
+  /* 🔥 Hidden POST form (REQUIRED) */
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = `${BASE_URL}/data/xlxs?${params.toString()}`;
+
+  /* 🔹 userIds field */
+  const input = document.createElement("input");
+  input.type = "hidden";
+  input.name = "userIds";
+  input.value = JSON.stringify(userIds);
+
+  form.appendChild(input);
+  document.body.appendChild(form);
+
+  /* ⬇ Native browser download */
+  form.submit();
+
+  /* 🧹 Cleanup */
+  document.body.removeChild(form);
+};
+
   const onOtpVerified = async () => {
     if (exportType === "csv") {
       try {

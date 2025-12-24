@@ -35,40 +35,48 @@ export default function OtpModal({
     }
   }, [open]);
 
-  const verifyOtp = async () => {
-    if (otp.length !== 4) {
+const verifyOtp = async () => {
+  if (otp.length !== 4) {
+    toast({
+      title: "Invalid OTP",
+      description: "Please enter a 4-digit OTP",
+      variant: "destructive",
+    });
+    return;
+  }
+
+  try {
+    setLoading(true);
+    const res = await VerifyOtp(otp);
+
+    if (res.success) {
       toast({
-        title: "Invalid OTP",
-        description: "Please enter a 4-digit OTP",
-        variant: "destructive",
+        title: "OTP Verified",
+        description: "You can now export data",
       });
-      return;
-    }
 
-    try {
-      setLoading(true);
-      const res = await VerifyOtp(otp);
-
-      if (res.success) {
-        toast({
-          title: "OTP Verified",
-          description: "You can now export data",
-        });
-
-        onVerified(); 
-        onClose();    
-      }
-    } catch (err) {
+      onVerified(); 
+      onClose();
+    } else {
+      // ❌ API returned success: false → show toast here
       toast({
         title: "OTP Failed",
-        description: "Invalid or expired OTP",
+        description: res.message || "Invalid or expired OTP",
         variant: "destructive",
       });
-      // ❌ DO NOT close modal here
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch (err) {
+    // ❌ Network or unexpected error
+    toast({
+      title: "OTP Error",
+      description:"Something went wrong",
+      variant: "destructive",
+    });
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
