@@ -86,7 +86,9 @@ const LeadPage = ({ token }: { token: string }) => {
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsCount, setRecordsCount] = useState(0);
-  
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const [selectedStatusPartner, setSelectedStatusPartner] = useState<string>("");
+
   // Load dates from localStorage
   useEffect(() => {
     const storedStart = localStorage.getItem("startDateLoan");
@@ -109,7 +111,7 @@ const LeadPage = ({ token }: { token: string }) => {
         pageSize,
         totalPages,
         currentPage,
-        recordsCount
+        recordsCount,
       });
       setColumns(cols);
     };
@@ -124,6 +126,8 @@ const LeadPage = ({ token }: { token: string }) => {
     try {
       if (startDate) params.startDate = startDate;
       if (endDate) params.endDate = endDate;
+      if (selectedStatusPartner !="Partners") params.partner = selectedStatusPartner;
+      if (selectedStatus!="Status") params.status = selectedStatus;
       const result = await fetchLoans(params);
       setData(result.data);
       setTotalPages(result.totalPages);
@@ -141,7 +145,7 @@ const LeadPage = ({ token }: { token: string }) => {
     if (datesLoaded) {
       fetchData();
     }
-  }, [datesLoaded, refresh, startDate, endDate, currentPage, pageSize]);
+  }, [datesLoaded, refresh, startDate, endDate, currentPage, pageSize, selectedStatus, selectedStatusPartner]);
 
   const incomeRanges = [
     { min: 0, max: 14999, label: "Under 15000" },
@@ -229,6 +233,10 @@ const LeadPage = ({ token }: { token: string }) => {
         setTotalPages={setTotalPages}
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
+        setSelectedStatus={setSelectedStatus}
+        selectedStatus={selectedStatus}
+        setSelectedStatusPartner={setSelectedStatusPartner}
+        selectedStatusPartner={selectedStatusPartner}
       />
       {isModalOpen && selectedRow && (
         <PartnerStatus
