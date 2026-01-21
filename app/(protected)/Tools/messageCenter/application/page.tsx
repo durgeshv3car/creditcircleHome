@@ -36,16 +36,17 @@ const NotificationCenterPage = () => {
   const [endDate, setEndDate] = useState<string | null>(null);
   const [datesLoaded, setDatesLoaded] = useState(false);
 
-  useEffect(() => {
-    const storedStart = localStorage.getItem("startDateTools");
-    const storedEnd = localStorage.getItem("endDateTools");
 
-    if (storedStart && storedEnd) {
-      setStartDate(storedStart);
-      setEndDate(storedEnd);
-    }
-    setDatesLoaded(true);
-  }, []);
+ useEffect(() => {
+  const storedStart = localStorage.getItem("startDateTools");
+  const storedEnd = localStorage.getItem("endDateTools");
+
+  if (storedStart) setStartDate(storedStart);
+  if (storedEnd) setEndDate(storedEnd);
+
+  setDatesLoaded(true); // ✅ signal ready
+}, []);
+
 
   const fetchData = async () => {
     try {
@@ -99,9 +100,12 @@ const NotificationCenterPage = () => {
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, [refresh, currentPage, pageSize, startDate, endDate, selectedValues]);
+useEffect(() => {
+  if (!datesLoaded) return; 
+
+  fetchData();
+}, [refresh, currentPage, pageSize, startDate, endDate, selectedValues, datesLoaded]);
+
 
   const filteredData = data.filter((item) => {
     return (
