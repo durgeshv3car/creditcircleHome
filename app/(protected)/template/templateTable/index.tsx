@@ -48,7 +48,7 @@ import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Categorys } from "../template-section/watti/components/columnsCategory";
 
-type ModalType = "watti" | "sms" ;
+type ModalType = "email" | "watti" | "sms" ;
 
 // Define the props interface for the edit modal components
 interface EditModalProps<Categorys> {
@@ -82,6 +82,14 @@ const modalMap: Record<
     edit: any; // Using any temporarily for dynamic imports
   }
 > = {
+   email: {
+    create: dynamic(
+      () => import("../template-section/email/components/Create")
+    ) as CreateComponent,
+    edit: dynamic(
+      () => import("../template-section/email/components/EditModal")
+    ),
+  },
   watti: {
     create: dynamic(
       () => import("../template-section/watti/components/Create")
