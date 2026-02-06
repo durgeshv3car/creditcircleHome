@@ -407,6 +407,13 @@ export function getMenuList(
           icon: "heroicons-outline:user-plus",
           children: [],
         },
+        {
+          href: "/template/template-section/email",
+          label: "Email Template",
+          active: pathname === "/template/template-section/email",
+          icon: "heroicons-outline:user-plus",
+          children: [],
+        },
          {
           href: "/template/template-section/watti",
           label: "Watti Template",
