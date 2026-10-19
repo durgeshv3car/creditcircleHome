@@ -29,6 +29,7 @@ const fields = [
   "email",
   "dob",
   "pan",
+  "score",
   "pinCode",
   "city",
   "state",
@@ -146,7 +147,12 @@ export const columns = ({
 
   ...fields.map((key) => ({
     accessorKey: key,
-    header: key.replace(/([A-Z])/g, " $1").trim(),
+    header:
+      key === "score"
+        ? "Score"
+        : key === "pan"
+        ? "PAN"
+        : key.replace(/([A-Z])/g, " $1").trim(),
     cell: ({ row }: { row: Row<DataProps> }) => (
       <span>{String(row.original[key] ?? "-")}</span>
     ),

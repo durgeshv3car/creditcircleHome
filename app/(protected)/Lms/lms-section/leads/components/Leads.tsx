@@ -55,6 +55,7 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
     { value: "phoneNumber", label: "PhoneNumber" },
     { value: "firstName", label: "FirstName" },
     { value: "email", label: "Email" },
+    { value: "score", label: "Score" },
     { value: "status", label: "Status" },
   ];
   const [allFilterOptions, setAllFilterOptions] = useState<
@@ -179,6 +180,7 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
       if (selected === "firstName") params.firstName = query;
       if (selected === "phoneNumber") params.phoneNumber = query;
       if (selected === "email") params.email = query;
+      if (selected === "score") params.score = query;
 
       if (selectedValues.state?.length) params.state = selectedValues.state;
       if (selectedValues.city?.length) params.city = selectedValues.city;
