@@ -14,7 +14,7 @@ export function SidebarToggle() {
     const collapsed = config.collapsed
     const isDesktop = useMediaQuery('(min-width: 1280px)')
     if (!isDesktop) return null
-    if (config.sidebar === 'two-column' && !config.hasSubMenu || config.menuHidden || config.layout === "horizontal" || config.sidebar === 'classic') {
+    if (config.sidebar === 'two-column' && !config.hasSubMenu || config.menuHidden || config.layout === "horizontal") {
         return null
     }
     if (config.sidebar === 'two-column') {
@@ -22,7 +22,7 @@ export function SidebarToggle() {
 
             <Button
                 onClick={() => setConfig((prevConfig) => ({ ...prevConfig, subMenu: !prevConfig.subMenu }))}
-                className="rounded-md h-auto p-0 hover:bg-transparent hover:text-default-800 text-default-500 "
+                className="h-9 w-9 rounded-sm border border-slate-200/90 bg-white hover:bg-gradient-to-tr hover:from-orange-50/80 hover:to-amber-50/80 hover:border-orange-300 text-slate-600 hover:text-[#FF6B4A] shadow-sm hover:shadow-md hover:shadow-orange-500/10 active:scale-95 transition-all duration-200 flex items-center justify-center group"
                 variant="ghost"
                 size="icon"
             >
@@ -34,7 +34,7 @@ export function SidebarToggle() {
                         exit={{ x: -20, opacity: 0 }}
                         transition={{ type: "spring", stiffness: 300, damping: 20 }}
                     >
-                        <Icon icon="heroicons:arrow-small-right-solid" className="h-6 w-6" />
+                        <Icon icon="heroicons:arrow-small-right-solid" className="h-5 w-5 group-hover:scale-105 transition-transform duration-200" />
                     </motion.div>
                 ) : (
                     <motion.div
@@ -44,7 +44,7 @@ export function SidebarToggle() {
                         exit={{ scale: 0.5, opacity: 0 }}
                         transition={{ type: "spring", stiffness: 300, damping: 20 }}
                     >
-                        <Icon icon="heroicons:bars-3-bottom-left-solid" className="h-6 w-6" />
+                        <Icon icon="heroicons:bars-3-bottom-left-solid" className="h-5 w-5 group-hover:scale-105 transition-transform duration-200" />
                     </motion.div>
                 )}
             </Button>
@@ -55,7 +55,7 @@ export function SidebarToggle() {
 
         <Button
             onClick={() => setConfig({ ...config, collapsed: !collapsed })}
-            className="rounded-md h-auto p-0 hover:bg-transparent hover:text-default-800 text-default-500 "
+            className="h-9 w-9 rounded-sm border border-slate-200/90 bg-white hover:bg-gradient-to-tr hover:from-orange-50/80 hover:to-amber-50/80 hover:border-orange-300 text-slate-600 hover:text-[#FF6B4A] shadow-sm hover:shadow-md hover:shadow-orange-500/10 active:scale-95 transition-all duration-200 flex items-center justify-center group"
             variant="ghost"
             size="icon"
         >
@@ -67,7 +67,7 @@ export function SidebarToggle() {
                     exit={{ x: -20, opacity: 0 }}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 >
-                    <Icon icon="heroicons:arrow-small-right-solid" className="h-6 w-6" />
+                    <Icon icon="heroicons:arrow-small-right-solid" className="h-5 w-5 group-hover:scale-105 transition-transform duration-200" />
                 </motion.div>
             ) : (
                 <motion.div
@@ -77,7 +77,7 @@ export function SidebarToggle() {
                     exit={{ scale: 0.5, opacity: 0 }}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 >
-                    <Icon icon="heroicons:bars-3-bottom-left-solid" className="h-6 w-6" />
+                    <Icon icon="heroicons:bars-3-bottom-left-solid" className="h-5 w-5 group-hover:scale-105 transition-transform duration-200" />
                 </motion.div>
             )}
         </Button>

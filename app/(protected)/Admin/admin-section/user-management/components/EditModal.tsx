@@ -155,7 +155,7 @@ const EditModal = <T extends Record<string, any>>({
                   <span className="text-sm font-medium">Permissions</span>
                   <button
                     onClick={() => handleEditPermissions(editedData[key])}
-                    className="text-blue-600 hover:text-blue-800"
+                    className="text-[#EA580C] hover:text-[#C2410C]"
                     title="Edit Permissions"
                   >
                     ✏️

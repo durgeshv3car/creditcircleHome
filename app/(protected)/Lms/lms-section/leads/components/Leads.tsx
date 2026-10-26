@@ -6,13 +6,14 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataProps } from ".././table/columns";
 import { useRouter } from "next/navigation";
 import PartnerStatusModal from "./PartnerStatus";
+import Loader from "@/components/loader";
 
 export type SelectedValues = {
   [key: string]: string[];
 };
 
 const ExampleTwo = dynamic(() => import(".././table"), {
-  loading: () => <p>Loading table...</p>,
+  loading: () => <Loader className="min-h-[50vh] h-auto" />,
   ssr: false,
 });
 interface LeadPageProps {
@@ -309,6 +310,8 @@ const LeadPage: React.FC<LeadPageProps> = ({ token }) => {
         setSelected={setSelected}
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
+        isLoading={loading}
+        recordsCount={recordsCount}
       />
       {selectedUser && (
         <PartnerStatusModal

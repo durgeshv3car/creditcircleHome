@@ -161,51 +161,52 @@ export function DateRangePicker({
           <Button
             id="date"
             size="sm"
+            variant="outline"
             className={cn(
-              "w-[200px] justify-start text-left font-normal bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 shadow-sm transition-all",
-              !date && "text-muted-foreground"
+              "h-9 w-auto min-w-[200px] justify-start text-left font-medium text-xs rounded-sm bg-white hover:bg-slate-50/80 border border-slate-200/90 hover:border-orange-400 text-slate-700 shadow-sm hover:shadow-md hover:shadow-orange-500/10 transition-all duration-200 px-3 group",
+              !date && "text-slate-400"
             )}
           >
-            <CalendarIcon className="mr-2 h-4 w-4 text-gray-500" />
+            <div className="p-1 rounded-xs bg-[#FFF1ED] text-[#EA580C] mr-2 group-hover:bg-[#FF6B4A] group-hover:text-white transition-colors duration-200 flex-shrink-0">
+              <CalendarIcon className="h-3.5 w-3.5" />
+            </div>
             {date?.from ? (
               date.to ? (
-                <>
+                <span className="font-semibold text-slate-800">
                   {format(date.from, "MMM dd")} - {format(date.to, "MMM dd, y")}
-                </>
+                </span>
               ) : (
-                format(date.from, "MMM dd, y")
+                <span className="font-semibold text-slate-800">{format(date.from, "MMM dd, y")}</span>
               )
             ) : (
-              <span>Pick a date range</span>
+              <span className="text-slate-500 font-medium">Pick a date range</span>
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0 shadow-lg border-0" align="end">
-          <div className="flex bg-white rounded-lg overflow-hidden">
+        <PopoverContent className="w-auto p-0 shadow-2xl shadow-slate-900/10 border border-slate-200/90 rounded-sm overflow-hidden bg-white/95 backdrop-blur-xl animate-in fade-in-0 zoom-in-95 duration-200" align="end" sideOffset={8}>
+          <div className="flex bg-white rounded-sm overflow-hidden">
             {/* Left Sidebar - Presets */}
-            <div className="w-36 bg-gray-50 border-r border-gray-100">
-              <div className="p-2">
-                <div className="text-xs font-medium text-gray-500 mb-2 px-2">
-                  Quick Select
-                </div>
-                <div className="space-y-0.5">
-                  {presetOptions.map((preset) => (
-                    <button
-                      key={preset.label}
-                      className="w-full text-left text-xs px-2 py-1.5 hover:bg-white hover:shadow-sm rounded transition-all text-gray-700"
-                      onClick={preset.action}
-                    >
-                      {preset.label}
-                    </button>
-                  ))}
-                </div>
+            <div className="w-36 bg-slate-50/90 border-r border-slate-100 p-2.5">
+              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-2">
+                Quick Select
+              </div>
+              <div className="space-y-0.5">
+                {presetOptions.map((preset) => (
+                  <button
+                    key={preset.label}
+                    className="w-full text-left text-xs px-2.5 py-1.5 hover:bg-white hover:text-[#2563EB] hover:shadow-sm rounded-sm transition-all text-slate-700 font-medium cursor-pointer"
+                    onClick={preset.action}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
               </div>
             </div>
 
             {/* Main Content */}
             <div className="p-3">
               {/* Compact Date Inputs */}
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-3">
+              <div className="bg-gray-50 border border-gray-200 rounded-sm p-3 mb-3">
                 <div className="flex items-center gap-3">
                   <div className="flex-1">
                     <label className="text-xs font-medium text-gray-600 block mb-1.5">
@@ -213,8 +214,8 @@ export function DateRangePicker({
                     </label>
                     <input
                       type="date"
-                      className="w-full text-sm border border-gray-300 rounded-md px-3 py-2 bg-white 
-                   focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none
+                      className="w-full text-sm border border-gray-300 rounded-sm px-3 py-2 bg-white 
+                   focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] focus:outline-none
                    transition-all duration-200 hover:border-gray-400"
                       value={
                         tempDate?.from
@@ -267,8 +268,8 @@ export function DateRangePicker({
                     </label>
                     <input
                       type="date"
-                      className="w-full text-sm border border-gray-300 rounded-md px-3 py-2 bg-white
-                   focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none
+                      className="w-full text-sm border border-gray-300 rounded-sm px-3 py-2 bg-white
+                   focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] focus:outline-none
                    transition-all duration-200 hover:border-gray-400"
                       value={
                         tempDate?.to ? format(tempDate.to, "yyyy-MM-dd") : ""
@@ -317,7 +318,7 @@ export function DateRangePicker({
               </div>
 
               {/* Enhanced Calendar */}
-              <div className="calendar-container bg-gray-100 rounded-md border border-gray-100 p-2">
+              <div className="calendar-container bg-gray-100 rounded-sm border border-gray-100 p-2">
                 <Calendar
                   initialFocus
                   mode="range"
@@ -325,7 +326,7 @@ export function DateRangePicker({
                   selected={tempDate}
                   onSelect={handleSelect}
                   numberOfMonths={2}
-                  className="rounded-md"
+                  className="rounded-sm"
                   classNames={{
                     months: "flex space-x-4",
                     month: "space-y-3",
@@ -334,23 +335,23 @@ export function DateRangePicker({
                     caption_label: "text-sm font-semibold text-gray-800",
                     nav: "space-x-1 flex items-center",
                     nav_button:
-                      "h-7 w-7 bg-white border border-gray-200 p-0 hover:bg-gray-50 rounded-md shadow-sm transition-colors",
+                      "h-7 w-7 bg-white border border-gray-200 p-0 hover:bg-gray-50 rounded-sm shadow-sm transition-colors",
                     table: "w-full border-collapse space-y-1",
                     head_row: "flex mb-2",
                     head_cell:
-                      "text-gray-500 rounded-md w-8 font-medium text-xs text-center py-1",
+                      "text-gray-500 rounded-sm w-8 font-medium text-xs text-center py-1",
                     row: "flex w-full mt-1",
                     cell: "text-center text-sm relative p-0 focus-within:relative focus-within:z-20",
-                    day: "h-8 w-8 p-0 font-normal hover:bg-blue-50 hover:text-blue-600 rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
+                    day: "h-8 w-8 p-0 font-normal hover:bg-blue-50 hover:text-blue-600 rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:ring-offset-2",
                     day_selected:
-                      "bg-blue-600 text-white hover:bg-blue-700 hover:text-white focus:bg-blue-700 focus:text-white shadow-md",
+                      "bg-[#2563EB] text-white hover:bg-[#1D4ED8] hover:text-white focus:bg-[#1D4ED8] focus:text-white shadow-sm",
                     day_today:
-                      "bg-orange-100 text-orange-700 font-medium border border-orange-200",
+                      "bg-blue-50 text-blue-700 font-semibold border border-blue-200",
                     day_outside: "text-gray-300",
                     day_disabled:
                       "text-gray-300 cursor-not-allowed hover:bg-transparent",
                     day_range_middle:
-                      "aria-selected:bg-blue-100 aria-selected:text-blue-700 hover:bg-blue-100 hover:text-blue-700",
+                      "aria-selected:bg-[#DBEAFE] aria-selected:text-[#2563EB] hover:bg-[#BFDBFE] hover:text-[#1D4ED8]",
                     day_range_start: "rounded-l-md rounded-r-none",
                     day_range_end: "rounded-r-md rounded-l-none",
                     day_hidden: "invisible",
@@ -358,23 +359,23 @@ export function DateRangePicker({
                 />
               </div>
 
-              {/* Compact Action Buttons */}
+              {/* Action Buttons */}
               {tempDate && (
-                <div className="flex justify-end gap-2 mt-3 pt-2">
+                <div className="flex justify-end gap-2 mt-3 pt-2.5 border-t border-slate-100">
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={handleCancel}
-                    className="h-7 px-3 text-xs"
+                    className="h-8 px-3.5 text-xs rounded-sm font-medium border-slate-200 hover:bg-slate-100 text-slate-700 transition-colors"
                   >
                     Cancel
                   </Button>
                   <Button
                     size="sm"
                     onClick={handleApply}
-                    className="h-7 px-3 text-xs bg-blue-600 hover:bg-blue-700"
+                    className="h-8 px-4 text-xs rounded-sm font-semibold bg-gradient-to-r from-[#FF6B4A] to-[#F48220] text-white shadow-md shadow-orange-500/25 hover:from-[#E65A38] hover:to-[#D9532F] transition-all"
                   >
-                    Apply
+                    Apply Range
                   </Button>
                 </div>
               )}

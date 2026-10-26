@@ -1,38 +1,36 @@
 "use client";
-import React,{useState} from "react";
+import React, { useState } from "react";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Eye, SquarePen, Trash2 } from "lucide-react";
+import { Eye, SquarePen, Trash2, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { ColumnDef } from "@tanstack/react-table";
-import { deleteAPi } from "@/app/(protected)/services/apiManagement/api";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { deleteUser } from "@/app/(protected)/services/adminUsers/api";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-
+import { cn } from "@/lib/utils";
 
 export interface Categorys {
   id: string;
   title: string; 
   active: boolean; 
-  name:string;
-  ipAddress:string;
-  action:string;
-  createdAt:Date;
+  name: string;
+  ipAddress: string;
+  action: string;
+  createdAt: Date;
   username: string; 
   email: string;
-  thumbnail:string;
+  thumbnail: string;
   role: string;
-  permissions:[]
-  token?:string;
+  permissions: [];
+  token?: string;
 }
-
 
 interface ColumnsCategoryProps {
   fetchData: () => void;
@@ -43,7 +41,6 @@ interface ColumnsCategoryProps {
   permissionList: string[];
   setPermissionList: (val: string[]) => void;
   token: string;
-  
 }
 
 export const columnsCategory = ({
@@ -55,9 +52,7 @@ export const columnsCategory = ({
   permissionList,
   setPermissionList,
   token
-  
 }: ColumnsCategoryProps): ColumnDef<Categorys>[] => [
-  
   {
     id: "select",
     header: ({ table }) => (
@@ -69,15 +64,17 @@ export const columnsCategory = ({
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
+          className="rounded border-slate-300 data-[state=checked]:bg-[#FF6B4A] data-[state=checked]:border-[#FF6B4A] transition-colors"
         />
       </div>
     ),
     cell: ({ row }) => (
-      <div className="flex items-center gap-2 xl:w-16">
+      <div className="flex items-center gap-2">
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
+          className="rounded border-slate-300 data-[state=checked]:bg-[#FF6B4A] data-[state=checked]:border-[#FF6B4A] transition-colors"
         />
       </div>
     ),
@@ -87,42 +84,60 @@ export const columnsCategory = ({
   {
     id: "serialNumber",
     header: "ID",
-    cell: ({ row }) => <span>{row.index + 1}</span>,
+    cell: ({ row }) => (
+      <span className="font-normal text-slate-500 font-mono text-xs whitespace-nowrap">
+        #{row.index + 1}
+      </span>
+    ),
     enableSorting: false,
   },
   {
-    accessorKey: "name", // Ensure this matches the key in your data
+    accessorKey: "name",
     header: "Name",
     cell: ({ row }) => (
-      <div className="flex gap-3 items-center">
-        <span className="text-sm">{row.original.name}</span>
-      </div>
+      <span className="text-xs font-normal text-slate-800 whitespace-nowrap">
+        {row.original.name || "—"}
+      </span>
     ),
   },
   {
-    accessorKey: "email", // Ensure this matches the key in your data
+    accessorKey: "email",
     header: "Email",
     cell: ({ row }) => (
-      <div className="flex gap-3 items-center">
-        <span className="text-sm">{row.original.email}</span>
-      </div>
+      <span className="text-xs font-normal text-slate-600 font-mono whitespace-nowrap">
+        {row.original.email || "—"}
+      </span>
     ),
   },
   {
-    accessorKey: "role", // Ensure this matches the key in your data
+    accessorKey: "role",
     header: "Role",
-    cell: ({ row }) => (
-      <div className="flex gap-3 items-center">
-        <span className="text-sm">{row.original.role}</span>
-      </div>
-    ),
+    cell: ({ row }) => {
+      const role = row.original.role || "User";
+      const roleColor =
+        role === "Super Admin"
+          ? "bg-purple-50 text-purple-700 border-purple-200/70"
+          : role === "Editor"
+          ? "bg-[#FFF1ED] text-[#EA580C] border-[#FFD7CC]"
+          : "bg-slate-100 text-slate-700 border-slate-200/70";
+
+      return (
+        <span
+          className={cn(
+            "text-[11px] font-medium px-2 py-0.5 rounded-md border whitespace-nowrap inline-block",
+            roleColor
+          )}
+        >
+          {role}
+        </span>
+      );
+    },
   },
   {
     accessorKey: "permissions",
     header: "Permissions",
     cell: ({ row }) => {
       const permissions = row.original.permissions || [];
-      
 
       const handleOpenModal = () => {
         setPermissionList(permissions);
@@ -130,49 +145,61 @@ export const columnsCategory = ({
       };
 
       return (
-        <div className="flex gap-3 items-center">
-          <TooltipProvider>
+        <div className="flex items-center">
+          <TooltipProvider delayDuration={150}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="w-7 h-7 ring-offset-transparent border-default-200 dark:border-default-300 text-default-400"
+                <button
+                  type="button"
+                  className="w-8 h-8 rounded-lg text-slate-400 hover:text-[#EA580C] hover:bg-[#FFF1ED] border border-transparent hover:border-orange-200 flex items-center justify-center transition-colors cursor-pointer"
                   onClick={handleOpenModal}
+                  title="View permissions"
                 >
-                  <Eye className="w-4 h-4" />
-                </Button>
+                  <Eye className="w-3.5 h-3.5" />
+                </button>
               </TooltipTrigger>
               <TooltipContent side="top">
-                <p>View</p>
+                <p>View Permissions ({permissions.length})</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
 
           {/* Modal */}
           <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent>
+            <DialogContent className="max-w-md p-5 rounded-lg">
               <DialogHeader>
-                <DialogTitle>User Permissions</DialogTitle>
+                <div className="flex items-center gap-2">
+                  <DialogTitle className="text-base font-semibold text-slate-900">
+                    User Permissions
+                  </DialogTitle>
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-[#FFF1ED] text-[#EA580C] border border-[#FFD7CC]">
+                    {permissionList.length} assigned
+                  </span>
+                </div>
               </DialogHeader>
-              <ul className="list-disc pl-5 space-y-1 max-h-60 overflow-y-auto">
+              <div className="mt-3 max-h-72 overflow-y-auto space-y-1.5 pr-1">
                 {permissionList.length > 0 ? (
                   permissionList.map((perm, index) => (
-                    <li key={index} className="text-sm text-gray-700">
-                      {perm}
-                    </li>
+                    <div
+                      key={index}
+                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-slate-50 border border-slate-100 text-xs text-slate-700 font-mono"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span>{perm}</span>
+                    </div>
                   ))
                 ) : (
-                  <p className="text-sm text-gray-500">No permissions assigned.</p>
+                  <p className="text-xs text-slate-400 py-3 text-center">
+                    No permissions assigned.
+                  </p>
                 )}
-              </ul>
+              </div>
             </DialogContent>
           </Dialog>
         </div>
       );
     },
   },
-
   {
     id: "actions",
     header: "Action",
@@ -180,7 +207,7 @@ export const columnsCategory = ({
     cell: ({ row }) => {
       const handleDelete = async (id: string, adminId: string) => {
         try {
-          const result = await deleteUser(id, adminId,token);
+          const result = await deleteUser(id, adminId, token);
           if (result.success) {
             toast.success("User data deleted");
             fetchData();
@@ -193,56 +220,53 @@ export const columnsCategory = ({
         }
       };
 
+      if (row.original.role === "Super Admin") {
+        return <span className="text-xs text-slate-400 font-mono">—</span>;
+      }
+
       return (
-        <>
-          {row.original.role != "Super Admin" ? (
-            <div className="flex items-center gap-2">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="w-7 h-7 border-default-200 dark:border-default-300 text-default-400"
-                      onClick={() =>
-                        router.push(
-                          `/Admin/admin-section/user-management?id=${row.original.id}`
-                        )
-                      }
-                    >
-                      <SquarePen className="w-3 h-3" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">
-                    <p>Edit</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="w-7 h-7 border-default-200 dark:border-default-300 text-default-400"
-                      onClick={() => handleDelete(row.original.id, adminId)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent
-                    side="top"
-                    className="bg-destructive text-destructive-foreground"
-                  >
-                    <p>Delete</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-          ) : (
-            <></>
-          )}
-        </>
+        <div className="flex items-center gap-1">
+          <TooltipProvider delayDuration={150}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  className="w-8 h-8 rounded-lg text-slate-400 hover:text-[#EA580C] hover:bg-[#FFF1ED] border border-transparent hover:border-orange-200 flex items-center justify-center transition-colors cursor-pointer"
+                  onClick={() =>
+                    router.push(
+                      `/Admin/admin-section/user-management?id=${row.original.id}`
+                    )
+                  }
+                >
+                  <SquarePen className="w-3.5 h-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                <p>Edit User</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider delayDuration={150}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  className="w-8 h-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 flex items-center justify-center transition-colors cursor-pointer"
+                  onClick={() => handleDelete(row.original.id, adminId)}
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent
+                side="top"
+                className="bg-rose-600 text-white border-rose-700"
+              >
+                <p>Delete User</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       );
     },
   },

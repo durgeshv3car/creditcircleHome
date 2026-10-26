@@ -4,13 +4,12 @@ import React, { useState, useEffect } from "react";
 import { notFound } from "next/navigation";
 import { useRouter } from "@/i18n/routing";
 import dynamic from "next/dynamic";
-import { Loader2 } from "lucide-react";
 import { columnsCategory } from "./columnsCategory";
 import type { Categorys } from "./columnsCategory";
 import type { ColumnDef } from "@tanstack/react-table";
 import { fetchSms } from "@/app/(protected)/services/smsTemplate/api";
+import Loader from "@/components/loader";
 
-// Dynamic imports
 const ExampleTwo = dynamic(() => import("../../../templateTable"), {
   ssr: false,
 });
@@ -24,8 +23,6 @@ function Category({
   role: string;
   permissions: any;
 }) {
- 
-
   const router = useRouter();
   const [data, setData] = useState<Categorys[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -36,9 +33,16 @@ function Category({
   const fetchData = async () => {
     try {
       const result = await fetchSms();
-      setData(result);
+      setData(
+        Array.isArray(result)
+          ? result
+          : Array.isArray(result?.data)
+          ? result.data
+          : []
+      );
     } catch (error) {
       console.error("Error fetching data:", error);
+      setData([]);
     } finally {
       setLoading(false);
     }
@@ -48,26 +52,26 @@ function Category({
     fetchData();
   }, [refresh]);
 
-  if (loading)
-    return <Loader2 className="me-2 h-4 w-4 animate-spin" />;
+  if (loading) return <Loader className="min-h-[50vh] h-auto" />;
 
   return (
-    <>
-      <div className="space-y-6">
-        <ExampleTwo
-          tableHeading="sms List"
-          tableData={data}
-          tableColumns={columnsCategory({
+    <div className="space-y-6">
+      <ExampleTwo
+        tableHeading="SMS Templates"
+        tableData={data}
+        tableColumns={
+          columnsCategory({
             fetchData,
             router,
-          }) as ColumnDef<Categorys>[]} 
-          setRefresh={setRefresh}
-          type={type}
-          role={role}
-          permissions={permissions}
-        />
-      </div>
-    </>
+          }) as ColumnDef<Categorys>[]
+        }
+        setRefresh={setRefresh}
+        type={type}
+        role={role}
+        permissions={permissions}
+        isLoading={loading}
+      />
+    </div>
   );
 }
 

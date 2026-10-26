@@ -8,13 +8,14 @@ import { useRouter } from "next/navigation";
 
 import { columnsRefer } from "./columnsRefer";
 import { fetchReferImages } from "@/app/(protected)/services/refer-earns/api";
+import Loader from "@/components/loader";
+
 interface LogoData {
   id: string;
   title: string;
   thumbnail: string | { web?: string; mobile?: string };
   companyUrl: string;
   active: boolean;
-  
 }
 
 function Users() {
@@ -35,39 +36,45 @@ function Users() {
   const fetchData = async () => {
     try {
       const result = await fetchReferImages(type);
-
-      setData(result);
+      setData(
+        Array.isArray(result)
+          ? result
+          : Array.isArray(result?.data)
+          ? result.data
+          : []
+      );
     } catch (error) {
       console.error("Error fetching data:", error);
+      setData([]);
     } finally {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchData();
   }, [refresh]);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <Loader className="min-h-[50vh] h-auto" />;
+
   return (
-    <>
-      <div className="space-y-6">
-        <ExampleTwo<LogoData>
-          tableHeading="Refer List"
-          tableData={data}
-          tableColumns={columnsRefer({
-            fetchData,
-            router,
-            setSelectedDate,
-            selectedDate,
-            open,
-            setOpen
-          }
-          )}
-          setRefresh={setRefresh}
-          type={type}
-        />
-      </div>
-    </>
+    <div className="space-y-6">
+      <ExampleTwo<LogoData>
+        tableHeading="Refer & Earns"
+        tableData={data}
+        tableColumns={columnsRefer({
+          fetchData,
+          router,
+          setSelectedDate,
+          selectedDate,
+          open,
+          setOpen,
+        })}
+        setRefresh={setRefresh}
+        type={type}
+        isLoading={loading}
+      />
+    </div>
   );
 }
 

@@ -6,24 +6,25 @@ import { color, shadow, rounded } from "@/lib/type"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center px-4 md:px-6 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-300 hover:ring-2 hover:ring-offset-2 ring-offset-background transition-all focus-visible:outline-none focus-visible:hidden focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+  "inline-flex items-center justify-center px-4 md:px-5 whitespace-nowrap rounded-sm text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B4A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
       color: {
-        default: "bg-default text-default-foreground hover:bg-default/90 hover:ring-default dark:disabled:bg-default-500",
-        primary: "bg-primary text-primary-foreground hover:bg-primary/90  hover:ring-primary",
-        secondary: "bg-secondary text-secondary-foreground  hover:ring-secondary",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 hover:ring-destructive",
-        warning: "bg-warning text-warning-foreground hover:bg-warning/90 hover:ring-warning",
-        info: "bg-info text-info-foreground hover:bg-info/90 hover:ring-info",
-        success: "bg-success text-success-foreground hover:bg-success/90 hover:ring-success",
+        default: "bg-[#0B1740] text-white hover:bg-[#15235A] shadow-sm",
+        primary: "bg-gradient-to-r from-[#FF6B4A] to-[#F48220] text-white hover:from-[#E65A38] hover:to-[#D9532F] shadow-md shadow-orange-500/25",
+        secondary: "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm shadow-red-500/20",
+        warning: "bg-warning text-warning-foreground hover:bg-warning/90 shadow-sm",
+        info: "bg-info text-info-foreground hover:bg-info/90 shadow-sm shadow-blue-500/20",
+        success: "bg-success text-success-foreground hover:bg-success/90 shadow-sm shadow-emerald-500/20",
       },
       variant: {
         default: "",
-        outline: "border  border-default text-default bg-transparent hover:bg-default hover:text-default-foreground hover:ring-0 hover:ring-transparent",
-        soft: "text-default bg-default/10 hover:bg-default  hover:text-default-foreground",
-        ghost: "text-default bg-transparent hover:bg-default  hover:text-default-foreground hover:ring-0 hover:ring-transparent hover:ring-offset-0",
-        shadow: "shadow-md"
+        outline: "border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 shadow-sm",
+        soft: "text-primary bg-primary/10 hover:bg-primary/20",
+        ghost: "text-slate-700 bg-transparent hover:bg-slate-100 hover:text-slate-900",
+        shadow: "shadow-md",
+        sidebar: "bg-transparent text-slate-300 hover:bg-white/[0.08] hover:text-white"
       },
       shadow: {
         sm: "shadow",

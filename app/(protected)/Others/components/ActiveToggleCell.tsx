@@ -3,35 +3,64 @@
 import React from "react";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { toggleServiceStatus } from "@/app/(protected)/services/ourServices/api"; 
+import { toggleServiceStatus } from "@/app/(protected)/services/ourServices/api";
+import { cn } from "@/lib/utils";
 
-const ActiveToggleCell = ({ row,type }: { row: any; type: string }) => {
-  const activeData = row?.original?.active ;
-  const id= row?.original?.id  ;
+const ActiveToggleCell = ({ row, type }: { row: any; type: string }) => {
+  const activeData = row?.original?.active;
+  const id = row?.original?.id;
   const [isActive, setIsActive] = React.useState(activeData);
+  const [isUpdating, setIsUpdating] = React.useState(false);
 
   const handleToggle = async (value: boolean) => {
-    const previousState = isActive; 
-    setIsActive(value); 
+    if (isUpdating) return;
+    const previousState = isActive;
+    setIsActive(value);
+    setIsUpdating(true);
 
     try {
       const result = await toggleServiceStatus(id, type, value);
       if (result.success) {
-        toast.success(`${type} ${value ? "activated" : "deactivated"} successfully`);
+        toast.success(
+          `${type} ${value ? "activated" : "deactivated"} successfully`
+        );
       } else {
-        setIsActive(previousState); 
+        setIsActive(previousState);
         toast.error("Failed to update status");
       }
     } catch (error) {
-      setIsActive(previousState); 
+      setIsActive(previousState);
       console.error("Error updating isActive:", error);
       toast.error("Failed to update status");
+    } finally {
+      setIsUpdating(false);
     }
   };
 
   return (
-    <div className="flex gap-3 items-center">
-      <Switch checked={isActive} onCheckedChange={handleToggle} />
+    <div className="flex items-center gap-2">
+      <Switch
+        checked={isActive}
+        onCheckedChange={handleToggle}
+        disabled={isUpdating}
+        className="data-[state=checked]:bg-[#101E4E] data-[state=unchecked]:bg-slate-200 focus-visible:ring-[#101E4E] cursor-pointer"
+      />
+      <span
+        className={cn(
+          "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide transition-all select-none border",
+          isActive
+            ? "bg-[#101E4E]/10 text-[#101E4E] border-[#101E4E]/25 shadow-2xs"
+            : "bg-slate-50 text-slate-500 border-slate-200/80"
+        )}
+      >
+        <span
+          className={cn(
+            "w-1.5 h-1.5 rounded-full shrink-0",
+            isActive ? "bg-[#101E4E]" : "bg-slate-400"
+          )}
+        />
+        {isActive ? "Active" : "Inactive"}
+      </span>
     </div>
   );
 };

@@ -125,24 +125,29 @@ const MenuItem = ({ href, label, icon, active, id, collapsed }: MenuItemProps) =
     return (
         <Button
             onClick={() => setMobileMenuConfig({ ...mobileMenuConfig, isOpen: false })}
-            variant={active ? "default" : "ghost"}
+            variant="sidebar"
             fullWidth
-            color={active ? "default" : "secondary"}
-            className={cn('', {
-                'justify-start text-sm font-medium capitalize h-auto py-3 md:px-3 px-3': !collapsed || hovered,
+            className={cn('group rounded-sm transition-all duration-200 ease-in-out', {
+                'justify-start text-sm font-medium capitalize h-auto py-2.5 md:px-3 px-3': !collapsed,
+                'justify-center p-0 h-10 w-10 mx-auto': collapsed,
+                'bg-gradient-to-r from-[#FF6B4A] to-[#F48220] text-white shadow-md shadow-orange-500/25 ring-1 ring-white/20 font-medium hover:!from-[#E65A38] hover:!to-[#D9532F] hover:!text-white': active,
+                'text-slate-300 hover:!text-white hover:!bg-white/[0.08] bg-transparent': !active,
                 'hover:ring-transparent hover:ring-offset-0': !active
             })}
             asChild
-            size={(collapsed && !hovered) ? "icon" : "default"}
+            size={collapsed ? "icon" : "default"}
         >
-            <Link href={href}>
-                <Icon icon={icon} className={cn('h-5 w-5 ', {
-                    'me-2': !collapsed || hovered
+            <Link href={href} className={cn("flex items-center", collapsed ? "justify-center" : "")}>
+                <Icon icon={icon} className={cn('h-5 w-5 transition-transform duration-200 ease-in-out group-hover:scale-105', {
+                    'me-2.5': !collapsed,
+                    'text-white': active,
+                    'text-slate-300 group-hover:text-white': !active,
                 })} />
-                {(!collapsed || hovered) && (
+                {!collapsed && (
                     <p
                         className={cn(
-                            "max-w-[200px] truncate",
+                            "max-w-[190px] truncate transition-colors duration-200",
+                            active ? "text-white font-medium" : "text-slate-300 group-hover:text-white"
                         )}
                     >
                         {label}

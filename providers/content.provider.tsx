@@ -10,7 +10,7 @@ const LayoutContentProvider = ({ children }: { children: React.ReactNode }) => {
         return (
             <main className={cn('flex-1 xl:ms-[300px]  ', {
                 'xl:ms-[72px]': config.subMenu || !config.hasSubMenu,
-                'bg-default-100 dark:bg-background': config.skin === 'default',
+                'bg-[#F6F8FC] dark:bg-background': config.skin === 'default',
                 'bg-transparent': config.skin === 'bordered',
                 'xl:ms-0': config.menuHidden || config.layout === "horizontal",
 
@@ -29,9 +29,9 @@ const LayoutContentProvider = ({ children }: { children: React.ReactNode }) => {
     return (
         <>
 
-            <main className={cn('flex-1 xl:ms-[248px]', {
+            <main className={cn('flex-1 xl:ms-[248px] transition-all duration-300 ease-in-out', {
                 'xl:ms-[72px]': config.collapsed,
-                'bg-default-100 dark:bg-background': config.skin === 'default',
+                'bg-[#F6F8FC] dark:bg-background': config.skin === 'default',
                 'bg-transparent': config.skin === 'bordered',
                 'xl:ms-0': config.menuHidden || config.layout === "horizontal",
                 'xl:ms-28': config.sidebar === 'compact',

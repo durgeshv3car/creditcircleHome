@@ -115,48 +115,71 @@ const OfferSelectionModal: React.FC<OfferSelectionModalProps> = ({ isOpen, onClo
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Select an Offer</DialogTitle>
+      <DialogContent className="max-w-md rounded-lg border border-slate-200 bg-white shadow-2xl p-6">
+        <DialogHeader className="pb-3 border-b border-slate-100">
+          <DialogTitle className="text-base font-bold text-slate-900">
+            Select an Offer
+          </DialogTitle>
         </DialogHeader>
 
         {/* ShadCN Combobox */}
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between">
-              {selectedOffer ? selectedOffer.title : "Select an Offer"}
-              <ChevronsUpDown className="opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-full p-0">
-            <Command>
-              <CommandInput placeholder="Search offer..." className="h-9" />
-              <CommandList>
-                <CommandEmpty>No offers found.</CommandEmpty>
-                <CommandGroup>
-                  {offers.map((offer) => (
-                    <CommandItem
-                      key={offer.id}
-                      value={offer.id}
-                      onSelect={() => handleSelectOffer(offer)}
-                    >
-                      {offer.title}
-                      <Check className={`ml-auto ${selectedOffer?.id === offer.id ? "opacity-100" : "opacity-0"}`} />
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
+        <div className="pt-2">
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={open}
+                className="w-full justify-between h-10 px-3 text-xs font-medium rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 cursor-pointer"
+              >
+                <span className="truncate">
+                  {selectedOffer ? selectedOffer.title : "Select an Offer..."}
+                </span>
+                <ChevronsUpDown className="w-3.5 h-3.5 opacity-50 shrink-0 ml-2" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 rounded-lg border border-slate-200 shadow-xl overflow-hidden">
+              <Command>
+                <CommandInput placeholder="Search offer..." className="h-9 text-xs" />
+                <CommandList className="max-h-60 overflow-y-auto p-1 clean-scrollbar">
+                  <CommandEmpty className="p-3 text-xs text-slate-400 text-center">
+                    No offers found.
+                  </CommandEmpty>
+                  <CommandGroup>
+                    {offers.map((offer) => (
+                      <CommandItem
+                        key={offer.id}
+                        value={offer.title}
+                        onSelect={() => {
+                          handleSelectOffer(offer);
+                          setOpen(false);
+                        }}
+                        className="text-xs rounded-md cursor-pointer py-1.5 px-2 flex items-center justify-between"
+                      >
+                        <span className="truncate">{offer.title}</span>
+                        <Check
+                          className={`w-3.5 h-3.5 text-[#FF6B4A] ml-auto ${
+                            selectedOffer?.id === offer.id
+                              ? "opacity-100"
+                              : "opacity-0"
+                          }`}
+                        />
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+        </div>
 
-        {/* Submit Button (Only active when an offer is selected) */}
+        {/* Submit Button */}
         <Button
-          className="mt-4 w-full"
+          className="mt-3 w-full h-10 rounded-md bg-[#FF6B4A] hover:bg-[#E65A38] text-white text-xs font-semibold shadow-sm transition-colors cursor-pointer"
           disabled={!selectedOffer || loading}
           onClick={handleSubmit}
         >
-          {loading ? "Submitting..." : "Submit Offer"}
+          {loading ? "Submitting..." : `Send ${type || "Offer"}`}
         </Button>
       </DialogContent>
     </Dialog>

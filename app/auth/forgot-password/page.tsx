@@ -1,72 +1,70 @@
-import { Link } from '@/i18n/routing';
+import { Link } from "@/i18n/routing";
 import ForgotPass from "@/components/partials/auth/forgot-pass";
-import Image from "next/image";
 import Copyright from "@/components/partials/auth/copyright";
-import Logo from "@/components/partials/auth/logo";
+import Image from "next/image";
 
 const ForgotPassPage = () => {
   return (
-    <div className="flex w-full items-center overflow-hidden min-h-dvh h-dvh basis-full">
-      <div className="overflow-y-auto flex flex-wrap w-full h-dvh">
-        <div
-          className="lg:block hidden flex-1 overflow-hidden text-[40px] leading-[48px] text-default-600 
- relative z-[1] bg-default-50"
-        >
-          <div className="max-w-[520px] pt-20 ps-20">
-            <Link href="/" className="mb-6 inline-block">
-              <Logo />
-            </Link>
-
-            <h4>
-              Unlock your Project{" "}
-              <span className="text-default-800  font-bold ms-2">
-                performance
-              </span>
-            </h4>
-          </div>
-          <div className="absolute left-0 bottom-[-130px] h-full w-full z-[-1]">
+    <div className="flex w-full min-h-screen h-screen overflow-hidden bg-white">
+      <div className="flex flex-col lg:flex-row w-full h-full overflow-y-auto">
+        {/* Left Side: Large Credit Circle Logo */}
+        <div className="lg:flex hidden flex-1 items-center justify-center p-8 xl:p-16 bg-[#F6F8FC] border-r border-slate-200">
+          <div className="w-full max-w-[360px] xl:max-w-[420px] flex items-center justify-center">
             <Image
-              width={300}
+              src="/images/logo/logo.svg"
+              alt="Credit Circle"
+              width={420}
               height={300}
-              src="/images/auth/ils1.svg"
-              alt=""
-              className="h-full w-full object-contain"
+              priority
+              className="w-full h-auto object-contain"
             />
           </div>
         </div>
-        <div className="flex-1 relative dark:bg-default-100 bg-white">
-          <div className=" h-full flex flex-col ">
-            <div className="max-w-[524px] mx-auto  w-full  md:px-[42px] md:py-[44px] p-7 text-2xl text-default-900  mb-3 flex flex-col justify-center h-full">
-              <div className="flex justify-center items-center text-center mb-6 lg:hidden ">
-                <Link href="/">
-                  <Logo />
-                </Link>
-              </div>
-              <div className="text-center 2xl:mb-10 mb-5">
-                <h4 className="font-medium mb-4">Forgot Your Password?</h4>
-                <div className="text-default-500  text-base">
-                  Reset Password with Dashcode.
-                </div>
-              </div>
-              <div className="font-normal text-base text-default-500  text-center px-2 bg-default-100 rounded py-3 mb-4 mt-10">
-                Enter your Email and instructions will be sent to you!
-              </div>
 
-              <ForgotPass />
-              <div className="md:max-w-[345px] mx-auto font-normal text-default-500  2xl:mt-12 mt-8 uppercase text-sm">
-                Forget It,
-                <Link
-                  href="/"
-                  className="text-default-900  font-medium hover:underline"
-                >
-                  Send me Back
-                </Link>
-                to The Sign In
-              </div>
+        {/* Right Side: Forgot Password Form */}
+        <div className="flex-1 flex flex-col justify-between p-6 sm:p-10 md:p-14 bg-white min-h-screen overflow-y-auto">
+          <div className="max-w-[400px] w-full mx-auto my-auto space-y-6">
+            {/* Mobile Logo for small screens */}
+            <div className="flex justify-center items-center text-center mb-4 lg:hidden">
+              <Link href="/">
+                <Image
+                  src="/images/logo/logo.svg"
+                  alt="Credit Circle"
+                  width={200}
+                  height={140}
+                  priority
+                  className="w-40 h-auto object-contain"
+                />
+              </Link>
             </div>
-            <div className="text-xs font-normal text-default-500  z-[999] pb-10 text-center">
-              <Copyright />
+
+            {/* Header */}
+            <div className="text-center space-y-1">
+              <h1 className="text-2xl font-semibold text-slate-800 tracking-tight">
+                Forgot password
+              </h1>
+              <p className="text-xs text-slate-500 font-normal">
+                Enter your email to receive password reset instructions
+              </p>
             </div>
+
+            {/* Form */}
+            <ForgotPass />
+
+            {/* Bottom Link */}
+            <div className="text-center text-xs tracking-wider uppercase text-slate-500 pt-2">
+              REMEMBER YOUR PASSWORD?{" "}
+              <Link
+                href="/auth/login"
+                className="font-bold text-slate-900 hover:underline"
+              >
+                SIGN IN
+              </Link>
+            </div>
+          </div>
+
+          <div className="text-xs text-slate-400 text-center pt-6">
+            <Copyright />
           </div>
         </div>
       </div>

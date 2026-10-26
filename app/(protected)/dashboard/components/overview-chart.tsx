@@ -72,27 +72,33 @@ const options: any = useMemo(
   () => ({
     chart: {
       toolbar: { show: false },
+      fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     },
     plotOptions: {
       radialBar: {
         dataLabels: {
-          name: { fontSize: "22px" },
+          name: {
+            fontSize: "18px",
+            fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+          },
           value: {
-            fontSize: "16px",
+            fontSize: "15px",
             fontWeight: 700,
+            fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
             color: mode === "light" ? colors["default-600"] : colors["default-300"],
             formatter: (val: number) => `${val}%`, 
           },
           total: {
             show: true,
             label: "Total",
+            fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
             color: mode === "light" ? colors["default-600"] : colors["default-300"],
             formatter: () => String(loanCount), 
           },
         },
       },
     },
-    colors: [colors.primary, colors.info],
+    colors: ["#4669FA", "#0CE7FA"],
     labels: labels,
     tooltip: {
       theme: mode === "dark" ? "dark" : "light",
@@ -122,16 +128,39 @@ const options: any = useMemo(
   }, [options, series]);
 
   return (
-
-    <Chart
-      key={`chart-${totalCount}-${applied}-${notApplied}-${mode}`} 
-      ref={chartRef}
-      options={options}
-      series={series}
-      type={chartType}
-      height={height}
-      width={"100%"}
-    />
+    <div className="flex flex-col items-center justify-between h-full w-full">
+      <div className="w-full flex items-center justify-center">
+        <Chart
+          key={`chart-${totalCount}-${applied}-${notApplied}-${mode}`} 
+          ref={chartRef}
+          options={options}
+          series={series}
+          type={chartType}
+          height={height}
+          width={"100%"}
+        />
+      </div>
+      <div className="w-full grid grid-cols-2 gap-3 pt-3 mt-auto border-t border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-2.5 p-2.5 rounded-sm bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#4669FA] shrink-0" />
+          <div className="min-w-0">
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">Applied</p>
+            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+              {applied} <span className="text-[11px] font-normal text-slate-400">({series[0]}%)</span>
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2.5 p-2.5 rounded-sm bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#0CE7FA] shrink-0" />
+          <div className="min-w-0">
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">Not Applied</p>
+            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+              {notApplied} <span className="text-[11px] font-normal text-slate-400">({series[1]}%)</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

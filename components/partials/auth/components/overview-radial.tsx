@@ -14,7 +14,7 @@ const OverviewRadialChart = ({
   height = 320,
   series = [67],
   chartType = "radialBar",
-  chartColor=["#2563eb"],
+  chartColor=["#FF6B4A"],
 }: OverviewRadialChartProps) => {
 
   const {theme:mode} = useTheme();

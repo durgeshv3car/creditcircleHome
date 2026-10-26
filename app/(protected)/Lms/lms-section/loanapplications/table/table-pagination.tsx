@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface TablePaginationProps {
   currentPage: number;                  
@@ -50,33 +51,36 @@ const TablePagination: React.FC<TablePaginationProps> = ({
   const pageNumbers = getPageNumbers();
 
   return (
-    <div className="flex items-center justify-end py-4 px-10">
-      <div className="flex items-center gap-2 flex-none">
+    <div className="flex items-center justify-end py-1">
+      <div className="flex items-center gap-1.5 flex-none">
         <Button
           variant="outline"
           size="icon"
           onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="w-8 h-8"
+          disabled={currentPage <= 1}
+          className="w-8 h-8 rounded-sm border border-slate-200/90 bg-white hover:bg-[#FFF1ED] hover:border-orange-300 text-slate-600 hover:text-[#EA580C] disabled:opacity-30 disabled:pointer-events-none shadow-2xs transition-all active:scale-95 cursor-pointer"
         >
           <ChevronLeft className="w-4 h-4" />
         </Button>
 
         {pageNumbers.map((page, idx) =>
           page === 'dots' ? (
-            <span key={idx} className="px-2 text-muted-foreground">
+            <span key={idx} className="px-1.5 text-slate-400 text-xs font-mono">
               ...
             </span>
           ) : (
-            <Button
+            <button
               key={`page-${page}`}
               onClick={() => onPageChange(page)}
-              size="icon"
-              className="w-8 h-8"
-              variant={currentPage === page ? 'default' : 'outline'}
+              className={cn(
+                "w-8 h-8 rounded-sm font-bold text-xs flex items-center justify-center transition-all duration-150 active:scale-95 cursor-pointer",
+                currentPage === page
+                  ? "bg-[#FF6B4A] text-white shadow-sm shadow-orange-500/25"
+                  : "bg-white text-slate-700 hover:text-[#EA580C] border border-slate-200/90 hover:border-orange-300 hover:bg-[#FFF1ED] shadow-2xs"
+              )}
             >
               {page}
-            </Button>
+            </button>
           )
         )}
 
@@ -84,8 +88,8 @@ const TablePagination: React.FC<TablePaginationProps> = ({
           variant="outline"
           size="icon"
           onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="w-8 h-8"
+          disabled={currentPage >= totalPages}
+          className="w-8 h-8 rounded-sm border border-slate-200/90 bg-white hover:bg-[#FFF1ED] hover:border-orange-300 text-slate-600 hover:text-[#EA580C] disabled:opacity-30 disabled:pointer-events-none shadow-2xs transition-all active:scale-95 cursor-pointer"
         >
           <ChevronRight className="w-4 h-4" />
         </Button>

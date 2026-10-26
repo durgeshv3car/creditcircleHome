@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { columnsSlider } from "./columnsSlider";
 import { fetchSliderImages } from "@/app/(protected)/services/sliders/api";
 import { SliderData } from "./columnsSlider";
+import Loader from "@/components/loader";
 
 function Users() {
   
@@ -37,7 +38,10 @@ function Users() {
     fetchData();
   }, [refresh]);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) {
+    return <Loader className="min-h-[50vh] h-auto" />;
+  }
+
   return (
     <>
       <div className="space-y-6">

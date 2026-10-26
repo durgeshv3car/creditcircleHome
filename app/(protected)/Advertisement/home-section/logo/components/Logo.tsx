@@ -9,6 +9,7 @@ import { useRouter } from "@/i18n/routing";
 
 import { columnsLogo } from "./columnsLogo";
 import { fetchLogoImages } from "@/app/(protected)/services/logos/api";
+import Loader from "@/components/loader";
 interface LogoData {
   id: string;
   title: string;
@@ -44,7 +45,7 @@ function Users() {
     fetchData();
   }, [refresh]);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <Loader className="min-h-[50vh] h-auto" />;
   return (
     <>
       <div className="space-y-6">

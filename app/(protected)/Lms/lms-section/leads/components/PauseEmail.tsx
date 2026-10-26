@@ -41,13 +41,19 @@ const PauseEmail = ({
   };
 
   return (
-    <Switch
-      checked={isActive}
-      onCheckedChange={handleToggle}
-      disabled={isUpdating}
-      aria-label={`Toggle Logo ${isActive ? "off" : "on"}`}
-    />
+    <div className="flex items-center justify-center">
+      <Switch
+        color="primary"
+        size="sm"
+        checked={isActive}
+        onCheckedChange={handleToggle}
+        disabled={isUpdating}
+        aria-label={`Toggle Email ${isActive ? "off" : "on"}`}
+        className="transition-all hover:scale-105"
+      />
+    </div>
   );
 };
 
 export default PauseEmail;
+

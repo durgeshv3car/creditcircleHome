@@ -1,6 +1,5 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import axios from "axios";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
@@ -20,14 +19,23 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
         try {
-          const response = await axios.post(`${API_BASE_URL}/auth/login`, {
-            email: credentials.email,
-            password: credentials.password,
-            expiresInMins: 1440,
+          const response = await fetch(`${API_BASE_URL}/auth/login`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: credentials.email,
+              password: credentials.password,
+              expiresInMins: 1440,
+            }),
           });
 
-          const data = response.data;
-        
+          if (!response.ok) {
+            throw new Error("Login failed. Please check your credentials.");
+          }
+
+          const data = await response.json();
 
           return {
             id: data.id,
@@ -37,7 +45,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             token: data.token,
           };
         } catch (error) {
-          console.error("Authorize Error:", error);
           throw new Error("Login failed. Please check your credentials.");
         }
       },
@@ -56,16 +63,22 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       return token;
     },
     async session({ session, token }: { session: any; token: any }) {
+      if (!token?.id || !token?.token) {
+        return session;
+      }
+
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-      
 
       try {
-       const res =await axios.get(`${API_BASE_URL}/auth/user/${token.id}`, {
+        const res = await fetch(`${API_BASE_URL}/auth/user/${token.id}`, {
           headers: {
             Authorization: `Bearer ${token.token}`,
           },
         });
-        
+
+        if (res.status === 401) {
+          return null;
+        }
 
         if (session.user) {
           session.user.id = token.id;
@@ -77,10 +90,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
         return session;
       } catch (error: any) {
-        if (error.response?.status === 401) {
-          return null;
-        }
-        console.error("Session Error:", error.message);
         return session;
       }
     },

@@ -12,6 +12,8 @@ const LoadingPlaceholder = ({ text = "Loading..." }) => (
   </div>
 );
 
+import Loader from "@/components/loader";
+
 const DashCodeSidebar = dynamic(() => import("@/components/partials/sidebar"));
 
 const LayoutProvider = dynamic(() => import("@/providers/layout.provider"), {
@@ -50,13 +52,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
         <DashCodeSidebar />
       </Suspense>
       <LayoutContentProvider>
-        <Suspense
-          fallback={
-            <div className="min-h-screen flex items-center justify-center">
-              <div className="animate-pulse">Loading content...</div>
-            </div>
-          }
-        >
+        <Suspense fallback={<Loader className="min-h-[75vh] h-full" />}>
           {children}
         </Suspense>
       </LayoutContentProvider>

@@ -6,41 +6,35 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { SquarePen, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { toast } from "sonner";
 import { ColumnDef } from "@tanstack/react-table";
-
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
-
 export interface Categorys {
-  id: string; // Ensure this matches the key in your data
-  title: string; // Ensure this matches the key in your data
-  active: boolean; // Add this field if it exists in your data
-  name:string;
-  ipAddress:string;
-  action:string;
-  createdAt:Date;
-  username: string; // Ensure this matches the key in your data
+  id: string;
+  title: string;
+  active: boolean;
+  name: string;
+  ipAddress: string;
+  action: string;
+  createdAt: Date;
+  username: string;
   email: string;
-  thumbnail:string;
+  thumbnail: string;
   role: string;
-  permissions:[]
+  permissions: [];
 }
+
 interface ColumnsCategoryProps {
   fetchData: () => void;
   router: AppRouterInstance;
-  token:string;
-
+  token: string;
 }
 
 export const columnsCategory = ({
   fetchData,
   router,
   token,
-
 }: ColumnsCategoryProps): ColumnDef<Categorys>[] => [
   {
     id: "select",
@@ -53,15 +47,17 @@ export const columnsCategory = ({
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
+          className="rounded border-slate-300 data-[state=checked]:bg-[#FF6B4A] data-[state=checked]:border-[#FF6B4A] transition-colors"
         />
       </div>
     ),
     cell: ({ row }) => (
-      <div className="flex items-center gap-2 xl:w-16">
+      <div className="flex items-center gap-2">
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
+          className="rounded border-slate-300 data-[state=checked]:bg-[#FF6B4A] data-[state=checked]:border-[#FF6B4A] transition-colors"
         />
       </div>
     ),
@@ -71,63 +67,63 @@ export const columnsCategory = ({
   {
     id: "serialNumber",
     header: "ID",
-    cell: ({ row }) => <span>{row.index + 1}</span>,
+    cell: ({ row }) => (
+      <span className="font-normal text-slate-500 font-mono text-xs whitespace-nowrap">
+        #{row.index + 1}
+      </span>
+    ),
     enableSorting: false,
   },
   {
-    accessorKey: "name", // Ensure this matches the key in your data
+    accessorKey: "name",
     header: "Name",
     cell: ({ row }) => (
-      <div className="flex gap-3 items-center">
-        <span className="text-sm">{row.original.name}</span>
-      </div>
+      <span className="text-xs font-normal text-slate-800 whitespace-nowrap">
+        {row.original.name || "—"}
+      </span>
     ),
   },
   {
-    accessorKey: "ip", // Ensure this matches the key in your data
-    header: "Ip",
+    accessorKey: "ip",
+    header: "IP Address",
     cell: ({ row }) => (
-      <div className="flex gap-3 items-center">
-        <span className="text-sm">{row.original.ipAddress}</span>
-      </div>
+      <span className="text-xs font-normal text-slate-600 font-mono whitespace-nowrap px-2 py-0.5 rounded bg-slate-50 border border-slate-200/60 inline-block">
+        {row.original.ipAddress || "—"}
+      </span>
     ),
   },
   {
-    accessorKey: "action", // Ensure this matches the key in your data
+    accessorKey: "action",
     header: "Action",
     cell: ({ row }) => (
-      <div className="flex gap-3 items-center">
-        <span className="text-sm">{row.original.action}</span>
-      </div>
+      <span className="text-xs font-normal text-slate-700 whitespace-nowrap">
+        {row.original.action || "—"}
+      </span>
     ),
   },
-{
-  accessorKey: "time",
-  header: "Time",
-  cell: ({ row }) => {
-    const utcDate = new Date(row.original.createdAt);
-    // const utcDate = new Date(utcDate.getTime() + 5.5 * 60 * 60 * 1000); // Convert to IST
+  {
+    accessorKey: "time",
+    header: "Timestamp",
+    cell: ({ row }) => {
+      if (!row.original.createdAt) {
+        return <span className="text-xs text-slate-400 font-mono">—</span>;
+      }
+      const utcDate = new Date(row.original.createdAt);
+      const day = String(utcDate.getDate()).padStart(2, "0");
+      const month = String(utcDate.getMonth() + 1).padStart(2, "0");
+      const year = utcDate.getFullYear();
 
-    const day = String(utcDate.getDate()).padStart(2, "0");
-    const month = String(utcDate.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
-    const year = utcDate.getFullYear();
+      const hours = String(utcDate.getHours()).padStart(2, "0");
+      const minutes = String(utcDate.getMinutes()).padStart(2, "0");
+      const seconds = String(utcDate.getSeconds()).padStart(2, "0");
 
-    const hours = String(utcDate.getHours()).padStart(2, "0");
-    const minutes = String(utcDate.getMinutes()).padStart(2, "0");
-    const seconds = String(utcDate.getSeconds()).padStart(2, "0");
+      const formatted = `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
 
-    const formatted = `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
-
-    return (
-      <div className="flex gap-3 items-center">
-        <span className="text-sm">{formatted}</span>
-      </div>
-    );
+      return (
+        <span className="text-xs font-normal text-slate-500 font-mono whitespace-nowrap">
+          {formatted}
+        </span>
+      );
+    },
   },
-}
-
-  
-
-
-
 ];

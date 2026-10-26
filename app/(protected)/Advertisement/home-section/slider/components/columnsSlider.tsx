@@ -14,7 +14,7 @@ import {
 } from '@tanstack/react-table';
 
 
-import { SquarePen, Trash2, CalendarClock } from "lucide-react";
+import { SquarePen, Trash2, CalendarClock, ExternalLink } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -23,7 +23,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import { Switch } from "@/components/ui/switch";
 import { Calendar } from "@/components/ui/calendar";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger,DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { deleteSliderImage, scheduleExpireSliderImage } from "@/app/(protected)/services/sliders/api";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
@@ -42,11 +42,20 @@ interface ColumnsSliderProps {
   selectedDate?: Date;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setOfferId: React.Dispatch<React.SetStateAction<string>>,
-    offerId: string
+  setOfferId: React.Dispatch<React.SetStateAction<string>>;
+  offerId: string;
 }
 
-export const columnsSlider = ({fetchData,router,setSelectedDate,selectedDate,open,setOpen,setOfferId,offerId}: ColumnsSliderProps): ColumnDef<SliderData>[] => [
+export const columnsSlider = ({
+  fetchData,
+  router,
+  setSelectedDate,
+  selectedDate,
+  open,
+  setOpen,
+  setOfferId,
+  offerId,
+}: ColumnsSliderProps): ColumnDef<SliderData>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -58,116 +67,157 @@ export const columnsSlider = ({fetchData,router,setSelectedDate,selectedDate,ope
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
+          className="rounded border-slate-300 data-[state=checked]:bg-[#FF6B4A] data-[state=checked]:border-[#FF6B4A] transition-colors"
         />
       </div>
     ),
     cell: ({ row }) => (
-      <div className="flex items-center gap-2 xl:w-16">
-       
+      <div className="flex items-center gap-2">
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
+          className="rounded border-slate-300 data-[state=checked]:bg-[#FF6B4A] data-[state=checked]:border-[#FF6B4A] transition-colors"
         />
       </div>
     ),
     enableSorting: false,
     enableHiding: false,
   },
-  
   {
     id: "serialNumber",
     header: "ID",
-    cell: ({ row }) => <span>{row.index + 1}</span>,
+    cell: ({ row }) => (
+      <span className="font-normal text-slate-500 font-mono text-xs whitespace-nowrap">
+        #{row.index + 1}
+      </span>
+    ),
     enableSorting: false,
   },
   {
     accessorKey: "title",
-    header: "Title",
+    header: "TITLE",
     cell: ({ row }) => (
-      <div className="flex gap-3 items-center">
-        <span className="text-sm">{row.original.title}</span>
-      </div>
+      <span className="text-xs font-normal text-slate-800 whitespace-nowrap">
+        {row.original.title || "Untitled"}
+      </span>
     ),
   },
- 
-  
   {
     accessorKey: "thumbnail.web",
-    header: "Web",
+    header: "WEB",
     cell: ({ row }) => {
       const thumbnailData = row.original.thumbnail;
-  
-      // Ensure thumbnailData is an object
-      const imageUrls = thumbnailData && typeof thumbnailData === "string" ? JSON.parse(thumbnailData) : thumbnailData;
-  
+      let imageUrls: any = thumbnailData;
+      if (thumbnailData && typeof thumbnailData === "string") {
+        try {
+          imageUrls = JSON.parse(thumbnailData);
+        } catch {
+          imageUrls = { web: thumbnailData };
+        }
+      }
+
       return (
-        <div className="flex gap-3 items-center">
-          <Avatar className="w-8 h-8 rounded-none bg-transparent shadow-none border-none">
-            {imageUrls?.web ? ( // ✅ FIXED: Changed from webUrl to web
-              <AvatarImage src={imageUrls.web} className="rounded-none" />
-            ) : (
-              <AvatarFallback className="rounded-none">NA</AvatarFallback>
-            )}
-          </Avatar>
+        <div className="flex items-center">
+          {imageUrls?.web ? (
+            <a
+              href={imageUrls.web}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group block overflow-hidden rounded-md border border-slate-200 bg-slate-100 shadow-2xs hover:shadow-xs transition-all"
+              title="Click to view full web creative"
+            >
+              <img
+                src={imageUrls.web}
+                alt="Web banner"
+                className="w-14 h-8 object-cover group-hover:scale-105 transition-transform duration-200"
+              />
+            </a>
+          ) : (
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono text-slate-400 bg-slate-50 border border-slate-200/60 select-none">
+              None
+            </span>
+          )}
         </div>
       );
     },
   },
   {
     accessorKey: "thumbnail.mobile",
-    header: "Mobile",
+    header: "MOBILE",
     cell: ({ row }) => {
       const thumbnailData = row.original.thumbnail;
-  
-      // Ensure thumbnailData is an object
-      const imageUrls = thumbnailData && typeof thumbnailData === "string" ? JSON.parse(thumbnailData) : thumbnailData;
-  
+      let imageUrls: any = thumbnailData;
+      if (thumbnailData && typeof thumbnailData === "string") {
+        try {
+          imageUrls = JSON.parse(thumbnailData);
+        } catch {
+          imageUrls = { mobile: thumbnailData };
+        }
+      }
+
       return (
-        <div className="flex gap-3 items-center">
-          <Avatar className="w-8 h-8 rounded-none bg-transparent shadow-none border-none">
-            {imageUrls?.mobile ? (
-              <AvatarImage src={imageUrls.mobile} className="rounded-none" />
-            ) : (
-              <AvatarFallback className="rounded-none">NA</AvatarFallback>
-            )}
-          </Avatar>
+        <div className="flex items-center">
+          {imageUrls?.mobile ? (
+            <a
+              href={imageUrls.mobile}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group block overflow-hidden rounded-md border border-slate-200 bg-slate-100 shadow-2xs hover:shadow-xs transition-all"
+              title="Click to view full mobile creative"
+            >
+              <img
+                src={imageUrls.mobile}
+                alt="Mobile banner"
+                className="w-14 h-8 object-cover group-hover:scale-105 transition-transform duration-200"
+              />
+            </a>
+          ) : (
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono text-slate-400 bg-slate-50 border border-slate-200/60 select-none">
+              None
+            </span>
+          )}
         </div>
       );
     },
   },
   {
     accessorKey: "companyUrl",
-    header: "Company URL",
-    cell: ({ row }) => (
-      <div className="flex gap-3 items-center">
-        <a
-          href={row.original.companyUrl} 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          className="text-sm text-blue-500 hover:underline cursor-pointer"
-        >
-          {row.original.companyUrl}
-        </a>
-      </div>
-    ),
+    header: "COMPANY URL",
+    cell: ({ row }) => {
+      const url = row.original.companyUrl;
+      return (
+        <div className="flex items-center">
+          {url ? (
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-700 font-mono font-normal hover:underline max-w-[240px] truncate group"
+              title={url}
+            >
+              <ExternalLink className="w-3.5 h-3.5 text-blue-400 group-hover:text-blue-600 shrink-0" />
+              <span className="truncate">{url}</span>
+            </a>
+          ) : (
+            <span className="text-xs text-slate-400 font-mono">—</span>
+          )}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "active",
-    header: "isActive",
+    header: "IS ACTIVE",
     cell: ({ row }) => <ActiveToggleCell row={row} refreshData={fetchData} />,
   },
-  
   {
     id: "actions",
-    header: "Action",
+    header: "ACTION",
     enableHiding: false,
     cell: ({ row }) => {
-     
-    
       const handleDelete = async (id: string) => {
         const result = await deleteSliderImage(id);
-      
         if (result.success) {
           fetchData();
           toast.success("Slider data deleted");
@@ -177,44 +227,44 @@ export const columnsSlider = ({fetchData,router,setSelectedDate,selectedDate,ope
       };
 
       return (
-        <div className="flex items-center gap-2">
- 
-          <TooltipProvider>
+        <div className="flex items-center gap-1">
+          <TooltipProvider delayDuration={150}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="w-7 h-7 border-default-200 dark:border-default-300 text-default-400"
+                <button
+                  type="button"
+                  className="w-8 h-8 rounded-lg text-slate-400 hover:text-[#EA580C] hover:bg-[#FFF1ED] border border-transparent hover:border-orange-200 flex items-center justify-center transition-colors cursor-pointer"
                   onClick={() =>
-                    router.push(`/Advertisement/home-section/slider?id=${row.original.id}`)
+                    router.push(
+                      `/Advertisement/home-section/slider?id=${row.original.id}`
+                    )
                   }
                 >
-                  <SquarePen className="w-3 h-3" />
-                </Button>
+                  <SquarePen className="w-3.5 h-3.5" />
+                </button>
               </TooltipTrigger>
               <TooltipContent side="top">
-                <p>Edit</p>
+                <p>Edit Slider</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <TooltipProvider>
+
+          <TooltipProvider delayDuration={150}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="w-7 h-7 border-default-200 dark:border-default-300 text-default-400"
+                <button
+                  type="button"
+                  className="w-8 h-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 flex items-center justify-center transition-colors cursor-pointer"
                   onClick={() => handleDelete(row.original.id)}
                 >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
               </TooltipTrigger>
               <TooltipContent
                 side="top"
-                className="bg-destructive text-destructive-foreground"
+                className="bg-rose-600 text-white border-rose-700"
               >
-                <p>Delete</p>
+                <p>Delete Slider</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -222,85 +272,92 @@ export const columnsSlider = ({fetchData,router,setSelectedDate,selectedDate,ope
       );
     },
   },
-   {
+  {
     id: "schedulExpire",
-    header: "schedulExpire",
+    header: "SCHEDULE EXPIRE",
     enableHiding: false,
     cell: ({ row }) => {
       const handleDateSelect = (date: Date | undefined) => {
         setSelectedDate(date);
-        console.log("Selected Deletion Date:", date);
       };
-      
+
       const handleScheduleDelete = async () => {
         if (!selectedDate) {
-          console.log("❌ No date selected");
+          toast.error("No date selected");
           return;
         }
-        console.log(offerId, "expireid set");
 
         const result = await scheduleExpireSliderImage(offerId, selectedDate);
-
         if (result.success) {
+          toast.success("Schedule expire set");
           fetchData();
           setOpen(false);
+        } else {
+          toast.error("Failed to schedule expire");
         }
       };
 
-      const handleChange = (id: string) => {
-        setOpen(true);
-        setOfferId(id)
-      };
+      const isCurrentOpen = open && offerId === row.original.id;
 
       return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Dialog
-            open={open}
-            onOpenChange={() => handleChange(row.original.id)}
+            open={isCurrentOpen}
+            onOpenChange={(isOpen) => {
+              if (isOpen) {
+                setOfferId(row.original.id);
+                setOpen(true);
+              } else {
+                setOpen(false);
+              }
+            }}
           >
-            <TooltipProvider>
+            <TooltipProvider delayDuration={150}>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <DialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="w-7 h-7 border-default-200 dark:border-default-300 text-default-400"
-                      onClick={() => setOpen(true)}
+                    <button
+                      type="button"
+                      className="w-8 h-8 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 border border-transparent hover:border-amber-100 flex items-center justify-center transition-colors cursor-pointer"
+                      onClick={() => {
+                        setOfferId(row.original.id);
+                        setOpen(true);
+                      }}
                     >
-                      <CalendarClock className="w-3 h-3" />
-                    </Button>
+                      <CalendarClock className="w-3.5 h-3.5" />
+                    </button>
                   </DialogTrigger>
                 </TooltipTrigger>
                 <TooltipContent side="top">
-                  <p>Auto Delete Calendar</p>
+                  <p>Auto Expire Schedule</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
 
             {/* Calendar Dialog */}
             <DialogContent
-              className="p-4"
+              className="max-w-sm p-6 rounded-lg border border-slate-200 bg-white shadow-xl"
               onOpenAutoFocus={(e) => {
                 e.preventDefault();
                 document.getElementById("schedule-delete-btn")?.focus();
               }}
             >
-              <DialogTitle className="text-lg font-semibold">
+              <DialogTitle className="text-base font-bold text-slate-900">
                 Select Expire Date
               </DialogTitle>
-              <DialogDescription>
+              <DialogDescription className="text-xs text-slate-500 mt-1">
                 Pick a date from the calendar below to automatically expire this
-                offer.
+                slider banner.
               </DialogDescription>
               <Calendar
                 mode="single"
                 selected={selectedDate}
                 onSelect={handleDateSelect}
-                className="border rounded-md p-2"
+                className="border border-slate-200 rounded-md p-2 mt-3"
               />
               <Button
-                className="mt-4 w-full"
+                id="schedule-delete-btn"
+                className="mt-4 w-full h-10 rounded-md bg-[#FF6B4A] hover:bg-[#E65A38] text-white text-xs font-semibold shadow-sm transition-colors cursor-pointer"
                 onClick={() => handleScheduleDelete()}
               >
                 Schedule Expire
@@ -311,6 +368,4 @@ export const columnsSlider = ({fetchData,router,setSelectedDate,selectedDate,ope
       );
     },
   },
-  
-  
 ];

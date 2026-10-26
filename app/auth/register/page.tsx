@@ -1,8 +1,7 @@
 import { Link } from "@/i18n/routing";
 import RegForm from "@/components/partials/auth/reg-form";
-import Image from "next/image";
 import Copyright from "@/components/partials/auth/copyright";
-import Logo from "@/components/partials/auth/logo";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { jwtDecode } from "jwt-decode";
@@ -30,68 +29,72 @@ const Register = async () => {
   if (role != "Super Admin" && !permissions.includes(allowed)) {
     notFound();
   }
+
   return (
-    <>
-      <div className="flex w-full items-center overflow-hidden min-h-dvh h-dvh basis-full">
-        <div className="overflow-y-auto flex flex-wrap w-full h-dvh">
-          <div
-            className="lg:block hidden flex-1 overflow-hidden text-[40px] leading-[48px] text-default-600 
-           relative z-[1] bg-default-50"
-          >
-            <div className="md:w-1/2 m-auto h-full w-full flex justify-center items-center">
-              <div>
+    <div className="flex w-full min-h-screen h-screen overflow-hidden bg-white">
+      <div className="flex flex-col lg:flex-row w-full h-full overflow-y-auto">
+        {/* Left Side: Large Credit Circle Logo */}
+        <div className="lg:flex hidden flex-1 items-center justify-center p-8 xl:p-16 bg-[#F6F8FC] border-r border-slate-200">
+          <div className="w-full max-w-[360px] xl:max-w-[420px] flex items-center justify-center">
+            <Image
+              src="/images/logo/logo.svg"
+              alt="Credit Circle"
+              width={420}
+              height={300}
+              priority
+              className="w-full h-auto object-contain"
+            />
+          </div>
+        </div>
+
+        {/* Right Side: Sign Up Form */}
+        <div className="flex-1 flex flex-col justify-between p-6 sm:p-10 md:p-14 bg-white min-h-screen overflow-y-auto">
+          <div className="max-w-[400px] w-full mx-auto my-auto space-y-6">
+            {/* Mobile Logo for small screens */}
+            <div className="flex justify-center items-center text-center mb-4 lg:hidden">
+              <Link href="/">
                 <Image
-                  alt=""
-                  loading="lazy"
-                  width="500"
-                  height="500"
-                  decoding="async"
-                  data-nimg="1"
-                  className="object-contain"
                   src="/images/logo/logo.svg"
+                  alt="Credit Circle"
+                  width={200}
+                  height={140}
+                  priority
+                  className="w-40 h-auto object-contain"
                 />
-              </div>
+              </Link>
+            </div>
+
+            {/* Header */}
+            <div className="text-center space-y-1">
+              <h1 className="text-2xl font-semibold text-slate-800 tracking-tight">
+                Sign up
+              </h1>
+              <p className="text-xs text-slate-500 font-normal">
+                Create an account to start using Credit Circle
+              </p>
+            </div>
+
+            {/* Form */}
+            <RegForm roleType={role} token={token} />
+
+            {/* Bottom Link */}
+            <div className="text-center text-xs tracking-wider uppercase text-slate-500 pt-2">
+              ALREADY REGISTERED?{" "}
+              <Link
+                href="/auth/login"
+                className="font-bold text-slate-900 hover:underline"
+              >
+                SIGN IN
+              </Link>
             </div>
           </div>
-          <div className="flex-1 relative dark:bg-default-100 bg-white ">
-            <div className=" h-full flex flex-col">
-              <div className="max-w-[524px] md:px-[42px] md:py-[44px] p-7  mx-auto w-full text-2xl text-default-900  mb-3 h-full flex flex-col justify-center">
-                <div className="flex justify-center items-center text-center mb-6 lg:hidden ">
-                  <Link href="/">
-                    <Logo />
-                  </Link>
-                </div>
-                <div className="text-center 2xl:mb-10 mb-5">
-                  <h4 className="font-medium">Sign up</h4>
-                  <div className="text-default-500  text-base">
-                    Create an account to start using Dashcode
-                  </div>
-                </div>
-                <RegForm roleType={role} token={token} />
-                {/* <div className=" relative border-b-[#9AA2AF] border-opacity-[16%] border-b pt-6">
-                  <div className=" absolute inline-block  bg-default-50 dark:bg-default-100 left-1/2 top-1/2 transform -translate-x-1/2 px-4 min-w-max text-sm  text-default-500  font-normal ">
-                    Or continue with
-                  </div>
-                </div> */}
 
-                <div className="max-w-[225px] mx-auto font-normal text-default-500  2xl:mt-12 mt-6 uppercase text-sm">
-                  Already registered?
-                  <Link
-                    href={token ? "/dashboard" : "/auth/login"}
-                    className="text-default-900  font-medium hover:underline"
-                  >
-                    Sign In
-                  </Link>
-                </div>
-              </div>
-              <div className="text-xs font-normal text-default-500 z-[999] pb-10 text-center">
-                <Copyright />
-              </div>
-            </div>
+          <div className="text-xs text-slate-400 text-center pt-6">
+            <Copyright />
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

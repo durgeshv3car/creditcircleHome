@@ -4,9 +4,10 @@ import dynamic from "next/dynamic";
 import { fetchLoans } from "../../../../services/loans/api";
 import { DataProps } from "../../loanapplications/table/columns";
 import PartnerStatus from "../components/PartnerStatus";
+import Loader from "@/components/loader";
 
 const ExampleTwo = dynamic(() => import(".././table"), {
-  loading: () => <p>Loading table...</p>,
+  loading: () => <Loader className="min-h-[50vh] h-auto" />,
   ssr: false,
 });
 
@@ -66,8 +67,14 @@ const LeadPage = ({ token }: { token: string }) => {
   const filteredSelectedValues = Object.fromEntries(
     Object.entries(selectedValues).filter(([key]) => {
       if (businessFields.includes(key)) {
-        return selectedValues.hasGST?.some((item) =>
-          typeof item === "boolean" ? item : item?.name === true
+        if (Array.isArray(selectedValues.hasGST)) {
+          return selectedValues.hasGST.some((item) =>
+            typeof item === "boolean" ? item : (item as any)?.name === true
+          );
+        }
+        return (
+          selectedValues.hasGST === "Yes" ||
+          (selectedValues.hasGST as any) === true
         );
       }
       return true;
@@ -237,6 +244,8 @@ const LeadPage = ({ token }: { token: string }) => {
         selectedStatus={selectedStatus}
         setSelectedStatusPartner={setSelectedStatusPartner}
         selectedStatusPartner={selectedStatusPartner}
+        recordsCount={recordsCount}
+        isLoading={loading}
       />
       {isModalOpen && selectedRow && (
         <PartnerStatus

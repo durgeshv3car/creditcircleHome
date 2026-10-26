@@ -12,21 +12,23 @@ const HeaderLogo = () => {
 
     return (
         config.layout === 'horizontal' ? (
-            <Link href="/dashboard/analytics" className="flex gap-2 items-center    ">
-                <DashCodeLogo className="  text-default-900 h-8 w-8 [&>path:nth-child(3)]:text-background [&>path:nth-child(2)]:text-background" />
-                <h1 className="text-xl font-semibold text-default-900 lg:block hidden ">
-                    CreditCircle
+            <Link href="/dashboard" className="flex gap-2.5 items-center">
+                <DashCodeLogo className="h-8 w-8" />
+                <h1 className="text-xl font-bold tracking-tight lg:block hidden">
+                    <span className="text-slate-900">CREDIT</span>{" "}
+                    <span className="text-[#FF6B4A]">CIRCLE</span>
                 </h1>
             </Link>
         ) :
-            !isDesktop && (
-                <Link href="/dashboard/analytics" className="flex gap-2 items-center    ">
-                    <DashCodeLogo className="  text-default-900 h-8 w-8 [&>path:nth-child(3)]:text-background [&>path:nth-child(2)]:text-background" />
-                    <h1 className="text-xl font-semibold text-default-900 lg:block hidden ">
-                        CreditCircle
+            !isDesktop ? (
+                <Link href="/dashboard" className="flex gap-2.5 items-center">
+                    <DashCodeLogo className="h-8 w-8" />
+                    <h1 className="text-xl font-bold tracking-tight">
+                        <span className="text-slate-900">CREDIT</span>{" "}
+                        <span className="text-[#FF6B4A]">CIRCLE</span>
                     </h1>
                 </Link>
-            )
+            ) : null
     )
 }
 

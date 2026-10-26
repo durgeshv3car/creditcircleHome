@@ -1,9 +1,8 @@
-// ActiveToggleCell.tsx
-"use client";
 import React from "react";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { updateOffer } from "@/app/(protected)/services/offers/api";
+import { cn } from "@/lib/utils";
 
 const HomeToggleCell = ({
   row,
@@ -53,10 +52,10 @@ const HomeToggleCell = ({
         null,
         null,
         null,
-        offerimageUrls.mobile || "",
-        offerimageUrls.web || "",
-        bannerimageUrls.banner || "",
-        logoimageUrls.logo || ""
+        offerimageUrls?.mobile || "",
+        offerimageUrls?.web || "",
+        bannerimageUrls?.banner || "",
+        logoimageUrls?.logo || ""
       );
       if (result.success) {
         toast.success(
@@ -74,8 +73,28 @@ const HomeToggleCell = ({
   };
 
   return (
-    <div className="flex gap-3 items-center">
-      <Switch checked={isHome} onCheckedChange={handleToggle} />
+    <div className="flex items-center gap-2">
+      <Switch
+        checked={isHome}
+        onCheckedChange={handleToggle}
+        className="data-[state=checked]:bg-[#101E4E] data-[state=unchecked]:bg-slate-200 focus-visible:ring-[#101E4E] cursor-pointer"
+      />
+      <span
+        className={cn(
+          "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide transition-all select-none border",
+          isHome
+            ? "bg-[#101E4E]/10 text-[#101E4E] border-[#101E4E]/25 shadow-2xs"
+            : "bg-slate-50 text-slate-500 border-slate-200/80"
+        )}
+      >
+        <span
+          className={cn(
+            "w-1.5 h-1.5 rounded-full shrink-0",
+            isHome ? "bg-[#101E4E]" : "bg-slate-400"
+          )}
+        />
+        {isHome ? "Yes" : "No"}
+      </span>
     </div>
   );
 };

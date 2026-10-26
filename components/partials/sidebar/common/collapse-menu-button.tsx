@@ -162,7 +162,7 @@ export function CollapseMenuButton({
             </Collapsible>
         )
     }
-    return !collapsed || hovered ? (
+    return !collapsed ? (
         <Collapsible
             open={isCollapsed}
             onOpenChange={setIsCollapsed}
@@ -178,10 +178,11 @@ export function CollapseMenuButton({
                     <Button
                         style={style}
                         ref={setNodeRef}
-                        variant={active ? "default" : "ghost"}
-                        color='secondary'
-                        className={cn('justify-start capitalize group  h-auto py-3 md:px-3 px-3   ring-offset-sidebar group-data-[state=open]:bg-secondary ', {
-                            'hover:md:ps-8': config.sidebar === 'draggable' && isDesktop
+                        variant="sidebar"
+                        className={cn('justify-start capitalize group h-auto py-2.5 md:px-3 px-3 rounded-sm transition-all duration-200 ease-in-out', {
+                            'hover:md:ps-8': config.sidebar === 'draggable' && isDesktop,
+                            'bg-white/[0.12] text-white shadow-sm ring-1 ring-white/10 font-medium hover:!bg-white/[0.16] hover:!text-white': active || isSubmenuActive,
+                            'text-slate-300 hover:!text-white hover:!bg-white/[0.08]': !(active || isSubmenuActive)
                         })}
                         fullWidth
                     >
@@ -195,15 +196,19 @@ export function CollapseMenuButton({
 
                                         })} />
                                 )}
-                                <span className="me-4">
+                                <span className={cn(
+                                    "me-2.5 transition-transform duration-200 group-hover:scale-105 group-hover:translate-x-0.5",
+                                    (active || isSubmenuActive) ? "text-white" : "text-slate-300 group-hover:text-white"
+                                )}>
                                     <Icon icon={icon} className="h-5 w-5" />
                                 </span>
                                 <p
                                     className={cn(
-                                        "max-w-[150px] truncate",
-                                        !collapsed || hovered
+                                        "max-w-[150px] truncate transition-colors duration-200",
+                                        !collapsed
                                             ? "translate-x-0 opacity-100"
-                                            : "-translate-x-96 opacity-0"
+                                            : "-translate-x-96 opacity-0",
+                                        (active || isSubmenuActive) ? "text-white font-medium" : "text-slate-300 group-hover:text-white"
                                     )}
                                 >
                                     {label}
@@ -211,17 +216,18 @@ export function CollapseMenuButton({
                             </div>
                             <div
                                 className={cn(
-                                    "whitespace-nowrap inline-flex items-center justify-center rounded-full h-5 w-5 bg-menu-arrow text-menu-menu-foreground  group-hover:bg-menu-arrow-active transition-all duration-300 ",
-                                    !collapsed || hovered
+                                    "whitespace-nowrap inline-flex items-center justify-center rounded-full h-5 w-5 transition-all duration-200 shadow-sm",
+                                    !collapsed
                                         ? "translate-x-0 opacity-100"
-                                        : "-translate-x-96 opacity-0", {
-                                    'bg-menu-arrow-active': active
-                                }
+                                        : "-translate-x-96 opacity-0",
+                                    (active || isSubmenuActive)
+                                        ? 'bg-[#FF6B4A]/40 text-white ring-1 ring-[#FF6B4A]/60'
+                                        : 'bg-white/[0.08] text-slate-300 group-hover:text-white group-hover:bg-white/[0.16]'
                                 )}
                             >
                                 <ChevronDown
-                                    size={16}
-                                    className="transition-transform duration-200"
+                                    size={13}
+                                    className="transition-transform duration-300 ease-in-out"
                                 />
                             </div>
                         </div>
@@ -229,35 +235,35 @@ export function CollapseMenuButton({
                 </div>
             </CollapsibleTrigger>
             <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+                <div className="border-l border-white/[0.12] pl-3 ml-4.5 my-1.5 space-y-1.5">
                 {submenus.map(({ href, label, active, children: subChildren }, index) => (
 
                     subChildren?.length === 0 ? (
                         <Button
                             onClick={() => setMobileMenuConfig({ ...mobileMenuConfig, isOpen: false })}
                             key={index}
-                            color='secondary'
-                            variant="ghost"
-                            className={cn('w-full  justify-start h-auto hover:bg-transparent hover:ring-offset-0 capitalize text-sm font-normal mb-2 last:mb-0 first:mt-3 md:px-5 px-5', {
-                                'font-medium': active,
-                                'dark:opacity-80': !active,
+                            variant="sidebar"
+                            className={cn('group/sub w-full justify-start h-auto py-2.5 px-3 rounded-sm transition-all duration-200', {
+                                'bg-gradient-to-r from-[#FF6B4A] to-[#F48220] text-white font-semibold shadow-md shadow-orange-500/25 ring-1 ring-white/20 hover:!from-[#E65A38] hover:!to-[#D9532F] hover:!text-white': active,
+                                'text-slate-300 font-medium hover:!text-white hover:!bg-white/[0.08]': !active,
                             })}
                             asChild
                         >
-                            <Link href={href}>
+                            <Link href={href} className="flex items-center w-full">
 
                                 <span
                                     className={cn(
-                                        "h-1.5 w-1.5 me-3 rounded-full  transition-all duration-150 ring-1    ring-default-600 ",
-                                        {
-                                            "ring-4 bg-default ring-opacity-30 ring-default": active,
-
-                                        }
+                                        "h-2 w-2 me-2.5 rounded-full transition-all duration-200 shrink-0",
+                                        active 
+                                          ? "bg-white ring-2 ring-white/40 shadow-[0_0_6px_rgba(255,255,255,0.7)]" 
+                                          : "bg-slate-400/60 ring-1 ring-slate-400/20 group-hover/sub:bg-white/80 group-hover/sub:ring-white/30"
                                     )}
                                 ></span>
                                 <p
                                     className={cn(
-                                        "max-w-[170px] truncate",
-                                        !collapsed || hovered
+                                        "max-w-[180px] truncate text-sm transition-colors duration-200",
+                                        active ? "text-white font-semibold" : "text-slate-300 group-hover/sub:text-white",
+                                        !collapsed
                                             ? "translate-x-0 opacity-100"
                                             : "-translate-x-96 opacity-0"
                                     )}
@@ -280,6 +286,7 @@ export function CollapseMenuButton({
 
 
                 ))}
+                </div>
             </CollapsibleContent>
         </Collapsible>
     ) : (
@@ -289,14 +296,14 @@ export function CollapseMenuButton({
                     <TooltipTrigger asChild>
                         <DropdownMenuTrigger asChild>
                             <Button
-                                variant={active ? "default" : "ghost"}
-                                color='secondary'
-                                className="w-full justify-center"
+                                variant="ghost"
+                                className={cn("w-10 h-10 mx-auto rounded-sm flex items-center justify-center transition-all duration-200", {
+                                    "bg-gradient-to-r from-[#FF6B4A] to-[#F48220] text-white shadow-md shadow-orange-500/25 ring-1 ring-white/20": active || isSubmenuActive,
+                                    "text-slate-300 hover:text-white hover:bg-white/[0.08]": !(active || isSubmenuActive),
+                                })}
                                 size="icon"
                             >
-
                                 <Icon icon={icon} className="h-5 w-5" />
-
                             </Button>
                         </DropdownMenuTrigger>
                     </TooltipTrigger>
@@ -305,24 +312,32 @@ export function CollapseMenuButton({
                     </TooltipContent>
                 </Tooltip>
             </TooltipProvider>
-            <DropdownMenuContent side="right" sideOffset={20} align="start" className={` border-sidebar space-y-1.5 ${sidebarTheme}`} >
-                <DropdownMenuLabel className="max-w-[190px] truncate">
+            <DropdownMenuContent side="right" sideOffset={14} align="start" className="bg-[#0B1740] border border-white/[0.12] shadow-2xl text-slate-200 rounded-sm p-2 min-w-[200px] backdrop-blur-xl" >
+                <DropdownMenuLabel className="max-w-[190px] truncate text-xs font-semibold text-white/90 px-2 py-1.5">
                     {label}
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator className='bg-default-300' />
-                <DropdownMenuGroup>
+                <DropdownMenuSeparator className='bg-white/[0.1] my-1' />
+                <DropdownMenuGroup className="space-y-1">
 
 
                     {submenus.map(({ href, label, icon, active, children }, index) => (
                         children?.length === 0 ? (
-                            <DropdownMenuItem key={index} asChild className={cn('focus:bg-secondary', {
-                                'bg-secondary text-secondary-foreground ': active
+                            <DropdownMenuItem key={index} asChild className={cn('rounded-sm cursor-pointer px-2.5 py-2 text-xs transition-colors', {
+                                'bg-gradient-to-r from-[#FF6B4A] to-[#F48220] text-white font-semibold shadow-sm shadow-orange-500/25': active,
+                                'text-slate-300 hover:text-white hover:bg-white/[0.08] focus:bg-white/[0.08] focus:text-white': !active
                             })}>
-                                <Link className="cursor-pointer flex-flex gap-3" href={href}>
-                                    {icon && (
-                                        <Icon icon={icon} className=' h-4 w-4' />
+                                <Link className="cursor-pointer flex items-center gap-2.5 w-full" href={href}>
+                                    {icon ? (
+                                        <Icon icon={icon} className='h-4 w-4 shrink-0' />
+                                    ) : (
+                                        <span className={cn(
+                                            "h-1.5 w-1.5 rounded-full shrink-0 transition-all",
+                                            active 
+                                              ? "bg-white ring-2 ring-white/40 shadow-[0_0_6px_rgba(255,255,255,0.7)]" 
+                                              : "bg-slate-400/60"
+                                        )} />
                                     )}
-                                    <p className="max-w-[180px] truncate">{label} </p>
+                                    <p className="max-w-[170px] truncate">{label}</p>
                                 </Link>
                             </DropdownMenuItem>
                         ) : (

@@ -11,6 +11,7 @@ import { useRouter } from "@/i18n/routing";
 import { columnsCategory } from "./columnsCategory";
 import { fetchCategories } from "@/app/(protected)/services/categorys/api";
 import { fetchNotificationsCount } from "../../../services/notifications/app/api";
+import Loader from "@/components/loader";
 interface Category {
   offerId: string;
   offerTitle: string;
@@ -67,9 +68,10 @@ function Category() {
           return;
         }
   
-        setData(result.counts);
+        setData(Array.isArray(result?.counts) ? result.counts : []);
       } catch (error) {
         console.error("Error fetching data:", error);
+        setData([]);
       } finally {
         setLoading(false);
       }
@@ -84,19 +86,19 @@ function Category() {
 
 
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <Loader className="min-h-[50vh] h-auto" />;
+
   return (
-    <>
-      <div className="space-y-6">
-        <ExampleTwo
-          tableHeading="Analytics List"
-          tableData={data}
-          tableColumns={columnsCategory(fetchData, router)}
-          setRefresh={setRefresh}
-          type={type}
-        />
-      </div>
-    </>
+    <div className="w-full space-y-6">
+      <ExampleTwo
+        tableHeading="Notification Analytics"
+        tableData={data}
+        tableColumns={columnsCategory(fetchData, router)}
+        setRefresh={setRefresh}
+        type={type}
+        isLoading={loading}
+      />
+    </div>
   );
 }
 

@@ -97,10 +97,9 @@ const StatisticsBlock = ({
     }
   };
   return (
-    <Card className={cn("  ", className)}>
-      <CardContent className=" py-[18px] px-4 ">
-
-        <div className="flex gap-6">
+    <Card className={cn("rounded-sm border border-slate-200/80 shadow-sm bg-white hover:shadow-md transition-all duration-200", className)}>
+      <CardContent className="py-5 px-5">
+        <div className="flex items-center gap-4">
           <div className="flex-none">
             <Chart
               options={options}
@@ -111,11 +110,11 @@ const StatisticsBlock = ({
             />
           </div>
           <div className="flex-1">
-            <div className="text-default-800  text-sm mb-1 font-medium">
+            <div className="text-slate-500 text-xs mb-1 font-medium">
               {title}
             </div>
-            <div className="text-default-900  text-lg font-medium">
-              {total}
+            <div className="text-slate-900 text-2xl font-bold tracking-tight">
+              {total ?? "-"}
             </div>
           </div>
         </div>
