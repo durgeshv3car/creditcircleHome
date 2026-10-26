@@ -1,3 +1,18 @@
+// Suppress Node.js DEP0169 url.parse deprecation warning emitted in Node 22/24+
+if (typeof process !== "undefined" && process.emitWarning) {
+  const originalEmitWarning = process.emitWarning;
+  process.emitWarning = function (warning, ...args) {
+    if (
+      args[1] === "DEP0169" ||
+      (typeof warning === "string" && (warning.includes("DEP0169") || warning.includes("url.parse()"))) ||
+      (warning && typeof warning === "object" && (warning.code === "DEP0169" || (warning.message && warning.message.includes("url.parse()"))))
+    ) {
+      return;
+    }
+    return originalEmitWarning.apply(process, [warning, ...args]);
+  };
+}
+
 import nextra from "nextra";
 import { hostname } from "os";
 

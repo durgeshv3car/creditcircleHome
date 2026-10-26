@@ -112,37 +112,42 @@ export function HeaderDateRange() {
         className="w-auto"
       />
 
-      <ChevronLeft
+      <button
+        type="button"
         onClick={decrementRange}
+        disabled={!dateRange?.from || !dateRange?.to}
+        aria-label="Previous date range"
         className={cn(
-          "h-6 w-6 rounded-full border border-gray-300 p-1 cursor-pointer text-primary hover:bg-gray-100",
-          {
-            "opacity-50 cursor-not-allowed": !dateRange?.from || !dateRange?.to,
-          }
+          "h-8.5 w-8.5 rounded-sm border border-slate-200/90 bg-white hover:bg-gradient-to-tr hover:from-blue-50/80 hover:to-indigo-50/80 hover:border-blue-300 text-slate-600 hover:text-[#2563EB] cursor-pointer shadow-sm hover:shadow-md hover:shadow-blue-500/10 transition-all duration-200 flex items-center justify-center hover:scale-105 active:scale-95 disabled:opacity-30 disabled:pointer-events-none disabled:hover:scale-100",
         )}
-      />
+      >
+        <ChevronLeft className="h-4 w-4" />
+      </button>
 
       {/* Increment Button */}
-      <ChevronRight
+      <button
+        type="button"
         onClick={incrementRange}
+        disabled={!dateRange?.from || !dateRange?.to}
+        aria-label="Next date range"
         className={cn(
-          "h-6 w-6 rounded-full border border-gray-300 p-1 cursor-pointer text-primary hover:bg-gray-100",
-          {
-            "opacity-50 cursor-not-allowed": !dateRange?.from || !dateRange?.to,
-          }
+          "h-8.5 w-8.5 rounded-sm border border-slate-200/90 bg-white hover:bg-gradient-to-tr hover:from-blue-50/80 hover:to-indigo-50/80 hover:border-blue-300 text-slate-600 hover:text-[#2563EB] cursor-pointer shadow-sm hover:shadow-md hover:shadow-blue-500/10 transition-all duration-200 flex items-center justify-center hover:scale-105 active:scale-95 disabled:opacity-30 disabled:pointer-events-none disabled:hover:scale-100",
         )}
-      />
+      >
+        <ChevronRight className="h-4 w-4" />
+      </button>
 
-     <TimerReset
-  onClick={handleReset}
-  className={cn(
-    "h-6 w-6 rounded-full border border-gray-300 p-1 cursor-pointer text-red-600 hover:bg-gray-100",
-    {
-      "opacity-50 cursor-not-allowed": !dateRange?.from || !dateRange?.to,
-    }
-  )}
- 
-/>
+      <button
+        type="button"
+        onClick={handleReset}
+        disabled={!dateRange?.from || !dateRange?.to}
+        aria-label="Reset date range"
+        className={cn(
+          "h-8.5 w-8.5 rounded-sm border border-slate-200/90 bg-white hover:bg-gradient-to-tr hover:from-rose-50/80 hover:to-orange-50/80 hover:border-rose-300 text-slate-500 hover:text-rose-600 cursor-pointer shadow-sm hover:shadow-md hover:shadow-rose-500/10 transition-all duration-200 flex items-center justify-center hover:scale-105 active:scale-95 disabled:opacity-30 disabled:pointer-events-none disabled:hover:scale-100",
+        )}
+      >
+        <TimerReset className="h-4 w-4" />
+      </button>
 
     </div>
   );

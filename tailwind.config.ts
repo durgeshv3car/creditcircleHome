@@ -8,7 +8,7 @@ const config = {
     './providers/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
-	],
+  ],
   prefix: "",
   theme: {
     container: {
@@ -19,7 +19,30 @@ const config = {
       },
     },
     extend: {
-       colors: {
+      fontFamily: {
+        sans: [
+          'var(--font-jakarta-sans)',
+          '"Mona Sans"',
+          '"Helvetica Neue"',
+          'Helvetica',
+          'Arial',
+          'sans-serif',
+        ],
+      },
+      colors: {
+        neutral: {
+          900: "var(--color-neutral-900)",
+        },
+        brand: {
+          navy: "#0B1740",
+          indigo: "#4F46E5",
+          blue: "#2563EB",
+          lavender: "#EEF2FF",
+          bg: "#F6F8FC",
+          card: "#FFFFFF",
+          orange: "#FF6B4A",
+          border: "#E2E8F0",
+        },
         border: "hsl(var(--border))",
         'menu-arrow': "hsl(var(--menu-arrow))",
         'menu-arrow-active': "hsl(var(--menu-arrow-active))",
@@ -65,11 +88,11 @@ const config = {
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar))",
-          
+
         },
         header: {
           DEFAULT: "hsl(var(--header))",
-          
+
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -107,9 +130,13 @@ const config = {
         },
       },
       borderRadius: {
+        DEFAULT: "var(--radius)",
+        '3xl': "0.375rem",
+        '2xl': "0.3125rem",
+        xl: "0.25rem",
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        md: "calc(var(--radius) - 1px)",
+        sm: "calc(var(--radius) - 2px)",
       },
       keyframes: {
         "accordion-down": {
@@ -120,7 +147,7 @@ const config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-         zoom: {
+        zoom: {
           "0%, 100%": { transform: "scale(0.5)" },
           "50%": { transform: "scale(1)" },
         },
@@ -153,7 +180,7 @@ const config = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         zoom: "zoom 1s ease-in-out infinite",
-         tada: "tada 1.5s ease-in-out infinite",
+        tada: "tada 1.5s ease-in-out infinite",
       },
     },
   },

@@ -10,7 +10,8 @@ interface RevenueBarChartProps {
   height?: number;
   chartType?: "bar" | "area";
   series?: any[];
-  chartColors?: string[]
+  chartColors?: string[];
+  showTitle?: boolean;
 }
 const defaultSeries = [{
   name: "Cashe",
@@ -28,8 +29,8 @@ const RevenueBarChart = ({
   height = 400,
   chartType = "bar",
   series = defaultSeries,
-  chartColors = ["#4669FA", "#0CE7FA", "#FA916B"]
-
+  chartColors = ["#4669FA", "#0CE7FA", "#FA916B"],
+  showTitle = true,
 }: RevenueBarChartProps) => {
   const [config] = useConfig();
   const { isRtl } = config;
@@ -40,11 +41,12 @@ const RevenueBarChart = ({
       toolbar: {
         show: false,
       },
+      fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     },
     plotOptions: {
       bar: {
         horizontal: false,
-        endingShape: "rounded",
+        borderRadius: 0,
         columnWidth: "45%",
       },
     },
@@ -53,14 +55,14 @@ const RevenueBarChart = ({
       position: "top",
       horizontalAlign: "right",
       fontSize: "12px",
-      fontFamily: "Inter",
-      offsetY: -30,
+      fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      offsetY: showTitle ? -30 : 0,
       markers: {
         width: 8,
         height: 8,
         offsetY: -1,
         offsetX: -5,
-        radius: 12,
+        radius: 0,
       },
       labels: {
         colors: mode === "dark" ? "#CBD5E1" : "#475569",
@@ -71,15 +73,15 @@ const RevenueBarChart = ({
       },
     },
     title: {
-      text: `${("Partners Loan Approval")}`,
+      text: showTitle ? "Partners Loan Approval" : "",
       align: "left",
-      offsetY: 13,
+      offsetY: showTitle ? 13 : 0,
       offsetX: isRtl ? "0%" : 0,
       floating: false,
       style: {
-        fontSize: "24px",
+        fontSize: showTitle ? "20px" : "0px",
         fontWeight: "600",
-        fontFamily: "Inter",
+        fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         color: mode === "dark" ? "#fff" : "#0f172a",
       },
     },
@@ -95,7 +97,7 @@ const RevenueBarChart = ({
       labels: {
         style: {
           colors: mode === "dark" ? "#CBD5E1" : "#475569",
-          fontFamily: "Inter",
+          fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         },
       },
     },
@@ -117,7 +119,7 @@ const RevenueBarChart = ({
       labels: {
         style: {
           colors: mode === "dark" ? "#CBD5E1" : "#475569",
-          fontFamily: "Inter",
+          fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         },
       },
       axisBorder: {
@@ -156,6 +158,7 @@ const RevenueBarChart = ({
           },
           plotOptions: {
             bar: {
+              borderRadius: 0,
               columnWidth: "80%",
             },
           },

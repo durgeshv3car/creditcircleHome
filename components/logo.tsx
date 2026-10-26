@@ -23,13 +23,17 @@ const Logo = () => {
     if (config.sidebar === 'two-column' || !isDesktop) return null
 
     return (
-        <Link href="/dashboard" className="flex gap-2 items-center    ">
-            <DashCodeLogo className="  text-default-900 h-8 w-8 [&>path:nth-child(3)]:text-background [&>path:nth-child(2)]:text-background" />
-            {(!config?.collapsed || hovered) && (
-                <h1 className="text-xl font-bold text-default-900 "><span className="text-blue-800">CREDIT</span> <span className="text-[#F04D23]">CIRCLE</span></h1>
+        <Link href="/dashboard" className="group flex gap-2.5 items-center transition-all duration-200">
+            <div className="transition-transform duration-200 group-hover:scale-105">
+                <DashCodeLogo className="h-8 w-8" />
+            </div>
+            {!config?.collapsed && (
+                <h1 className="text-xl font-bold tracking-tight select-none">
+                    <span className="text-white">CREDIT</span>{" "}
+                    <span className="text-[#FF6B4A]">CIRCLE</span>
+                </h1>
             )}
         </Link>
-
     );
 };
 

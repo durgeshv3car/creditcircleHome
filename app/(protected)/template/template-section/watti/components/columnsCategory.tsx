@@ -107,19 +107,19 @@ export const columnsCategory = ({
       };
 
       return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="outline"
                   size="icon"
-                  className="w-7 h-7 border-default-200 dark:border-default-300 text-default-400"
+                  className="w-7 h-7 text-slate-500 hover:text-[#EA580C] hover:border-orange-200 hover:bg-[#FFF1ED] rounded-md transition-colors cursor-pointer"
                   onClick={() =>
                     router.push(`/template/template-section/watti?id=${row.original.id}`)
                   }
                 >
-                  <SquarePen className="w-3 h-3" />
+                  <SquarePen className="w-3.5 h-3.5" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="top">
@@ -133,10 +133,10 @@ export const columnsCategory = ({
                 <Button
                   variant="outline"
                   size="icon"
-                  className="w-7 h-7 border-default-200 dark:border-default-300 text-default-400"
+                  className="w-7 h-7 text-slate-500 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50/50 rounded-md transition-colors cursor-pointer"
                   onClick={() => handleDelete(row.original.id)}
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3.5 h-3.5" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent

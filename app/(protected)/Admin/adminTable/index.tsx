@@ -22,11 +22,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Users, Cpu, Activity, SlidersHorizontal, Check, Search, X, Plus } from "lucide-react";
+import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Icon } from "@/components/ui/icon";
@@ -231,167 +233,336 @@ const ExampleTwo = ({
   const CreateModalComponent = modalMap[type]?.create;
   const EditModalComponent = modalMap[type]?.edit;
 
+  const selectedRowsCount = Object.keys(rowSelection).length;
+
+  const searchColumn =
+    table.getColumn("name") ||
+    table.getColumn("title") ||
+    table.getColumn("username") ||
+    table.getColumn("action");
+  const searchValue = (searchColumn?.getFilterValue() as string) ?? "";
+
+  const entityName =
+    type === "user" ? "User" : type === "api" ? "API" : "Log";
+
+  const getIcon = () => {
+    if (type === "user") return <Users className="w-5 h-5 text-white" />;
+    if (type === "api") return <Cpu className="w-5 h-5 text-white" />;
+    return <Activity className="w-5 h-5 text-white" />;
+  };
+
+  const getSubtitle = () => {
+    if (type === "user")
+      return "Manage admin users, roles and system access permissions";
+    if (type === "api")
+      return "Configure API endpoints, credentials, counters and integration status";
+    return "Track user audit trails, actions, IP addresses and timestamps";
+  };
+
+  const getCountLabel = () => {
+    if (type === "user") return `${tableData.length} users`;
+    if (type === "api") return `${tableData.length} APIs`;
+    return `${tableData.length} logs`;
+  };
+
   return (
     <div className="w-full">
-      {/* Header & Filter Section */}
-      <div className="flex items-center justify-between py-4 px-5">
-        <div className="flex items-center gap-16">
-          <div className="text-xl font-medium text-gray-600">
-            {tableHeading}
-          </div>{" "}
-          {
-            <>
-              {type === "api" && (
-                <>
-                  <Button
-                    onClick={createPage}
-                    className="bg-gray-600 hover:bg-gray-700 text-white h-8 text-xs rounded-md shadow-sm transition-all px-6"
-                  >
-                    Add {tableHeading}
-                  </Button>
-                </>
-              )}
-            </>
-          }
+      {/* Main Table Card */}
+      <div className="p-6 bg-white rounded-sm border border-slate-200/80 shadow-xs mb-8">
+        {/* Row 1: Header (Title & Meta on Left, Add Button on Right) */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4">
+          {/* Card Header Left */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-sm bg-[#101E4E] text-white flex items-center justify-center shrink-0 shadow-xs">
+              {getIcon()}
+            </div>
+            <div>
+              <div className="flex items-center gap-2.5">
+                <h2 className="text-lg font-bold text-slate-900 tracking-tight">
+                  {tableHeading}
+                </h2>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#FFF1ED] text-[#EA580C] border border-[#FFD7CC]">
+                  {getCountLabel()}
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 font-normal mt-0.5">
+                {getSubtitle()}
+              </p>
+            </div>
+          </div>
+
+          {/* Card Header Right: Add Button (for API Management and User Management) */}
+          {type !== "logs" && (
+            <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+              <Button
+                type="button"
+                onClick={createPage}
+                className="inline-flex items-center justify-center gap-1.5 h-9 px-3.5 bg-[#FF6B4A] hover:bg-[#E65A38] text-white text-xs font-semibold rounded-sm shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer active:scale-[0.98] shrink-0 whitespace-nowrap"
+              >
+                <Plus className="w-3.5 h-3.5 text-white stroke-[2.5]" />
+                <span>Add {entityName}</span>
+              </Button>
+            </div>
+          )}
         </div>
 
-        <div className="flex items-center gap-4">
-          {/* Select for Rows per Page */}
-          <label className="text-sm text-gray-600">Rows per page:</label>
-          <Select
-            onValueChange={(value) => setPageSize(Number(value))}
-            value={String(pageSize)}
-          >
-            <SelectTrigger className="w-20 border rounded px-2 py-1">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {[20, 50, 100, 200, 500].map((value) => (
-                <SelectItem key={value} value={String(value)}>
-                  {value}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        {/* Row 2: Toolbar (Search on Left, Rows & Columns on Right) */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-100 mb-4">
+          {/* Search Filter Input */}
+          <div className="relative flex items-center w-full sm:w-72">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 pointer-events-none" />
+            <Input
+              placeholder={`Search by ${searchColumn?.id || "name"}...`}
+              value={searchValue}
+              onChange={(event) =>
+                searchColumn?.setFilterValue(event.target.value)
+              }
+              className="w-full h-9 pl-9 pr-8 text-xs bg-white border border-slate-200 rounded-md text-slate-800 placeholder:text-slate-400 focus-visible:ring-1 focus-visible:ring-[#FF6B4A] shadow-2xs"
+            />
+            {searchValue && (
+              <button
+                type="button"
+                onClick={() => searchColumn?.setFilterValue("")}
+                className="absolute right-2.5 text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
 
-          {/* Select for Column Visibility */}
-          <label className="text-sm text-gray-600">Hide Column:</label>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto">
-                Columns
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" forceMount>
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
+          {/* Right Toolbar: Rows & Columns */}
+          <div className="flex items-center gap-2">
+            {/* Rows Per Page Select */}
+            <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+              <Select
+                onValueChange={(value) => setPageSize(Number(value))}
+                value={String(pageSize)}
+              >
+                <SelectTrigger className="h-9 px-3 rounded-md border border-slate-200 bg-white text-xs font-medium text-slate-700 shadow-none hover:bg-slate-50 cursor-pointer w-auto min-w-[85px] gap-1.5">
+                  <span className="text-slate-400 font-normal">Rows:</span>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="rounded-lg border border-slate-200 bg-white shadow-lg p-1">
+                  {[20, 50, 100, 200, 500].map((value) => (
+                    <SelectItem
+                      key={value}
+                      value={String(value)}
+                      className="rounded-md text-xs cursor-pointer"
+                    >
+                      {value}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Columns Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="h-9 px-3.5 text-xs font-medium rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 flex items-center gap-2 shadow-2xs cursor-pointer transition-colors"
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Columns</span>
+                  <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-100 text-slate-600 font-mono font-medium">
+                    {
+                      table
+                        .getAllColumns()
+                        .filter(
+                          (c) =>
+                            c.getCanHide() &&
+                            c.getIsVisible() &&
+                            c.id !== "select" &&
+                            c.id !== "actions"
+                        ).length
                     }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="w-64 p-0 rounded-lg bg-white border border-slate-200 shadow-xl overflow-hidden z-50"
+              >
+                {/* Header */}
+                <div className="px-3.5 py-2.5 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-semibold text-slate-800">
+                      Toggle Columns
+                    </span>
+                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-[#FFF1ED] text-[#EA580C] border border-[#FFD7CC]">
+                      {
+                        table
+                          .getAllColumns()
+                          .filter(
+                            (c) =>
+                              c.getCanHide() &&
+                              c.getIsVisible() &&
+                              c.id !== "select" &&
+                              c.id !== "actions"
+                          ).length
+                      }{" "}
+                      active
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => table.toggleAllColumnsVisible(true)}
+                      className="text-[11px] font-medium text-[#FF6B4A] hover:underline cursor-pointer px-1 py-0.5 rounded"
+                      title="Select all columns"
+                    >
+                      All
+                    </button>
+                    <span className="text-slate-300 text-xs">|</span>
+                    <button
+                      type="button"
+                      onClick={() => table.toggleAllColumnsVisible(false)}
+                      className="text-[11px] font-medium text-slate-500 hover:text-slate-800 hover:underline cursor-pointer px-1 py-0.5 rounded"
+                      title="Hide all hideable columns"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                </div>
 
-          {/* Input for Filtering */}
-          <Input
-            placeholder="Filter Name..."
-            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn("name")?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm"
+                {/* Column Items */}
+                <div className="max-h-72 overflow-y-auto p-1.5 clean-scrollbar">
+                  {table
+                    .getAllColumns()
+                    .filter((column) => column.getCanHide())
+                    .map((column) => {
+                      const isVisible = column.getIsVisible();
+                      return (
+                        <DropdownMenuItem
+                          key={column.id}
+                          onSelect={(e) => {
+                            e.preventDefault();
+                            column.toggleVisibility(!isVisible);
+                          }}
+                          className={cn(
+                            "flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-xs cursor-pointer transition-colors",
+                            isVisible
+                              ? "text-slate-800 font-medium hover:bg-slate-50"
+                              : "text-slate-400 hover:bg-slate-50"
+                          )}
+                        >
+                          <div
+                            className={cn(
+                              "w-4 h-4 rounded-[3px] border flex items-center justify-center transition-all duration-150 shrink-0",
+                              isVisible
+                                ? "bg-[#FF6B4A] border-[#FF6B4A] text-white shadow-2xs"
+                                : "border-slate-300 bg-white hover:border-slate-400"
+                            )}
+                          >
+                            {isVisible && (
+                              <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                            )}
+                          </div>
+                          <span className="truncate flex-1 capitalize">
+                            {column.id}
+                          </span>
+                        </DropdownMenuItem>
+                      );
+                    })}
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+
+        {/* Selected Rows Banner if any */}
+        {selectedRowsCount > 0 && (
+          <div className="flex items-center justify-between p-3 mb-3 bg-[#FFF1ED]/60 border border-[#FFD7CC] rounded-sm text-xs font-semibold text-[#EA580C]">
+            <span>
+              {selectedRowsCount} item
+              {selectedRowsCount > 1 ? "s" : ""} selected
+            </span>
+            <button
+              type="button"
+              onClick={() => setRowSelection({})}
+              className="text-xs font-bold text-slate-600 hover:text-slate-900 bg-white px-2.5 py-1 rounded-sm border border-slate-200 shadow-2xs cursor-pointer"
+            >
+              Clear selection
+            </button>
+          </div>
+        )}
+
+        {/* Table Component */}
+        <div className="overflow-x-auto rounded-sm border border-slate-200/80">
+          <Table className="w-full text-left border-collapse">
+            <TableHeader className="bg-slate-50/70 border-b border-slate-200/80">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow
+                  key={headerGroup.id}
+                  className="hover:bg-transparent border-none"
+                >
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead
+                        key={header.id}
+                        onClick={header.column.getToggleSortingHandler()}
+                        className="cursor-pointer select-none py-3 px-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider hover:text-slate-800 transition-colors whitespace-nowrap min-w-[120px]"
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableHeader>
+
+            <TableBody>
+              {table.getRowModel()?.rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                    className="group border-b border-slate-100 hover:bg-slate-50/50 transition-colors data-[state=selected]:bg-[#FFF1ED]/40 cursor-default"
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        className="py-3.5 px-4 text-xs font-normal"
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={tableColumns.length}
+                    className="h-32 text-center text-xs text-slate-400 font-normal"
+                  >
+                    No records found.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Bottom Pagination */}
+        <div className="mt-4 pt-4 border-t border-slate-100">
+          <TablePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => setCurrentPage(page)}
+            pageSize={pageSize}
+            totalRecords={totalPages > 1 ? totalPages * pageSize : tableData.length}
           />
         </div>
       </div>
-      {/* Table Component */}
-      <Table>
-        <TableHeader className="bg-default-200">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHead
-                  key={header.id}
-                  onClick={header.column.getToggleSortingHandler()}
-                  className="cursor-pointer select-none"
-                >
-                  {header.isPlaceholder ? null : (
-                    <div className="flex items-center justify-between">
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                      {header.column.getIsSorted() && (
-                        <span className="text-sm">
-                          {header.column.getIsSorted() === "asc" ? (
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <span className="cursor-pointer">
-                                    <Icon icon="heroicons:arrow-up" />
-                                  </span>
-                                </TooltipTrigger>
-                                <TooltipContent>Sort Ascending</TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          ) : (
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <span className="cursor-pointer">
-                                    <Icon icon="heroicons:arrow-down" />
-                                  </span>
-                                </TooltipTrigger>
-                                <TooltipContent>Sort Descending</TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          )}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-
-        <TableBody>
-          {table.getRowModel()?.rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell
-                colSpan={tableColumns.length}
-                className="h-24 text-center"
-              >
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      <TablePagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={(page) => setCurrentPage(page)}
-      />
 
       {/* Create Modal */}
       <React.Suspense fallback={<div>Loading...</div>}>

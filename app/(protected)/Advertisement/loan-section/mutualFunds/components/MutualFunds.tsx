@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { columnsRecommend } from "./columnsRecommend";
 import { fetchServices } from "@/app/(protected)/services/ourServices/api";
 import { RowData } from "./columnsRecommend";
+import Loader from "@/components/loader";
 
 function Users() {
   const allowed = ["superadmin", "admin"];
@@ -39,7 +40,7 @@ function Users() {
     fetchData();
   }, [refresh,fetchData]);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <Loader className="min-h-[50vh] h-auto" />;
   return (
     <>
       <div className="space-y-6">

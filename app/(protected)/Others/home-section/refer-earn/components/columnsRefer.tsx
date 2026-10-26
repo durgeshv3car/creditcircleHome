@@ -9,7 +9,7 @@ import {
 import ActiveToggleCell from "./ActiveToggleCell";
 
 
-import { SquarePen, Trash2, CalendarClock } from "lucide-react";
+import { SquarePen, Trash2, CalendarClock, ExternalLink } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -140,19 +140,28 @@ export const columnsRefer = ({fetchData,router,setSelectedDate,selectedDate,open
 
   {
     accessorKey: "companyUrl",
-    header: "Company URL",
-    cell: ({ row }) => (
-      <div className="flex gap-3 items-center">
-        <a
-          href={row.original.companyUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm text-blue-500 hover:underline cursor-pointer"
-        >
-          {row.original.companyUrl}
-        </a>
-      </div>
-    ),
+    header: "COMPANY URL",
+    cell: ({ row }) => {
+      const url = row.original.companyUrl;
+      return (
+        <div className="flex items-center">
+          {url ? (
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-700 font-mono font-normal hover:underline max-w-[240px] truncate group"
+              title={url}
+            >
+              <ExternalLink className="w-3.5 h-3.5 text-blue-400 group-hover:text-blue-600 shrink-0" />
+              <span className="truncate">{url}</span>
+            </a>
+          ) : (
+            <span className="text-xs text-slate-400 font-mono">—</span>
+          )}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "active",
@@ -178,21 +187,21 @@ export const columnsRefer = ({fetchData,router,setSelectedDate,selectedDate,open
                  };
 
       return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="outline"
                   size="icon"
-                  className="w-7 h-7 border-default-200 dark:border-default-300 text-default-400"
+                  className="w-7 h-7 text-slate-500 hover:text-[#EA580C] hover:border-orange-200 hover:bg-[#FFF1ED] rounded-md transition-colors cursor-pointer"
                   onClick={() =>
                     router.push(
                       `/Others/home-section/refer-earn?id=${row.original.id}`
                     )
                   }
                 >
-                  <SquarePen className="w-3 h-3" />
+                  <SquarePen className="w-3.5 h-3.5" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="top">
@@ -206,10 +215,10 @@ export const columnsRefer = ({fetchData,router,setSelectedDate,selectedDate,open
                 <Button
                   variant="outline"
                   size="icon"
-                  className="w-7 h-7 border-default-200 dark:border-default-300 text-default-400"
+                  className="w-7 h-7 text-slate-500 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50/50 rounded-md transition-colors cursor-pointer"
                   onClick={() => handleDelete(row.original.id)}
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3.5 h-3.5" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent

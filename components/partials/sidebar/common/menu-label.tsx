@@ -7,7 +7,7 @@ const MenuLabel = ({ label, className }: { label: string, className?: string }) 
     const [config] = useConfig()
     if (config.sidebar === 'compact') return null
     return (
-        <p className={cn('text-xs font-semibold text-default-800  py-4 max-w-[248px] truncate uppercase', className)}>
+        <p className={cn('text-[11px] font-semibold text-slate-400/70 tracking-wider py-3 px-3 max-w-[248px] truncate uppercase', className)}>
             {label}
         </p>
     )

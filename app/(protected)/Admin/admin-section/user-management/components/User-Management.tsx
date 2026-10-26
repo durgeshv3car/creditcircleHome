@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { useRouter } from "@/i18n/routing";
 import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
+import Loader from "@/components/loader";
 import { columnsCategory } from "./columnsCategory";
 import type { Categorys } from "./columnsCategory";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -61,13 +62,13 @@ function Category({
     fetchData();
   }, [refresh]);
 
-  if (loading) return <Loader2 className="me-2 h-4 w-4 animate-spin" />;
+  if (loading) return <Loader className="min-h-[50vh] h-auto" />;
 
   return (
     <>
       <div className="space-y-6">
         <ExampleTwo
-          tableHeading="User List"
+          tableHeading="User Management"
           tableData={data}
           tableColumns={
             columnsCategory({

@@ -21,7 +21,7 @@ import { jwtDecode } from "jwt-decode";
 interface DecodedToken {
   role: string;
   email: string;
-  
+
 }
 
 const ProfileInfo = async () => {
@@ -29,160 +29,91 @@ const ProfileInfo = async () => {
   let role = "";
   let email = "";
 
- if (session?.user && 'token' in session.user) {
-     const decoded = jwtDecode<DecodedToken>((session.user as { token: string }).token);
-     email=decoded.email;
-     role = decoded.role;
-   }
+  if (session?.user && 'token' in session.user) {
+    const decoded = jwtDecode<DecodedToken>((session.user as { token: string }).token);
+    email = decoded.email;
+    role = decoded.role;
+  }
+
+  const getInitials = (str: string) => {
+    if (!str) return "AS";
+    const parts = str.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return str.slice(0, 2).toUpperCase();
+  };
+
+  const initials = getInitials(role);
 
   return (
     <div className="md:block hidden">
       <DropdownMenu>
-        <DropdownMenuTrigger asChild className=" cursor-pointer">
-          <div className=" flex items-center gap-3  text-default-800 ">
-            {/* <Image
-              src={session?.user?.image as string}
-              alt={session?.user?.username?.charAt(0) as string}
-              width={36}
-              height={36}
-              className="rounded-full"
-            /> */}
-
-            <div className="text-sm font-medium  capitalize lg:block hidden  ">
-              {role}
-            </div>
-            <span className="text-base  me-2.5 lg:inline-block hidden">
-              <Icon icon="heroicons-outline:chevron-down"></Icon>
-            </span>
-          </div>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56 p-0" align="end">
-          <DropdownMenuLabel className="flex gap-2 items-center mb-1 p-3">
-            {/* <Image
-              src={session?.user?.image as string}
-              alt={session?.user?.username?.charAt(0) as string}
-              width={36}
-              height={36}
-              className="rounded-full"
-            /> */}
-
-            <div>
-              <div className="text-sm font-medium text-default-800 capitalize ">
-                {role}
+        <DropdownMenuTrigger asChild className="cursor-pointer">
+          <button
+            type="button"
+            className="flex items-center gap-2.5 pl-1.5 pr-3.5 py-1 rounded-sm border border-slate-200/90 bg-white hover:bg-slate-50/90 hover:border-orange-300 shadow-sm hover:shadow-md hover:shadow-orange-500/10 transition-all duration-200 group focus:outline-none focus:ring-2 focus:ring-orange-500/20 data-[state=open]:border-orange-400 data-[state=open]:shadow-md data-[state=open]:shadow-orange-500/15"
+          >
+            <div className="relative">
+              <div className="w-8 h-8 rounded-sm bg-gradient-to-tr from-[#FF6B4A] to-[#F48220] text-white flex items-center justify-center font-bold text-xs shadow-md shadow-orange-500/25 ring-1 ring-white transition-transform duration-200 group-hover:scale-105">
+                {initials}
               </div>
-              <Link
-                href="/dashboard"
-                className="text-xs text-default-600 hover:text-primary"
-              >
-                {email}
-              </Link>
+              <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white" />
             </div>
-          </DropdownMenuLabel>
-          {/* <DropdownMenuGroup>
-            {[
-              // {
-              //   name: "profile",
-              //   icon: "heroicons:user",
-              //   href: "/user-profile",
-              // },
-              // {
-              //   name: "Settings",
-              //   icon: "heroicons:paper-airplane",
-              //   href: "/dashboard",
-              // },
-            ].map((item, index) => (
-              <Link
-                href={item.href}
-                key={`info-menu-${index}`}
-                className="cursor-pointer"
-              >
-                <DropdownMenuItem className="flex items-center gap-2 text-sm font-medium text-default-600 capitalize px-3 py-1.5 cursor-pointer">
-                  <Icon icon={item.icon} className="w-4 h-4" />
-                  {item.name}
-                </DropdownMenuItem>
-              </Link>
-            ))}
-          </DropdownMenuGroup> */}
-          {/* <DropdownMenuSeparator /> */}
-          <DropdownMenuGroup>
-            <DropdownMenuSub>
-              {/* <DropdownMenuSubTrigger className="flex items-center gap-2 text-sm font-medium text-default-600 capitalize px-3 py-1.5 ">
-                <Icon icon="heroicons:user-plus" className="w-4 h-4" />
-                Invite user
-              </DropdownMenuSubTrigger> */}
-              {/* <DropdownMenuPortal>
-                <DropdownMenuSubContent>
-                  {[
-                    {
-                      name: "email",
-                    },
-                    {
-                      name: "message",
-                    },
-                    {
-                      name: "facebook",
-                    },
-                  ].map((item, index) => (
-                    <Link
-                      href="/dashboard"
-                      key={`message-sub-${index}`}
-                      className="cursor-pointer"
-                    >
-                      <DropdownMenuItem className="text-sm font-medium text-default-600 capitalize px-3 py-1.5 cursor-pointer">
-                        {item.name}
-                      </DropdownMenuItem>
-                    </Link>
-                  ))}
-                </DropdownMenuSubContent>
-              </DropdownMenuPortal> */}
-            </DropdownMenuSub>
+            <div className="flex flex-col text-left lg:block hidden">
+              <span className="text-xs font-bold text-slate-800 capitalize block tracking-tight group-hover:text-[#FF6B4A] transition-colors">
+                {role || "Super Admin"}
+              </span>
+            </div>
+            <span className="text-slate-400 group-hover:text-[#FF6B4A] transition-transform duration-300 lg:inline-block hidden group-data-[state=open]:rotate-180">
+              <Icon icon="heroicons-outline:chevron-down" className="w-3.5 h-3.5" />
+            </span>
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-72 p-2 rounded-sm bg-white border border-slate-200/90 shadow-2xl shadow-slate-900/10 overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200" align="end" sideOffset={8}>
+          {/* Light-themed Hero Card */}
+          <div className="relative overflow-hidden p-3.5 rounded-sm bg-gradient-to-br from-slate-50 via-orange-50/40 to-amber-50/30 border border-orange-100/80 shadow-xs">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-sm bg-gradient-to-tr from-[#FF6B4A] to-[#F48220] text-white flex items-center justify-center font-bold text-sm shadow-md shadow-orange-500/25 ring-1 ring-white shrink-0">
+                {initials}
+              </div>
+              <div className="overflow-hidden min-w-0 flex-1">
+                <div className="text-sm font-bold text-slate-900 capitalize truncate tracking-tight">
+                  {role || "Super Admin"}
+                </div>
+                <div className="text-xs text-slate-500 truncate flex items-center gap-1.5 mt-0.5">
+                  <Icon icon="heroicons:envelope" className="w-3.5 h-3.5 text-[#FF6B4A] shrink-0" />
+                  <span className="truncate font-medium">{email || "admin@creditcircle.com"}</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
-            {/* <DropdownMenuSub>
-              <DropdownMenuSubTrigger className="flex items-center gap-2 text-sm font-medium text-default-600 capitalize px-3 py-1.5 cursor-pointer">
-                <Icon icon="heroicons:phone" className="w-4 h-4" />
-                Support
-              </DropdownMenuSubTrigger>
-              <DropdownMenuPortal>
-                <DropdownMenuSubContent>
-                  {[
-                    {
-                      name: "portal",
-                    },
-                    {
-                      name: "slack",
-                    },
-                    {
-                      name: "whatsapp",
-                    },
-                  ].map((item, index) => (
-                    <Link href="/dashboard" key={`message-sub-${index}`}>
-                      <DropdownMenuItem className="text-sm font-medium text-default-600 capitalize px-3 py-1.5 cursor-pointer">
-                        {item.name}
-                      </DropdownMenuItem>
-                    </Link>
-                  ))}
-                </DropdownMenuSubContent>
-              </DropdownMenuPortal>
-            </DropdownMenuSub> */}
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator className="mb-0 dark:bg-background" />
-          <DropdownMenuItem className="flex items-center gap-2 text-sm font-medium text-default-600 capitalize my-1 px-3 cursor-pointer">
-            <div>
-              <form
-                action={async () => {
-                  "use server";
-                  await signOut();
-                }}
+
+          <DropdownMenuSeparator className="my-2 bg-slate-100" />
+
+          {/* Sign Out Button */}
+          <DropdownMenuItem asChild className="rounded-sm px-3 py-2 text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50/80 cursor-pointer transition-all duration-150 focus:bg-rose-50 focus:text-rose-700 group">
+            <form
+              action={async () => {
+                "use server";
+                await signOut();
+              }}
+              className="w-full"
+            >
+              <button
+                type="submit"
+                className="w-full flex items-center justify-between cursor-pointer"
               >
-                <button
-                  type="submit"
-                  className=" w-full  flex  items-center gap-2"
-                >
-                  <Icon icon="heroicons:power" className="w-4 h-4" />
-                  Log out
-                </button>
-              </form>
-            </div>
+                <div className="flex items-center gap-2.5">
+                  <div className="p-1.5 rounded-sm bg-rose-100/70 text-rose-600 group-hover:bg-rose-600 group-hover:text-white transition-colors duration-200">
+                    <Icon icon="heroicons:power" className="w-3.5 h-3.5" />
+                  </div>
+                  <span>Log out</span>
+                </div>
+                <Icon icon="heroicons:arrow-right-on-rectangle" className="w-4 h-4 text-rose-400 group-hover:translate-x-0.5 transition-transform duration-200" />
+              </button>
+            </form>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

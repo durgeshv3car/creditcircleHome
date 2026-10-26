@@ -18,17 +18,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
+  DropdownMenuItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Icon } from "@/components/ui/icon";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import {
   Select,
   SelectContent,
@@ -44,9 +37,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  FileText,
+  SlidersHorizontal,
+  Check,
+  Search,
+  X,
+  Plus,
+  FolderOpen,
+} from "lucide-react";
 import TablePagination from "./table-pagination";
 import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
+import { cn } from "@/lib/utils";
 
 type ModalType = "faq" | "policy" | "creditScore" | "walletPoints";
 
@@ -122,14 +125,16 @@ interface TableProps<T> {
   tableData: T[];
   setRefresh: React.Dispatch<React.SetStateAction<boolean>>;
   type: ModalType;
+  isLoading?: boolean;
 }
 
-const ExampleTwo = <T,>({
+const ExampleTwo = <T extends Record<string, any>>({
   tableHeading,
   tableData,
   tableColumns,
   setRefresh,
   type,
+  isLoading = false,
 }: TableProps<T>) => {
   const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
@@ -153,47 +158,51 @@ const ExampleTwo = <T,>({
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnsField, setColumnsField] = React.useState<string[]>([]);
   const [pageSize, setPageSize] = React.useState(20);
+  const [searchQuery, setSearchQuery] = React.useState("");
+
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize,
   });
 
-  const [globalFilter, setGlobalFilter] = React.useState(""); 
-
   const table = useReactTable({
     data: tableData,
     columns: tableColumns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onPaginationChange: setPagination,
+    onRowSelectionChange: setRowSelection,
+    onGlobalFilterChange: setSearchQuery,
+    globalFilterFn: (row, columnId, filterValue) => {
+      const q = (filterValue ?? "").toString().toLowerCase();
+      if (!q) return true;
+      const title = row.getValue("title")?.toString().toLowerCase() ?? "";
+      const companyUrl =
+        row.getValue("companyUrl")?.toString().toLowerCase() ?? "";
+      const description =
+        row.getValue("description")?.toString().toLowerCase() ?? "";
+      return (
+        title.includes(q) || companyUrl.includes(q) || description.includes(q)
+      );
+    },
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
       pagination,
-      globalFilter, // ✅ ADDED
-    },
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
-    onPaginationChange: setPagination,
-    onRowSelectionChange: setRowSelection,
-    onGlobalFilterChange: setGlobalFilter, // ✅ ADDED
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-
-    // ✅ Custom global filter for "title" and "companyUrl"
-    globalFilterFn: (row, columnId, filterValue) => {
-      const title = row.getValue("title")?.toString().toLowerCase() ?? "";
-      const companyUrl =
-        row.getValue("companyUrl")?.toString().toLowerCase() ?? "";
-      const filter = filterValue?.toLowerCase() ?? "";
-      return title.includes(filter) || companyUrl.includes(filter);
+      globalFilter: searchQuery,
     },
   });
 
   React.useEffect(() => {
     if (!table) return;
+
     const headers = table
       .getHeaderGroups()
       .flatMap((headerGroup) =>
@@ -201,6 +210,7 @@ const ExampleTwo = <T,>({
           String(header.column.columnDef.header)
         )
       );
+
     setColumnsField(headers);
   }, [table]);
 
@@ -215,148 +225,303 @@ const ExampleTwo = <T,>({
   const CreateModalComponent = modalMap[type]?.create;
   const EditModalComponent = modalMap[type]?.edit;
 
+  const selectedCount = Object.keys(rowSelection).length;
+  const currentPage = table.getState().pagination.pageIndex;
+
   return (
     <div className="w-full">
-      <div className="flex items-center justify-between py-4 px-5">
-        <div className="flex items-center gap-16">
-          <div className="text-xl font-medium text-gray-600">
-            {tableHeading}
+      {/* Main Table Card matching LMS Leads */}
+      <div className="p-6 bg-white rounded-sm border border-slate-200/80 shadow-xs mb-8">
+        {/* Top Header & Toolbar Row */}
+        <div className="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-slate-100 mb-2">
+          {/* Header Left */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-sm bg-[#101E4E] text-white flex items-center justify-center shrink-0 shadow-xs">
+              <FileText className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2.5">
+                <h2 className="text-lg font-bold text-slate-900 tracking-tight">
+                  {tableHeading}
+                </h2>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#101E4E]/10 text-[#101E4E] border border-[#101E4E]/20">
+                  {tableData.length} records
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 font-normal mt-0.5">
+                Manage, update, schedule and configure content records
+              </p>
+            </div>
           </div>
-          <Button
-            onClick={createPage}
-            className="bg-gray-600 hover:bg-gray-700 text-white h-8 text-xs rounded-md shadow-sm transition-all px-6"
-          >
-            Add {tableHeading}
-          </Button>
+
+          {/* Right Toolbar */}
+          <div className="flex flex-wrap items-center gap-2.5">
+            {/* Quick Search */}
+            <div className="relative flex items-center">
+              <Input
+                placeholder="Search records..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-9 pr-7 text-xs bg-white border border-slate-200 rounded-sm text-slate-800 placeholder:text-slate-400 focus-visible:ring-1 focus-visible:ring-[#FF6B4A] focus-visible:border-[#FF6B4A] w-44 sm:w-56 shadow-2xs"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            {/* Columns Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="h-9 px-3 text-xs font-medium rounded-sm border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 flex items-center gap-1.5 shadow-2xs cursor-pointer transition-colors"
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Columns</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="w-56 p-0 rounded-sm bg-white border border-slate-200 shadow-xl overflow-hidden z-50"
+              >
+                <div className="px-3.5 py-2.5 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-slate-800">
+                    Visible Columns
+                  </span>
+                  <div className="flex items-center gap-1 text-[11px]">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        table
+                          .getAllColumns()
+                          .filter((c) => c.getCanHide())
+                          .forEach((c) => c.toggleVisibility(true));
+                      }}
+                      className="font-medium text-slate-500 hover:text-[#EA580C] px-1.5 py-0.5 rounded hover:bg-slate-100 transition-colors cursor-pointer"
+                    >
+                      All
+                    </button>
+                    <span className="text-slate-300">·</span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        table
+                          .getAllColumns()
+                          .filter((c) => c.getCanHide())
+                          .forEach((c) => c.toggleVisibility(false));
+                      }}
+                      className="font-medium text-slate-500 hover:text-rose-600 px-1.5 py-0.5 rounded hover:bg-slate-100 transition-colors cursor-pointer"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                </div>
+
+                <div className="max-h-60 overflow-y-auto p-1.5 space-y-0.5 clean-scrollbar">
+                  {table
+                    .getAllColumns()
+                    .filter((column) => column.getCanHide())
+                    .map((column) => {
+                      const isVisible = column.getIsVisible();
+                      return (
+                        <DropdownMenuItem
+                          key={column.id}
+                          onSelect={(e) => {
+                            e.preventDefault();
+                            column.toggleVisibility(!isVisible);
+                          }}
+                          className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 cursor-pointer focus:bg-slate-50 focus:text-slate-900 outline-none transition-colors"
+                        >
+                          <div
+                            className={cn(
+                              "w-4 h-4 rounded-[3px] border flex items-center justify-center transition-all duration-150 shrink-0",
+                              isVisible
+                                ? "bg-[#FF6B4A] border-[#FF6B4A] text-white shadow-2xs"
+                                : "border-slate-300 bg-white hover:border-slate-400"
+                            )}
+                          >
+                            {isVisible && (
+                              <Check className="w-3 h-3 stroke-[2.5]" />
+                            )}
+                          </div>
+                          <span className="truncate flex-1 capitalize">
+                            {column.id.replace(/([A-Z])/g, " $1")}
+                          </span>
+                        </DropdownMenuItem>
+                      );
+                    })}
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Create New Entry Button */}
+            {CreateModalComponent && (
+              <button
+                onClick={createPage}
+                className="bg-[#FF6B4A] hover:bg-[#E65A38] text-white px-3.5 h-9 rounded-sm text-xs font-semibold shadow-sm transition-colors cursor-pointer flex items-center gap-1.5 active:scale-95"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add {tableHeading}</span>
+              </button>
+            )}
+          </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <label className="text-sm text-gray-600">Rows per page:</label>
-          <Select
-            onValueChange={(value) => setPageSize(Number(value))}
-            value={String(pageSize)}
-          >
-            <SelectTrigger className="w-20 border rounded px-2 py-1">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {[20, 50, 100].map((value) => (
-                <SelectItem key={value} value={String(value)}>
-                  {value}
-                </SelectItem>
+        {/* Selected Rows Banner if any */}
+        {selectedCount > 0 && (
+          <div className="flex items-center justify-between p-3 mb-3 bg-[#FFF1ED]/60 border border-[#FFD7CC] rounded-sm text-xs font-semibold text-[#EA580C]">
+            <span>
+              {selectedCount} item{selectedCount > 1 ? "s" : ""} selected
+            </span>
+            <button
+              type="button"
+              onClick={() => setRowSelection({})}
+              className="text-xs font-bold text-slate-600 hover:text-slate-900 bg-white px-2.5 py-1 rounded-sm border border-slate-200 shadow-2xs cursor-pointer"
+            >
+              Clear selection
+            </button>
+          </div>
+        )}
+
+        {/* Table Component */}
+        <div className="overflow-x-auto rounded-sm border border-slate-200/80">
+          <Table className="w-full text-left border-collapse">
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow
+                  key={headerGroup.id}
+                  className="hover:bg-transparent bg-slate-50/60 border-b border-slate-100"
+                >
+                  {headerGroup.headers.map((header) => (
+                    <TableHead
+                      key={header.id}
+                      onClick={header.column.getToggleSortingHandler()}
+                      className="cursor-pointer select-none py-3 px-4 text-[11px] font-medium text-slate-400 uppercase tracking-wider hover:text-slate-700 transition-colors whitespace-nowrap"
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  ))}
+                </TableRow>
               ))}
-            </SelectContent>
-          </Select>
+            </TableHeader>
 
-          <label className="text-sm text-gray-600">Hide Column:</label>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto">
-                Columns
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" forceMount>
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
+            <TableBody>
+              {isLoading ? (
+                Array.from({ length: 6 }).map((_, rIdx) => (
+                  <TableRow
+                    key={`skeleton-${rIdx}`}
+                    className="border-b border-slate-100"
                   >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                    {table.getVisibleLeafColumns().map((col) => (
+                      <TableCell
+                        key={`skeleton-cell-${col.id}-${rIdx}`}
+                        className="py-3.5 px-4"
+                      >
+                        <div className="h-4 w-20 bg-slate-100 rounded animate-pulse" />
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : table.getRowModel().rows.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                    className="group border-b border-slate-100 hover:bg-slate-50/50 transition-colors data-[state=selected]:bg-[#FFF1ED]/40 cursor-default"
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        className="py-3.5 px-4 text-xs"
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={table.getVisibleLeafColumns().length || 6}
+                    className="h-44 text-center"
+                  >
+                    <div className="flex flex-col items-center justify-center gap-2 text-slate-400 py-8">
+                      <FolderOpen className="w-8 h-8 text-slate-300" />
+                      <p className="text-sm font-semibold text-slate-700">
+                        No records found
+                      </p>
+                      <p className="text-xs text-slate-400">
+                        Try adjusting your search criteria or adding a new entry.
+                      </p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
 
-          {/* ✅ Updated Filter Input */}
-          <Input
-            placeholder="Filter ..."
-            value={globalFilter}
-            onChange={(event) => setGlobalFilter(event.target.value)}
-            className="max-w-sm"
-          />
+        {/* Bottom Pagination Bar */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 mt-2 border-t border-slate-100">
+          <div className="text-xs text-slate-500 font-normal">
+            Showing{" "}
+            {table.getRowModel().rows.length
+              ? currentPage * pageSize + 1
+              : 0}
+            –
+            {Math.min(
+              (currentPage + 1) * pageSize,
+              table.getFilteredRowModel().rows.length
+            )}{" "}
+            of {table.getFilteredRowModel().rows.length.toLocaleString()} records
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 text-xs text-slate-500 font-normal">
+              <span>Rows per page</span>
+              <Select
+                value={String(pageSize)}
+                onValueChange={(value) => setPageSize(Number(value))}
+              >
+                <SelectTrigger className="h-8 px-2.5 rounded-md border border-slate-200 bg-white text-xs font-medium text-slate-700 shadow-none hover:bg-slate-50 cursor-pointer w-auto min-w-[60px] gap-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="rounded-lg border border-slate-200 bg-white shadow-lg p-1">
+                  {[20, 50, 100].map((v) => (
+                    <SelectItem
+                      key={v}
+                      value={String(v)}
+                      className="rounded-md text-xs cursor-pointer"
+                    >
+                      {v}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <TablePagination table={table} />
+          </div>
         </div>
       </div>
 
-      <Table>
-        <TableHeader className="bg-default-200">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHead
-                  key={header.id}
-                  onClick={header.column.getToggleSortingHandler()}
-                  className="cursor-pointer select-none"
-                >
-                  {header.isPlaceholder ? null : (
-                    <div className="flex items-center justify-between">
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                      {header.column.getIsSorted() && (
-                        <span className="text-sm">
-                          {header.column.getIsSorted() === "asc" ? (
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <span className="cursor-pointer">
-                                    <Icon icon="heroicons:arrow-up" />
-                                  </span>
-                                </TooltipTrigger>
-                              </Tooltip>
-                            </TooltipProvider>
-                          ) : (
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <span className="cursor-pointer">
-                                    <Icon icon="heroicons:arrow-down" />
-                                  </span>
-                                </TooltipTrigger>
-                              </Tooltip>
-                            </TooltipProvider>
-                          )}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-
-        <TableBody>
-          {table.getRowModel()?.rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell
-                colSpan={tableColumns.length}
-                className="h-24 text-center"
-              >
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      <TablePagination table={table} />
+      {/* Create Modal */}
       {isCreateOpen && CreateModalComponent && (
         <CreateModalComponent
           onClose={closeCreateModal}
@@ -365,6 +530,8 @@ const ExampleTwo = <T,>({
           type={type}
         />
       )}
+
+      {/* Edit Modal */}
       {isModalOpen && EditModalComponent && (
         <EditModalComponent
           id={leadId}

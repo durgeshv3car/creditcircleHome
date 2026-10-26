@@ -61,11 +61,10 @@ export function CollapseMenuButton2({
                 <div className=' flex items-center group [&[data-state=open]>button>div>div>svg]:rotate-180' >
 
                     <Button
-
                         variant={active ? "default" : "ghost"}
-                        color={active ? 'default' : 'secondary'}
-                        className={cn('justify-start capitalize md:px-3 px-3 h-10', {
-                            'group-data-[state=open]:bg-secondary': !active
+                        className={cn('justify-start capitalize md:px-3 px-3 h-10 rounded-sm transition-all', {
+                            'bg-gradient-to-r from-[#FF6B4A] to-[#F48220] text-white shadow-md shadow-orange-500/25 ring-1 ring-white/20': active,
+                            'text-slate-300 hover:text-white hover:bg-white/[0.08]': !active
                         })}
                         fullWidth
                     >

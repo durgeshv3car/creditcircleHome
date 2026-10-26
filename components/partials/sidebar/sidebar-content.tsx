@@ -31,19 +31,14 @@ const SidebarContent = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <aside
-            onMouseEnter={() => config.sidebar === 'classic' && setHoverConfig({ hovered: true })}
-            onMouseLeave={() => config.sidebar === 'classic' && setHoverConfig({ hovered: false })}
-
-            className={cn('fixed  z-50 w-[248px]  bg-sidebar  shadow-base    xl:block hidden ', sidebarTheme, {
+            className={cn('fixed z-50 w-[248px] bg-gradient-to-b from-[#0B1740] via-[#0D1B48] to-[#111F50] text-slate-200 border-r border-white/[0.08] shadow-[4px_0_24px_rgba(11,23,64,0.18)] xl:block hidden transition-all duration-300 ease-in-out', sidebarTheme, {
                 'w-[72px]': config.collapsed && config.sidebar !== 'compact',
                 'border-b': config.skin === 'bordered',
                 'shadow-base': config.skin === 'default',
                 'h-full start-0': config.layout !== 'semi-box' && config.layout !== 'compact',
-                'm-6 bottom-0 top-0  start-0   rounded-md': config.layout === 'semi-box',
+                'm-6 bottom-0 top-0  start-0   rounded-sm': config.layout === 'semi-box',
                 'm-10 bottom-0 top-0  start-0   ': config.layout === 'compact',
                 'w-28': config.sidebar === 'compact',
-                "w-[248px]": hoverConfig.hovered
-
             })}>
             <div className=" relative  flex flex-col h-full  ">
                 {config.sidebarBgImage !== undefined && (

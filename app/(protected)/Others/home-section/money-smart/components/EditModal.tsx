@@ -6,12 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ImageUpload from "../../../components/ImageUpload";
 import { toast } from "sonner";
-import axios from "axios";
 import { Switch } from "@/components/ui/switch";
 import { updateMoney } from "@/app/(protected)/services/moneySmart/api";
 import TextEditor from "./SunEditor";
-
 import { FileWithPreview } from "../../../components/ImageUpload";
+import { X, Banknote, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+
 interface TableRow {
   id: string;
   imageUrl?: string;
@@ -36,15 +37,15 @@ const EditModal: React.FC<EditModalProps> = ({
   const [selectedRow, setSelectedRow] = useState<TableRow | null>(null);
   const [mobileFile, setMobileFile] = useState<FileWithPreview | null>(null);
   const [webFile, setWebFile] = useState<FileWithPreview | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const Web_DIMENSIONS = { width: 1920, height: 970 };
-  const Mobile_DIMENSIONS = { width: 356*2, height: 180*2 };
+  const Mobile_DIMENSIONS = { width: 356 * 2, height: 180 * 2 };
   const dimensions = {
     web: Web_DIMENSIONS,
     mobile: Mobile_DIMENSIONS,
   };
 
-  // Find the row data based on the id
   useEffect(() => {
     if (id && tableData) {
       const foundRow = tableData.find((row) => row.id === id) || null;
@@ -73,141 +74,211 @@ const EditModal: React.FC<EditModalProps> = ({
 
   const refreshData = () => setRefresh((prev) => !prev);
   const type = "money";
+
   const handleUpdate = async () => {
     if (!id) return;
 
-    const result = await updateMoney(
-      id,
-      type,
-      dimensions,
-      editedData,
-      mobileFile?.file,
-      webFile?.file,
-      mobileFile?.preview,
-      webFile?.preview
-    );
+    setIsSubmitting(true);
+    try {
+      const result = await updateMoney(
+        id,
+        type,
+        dimensions,
+        editedData,
+        mobileFile?.file,
+        webFile?.file,
+        mobileFile?.preview,
+        webFile?.preview
+      );
 
-    if (result?.success) {
-      refreshData();
-      handleClose();
-      toast.success("MoneySmart updated successfully!");
-    } else {
-      toast.error(result?.message || "An error occurred.");
+      if (result?.success) {
+        refreshData();
+        handleClose();
+        toast.success("MoneySmart updated successfully!");
+      } else {
+        toast.error(result?.message || "Failed to update entry.");
+      }
+    } catch (error) {
+      console.error("Error updating:", error);
+      toast.error("An error occurred while updating");
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
   if (!selectedRow) return null;
 
   return (
     <>
-      {/* Overlay */}
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-40"
+        className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 transition-opacity"
         onClick={handleClose}
       />
-
-      {/* Right-Side Modal */}
-      <div className="fixed right-0 top-0 h-full w-1/3 bg-white shadow-lg transform transition-transform duration-300 translate-x-0 z-50 p-6 overflow-y-auto max-h-screen">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-medium">Edit Row</h2>
-          <button
-            onClick={handleClose}
-            className="text-gray-600 hover:text-black"
-          >
-            ✖
-          </button>
-        </div>
-
-        <div className="space-y-3">
-          {Object.keys(selectedRow).map((key) =>
-            ![
-              "id",
-              "action",
-              "createdAt",
-              "updatedAt",
-              "type",
-              "thumbnail",
-              "userId",
-              "isHome",
-              "brandLogo",
-              "brandName",
-              "category",
-              "offerBanner",
-              "deletionDate",
-              "buttonType",
-            ].includes(key) ? (
-              <div key={key}>
-                <div className="flex items-center">
-                  <label className="block text-sm font-medium">
-                    {key === "offerImage" ? "" : key}
-                  </label>
-              
-                </div>
-
-                {/* Handle Nested `offerImage` Object */}
-                {key === "offerImage" &&
-                typeof selectedRow[key] === "object" ? (
-                  <div className="space-y-3">
-                    {/* Web Image */}
-                    <div>
-                      <label className="block text-sm font-medium">Web  ( {Web_DIMENSIONS.width} x {Web_DIMENSIONS.height} )</label>
-                      <ImageUpload
-                        files={webFile ? [webFile] : []}
-                        setFiles={(files: FileWithPreview[]) =>
-                          setWebFile(files[0] || null)
-                        }
-                        label="Web"
-                      />
-                    </div>
-
-                    {/* Mobile Image */}
-                    <div>
-                      <label className="block text-sm font-medium">
-                        Mobile ( {Mobile_DIMENSIONS.width} x {Mobile_DIMENSIONS.height} )
-                      </label>
-                      <ImageUpload
-                        files={mobileFile ? [mobileFile] : []}
-                        setFiles={(files: FileWithPreview[]) =>
-                          setMobileFile(files[0] || null)
-                        }
-                        label="Mobile"
-                      />
-                    </div>
-                  </div>
-                ) : key === "isActive" ? (
-                  <Switch
-                    checked={Boolean(editedData[key])}
-                    onCheckedChange={(value) =>
-                      setEditedData((prev) => ({ ...prev, [key]: value }))
-                    }
-                  />
-                ) : key === "detailDescription" ? (
-                  <TextEditor
-                    value={editedData.detailDescription || ""}
-                    onChange={(value: string) =>
-                      setEditedData((prev) => ({
-                        ...prev,
-                        detailDescription: value,
-                      }))
-                    }
-                  />
-                ) : (
-                  <Input
-                    name={key}
-                    value={editedData[key] || ""}
-                    onChange={onInputChange}
-                    className="w-full"
-                  />
-                )}
+      <div className="fixed right-0 top-0 h-full w-full sm:w-[540px] md:w-[600px] bg-white shadow-2xl z-50 p-6 flex flex-col justify-between overflow-y-auto animate-in slide-in-from-right duration-200">
+        <div>
+          {/* Header */}
+          <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-[#FFF1ED] text-[#EA580C] flex items-center justify-center shadow-2xs">
+                <Banknote className="w-4 h-4 text-[#EA580C]" />
               </div>
-            ) : null
-          )}
+              <div>
+                <h2 className="text-base font-bold text-slate-900">Edit MoneySmarts Entry</h2>
+                <p className="text-xs text-slate-400">Update financial insight banners and rich content</p>
+              </div>
+            </div>
+            <button
+              onClick={handleClose}
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Form */}
+          <div className="mt-6 space-y-4">
+            {Object.keys(selectedRow).map((key) =>
+              ![
+                "id",
+                "action",
+                "createdAt",
+                "updatedAt",
+                "type",
+                "thumbnail",
+                "userId",
+                "isHome",
+                "brandLogo",
+                "brandName",
+                "category",
+                "offerBanner",
+                "deletionDate",
+                "buttonType",
+              ].includes(key) ? (
+                <div key={key}>
+                  {key === "offerImage" &&
+                  typeof selectedRow[key] === "object" ? (
+                    <div className="space-y-3">
+                      <div>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label className="block text-xs font-semibold text-slate-700">
+                            Web Banner
+                          </label>
+                          <span className="text-[11px] text-slate-400 font-medium">
+                            {Web_DIMENSIONS.width} × {Web_DIMENSIONS.height} px
+                          </span>
+                        </div>
+                        <ImageUpload
+                          files={webFile ? [webFile] : []}
+                          setFiles={(files: FileWithPreview[]) =>
+                            setWebFile(files[0] || null)
+                          }
+                          label="Web"
+                        />
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label className="block text-xs font-semibold text-slate-700">
+                            Mobile Banner
+                          </label>
+                          <span className="text-[11px] text-slate-400 font-medium">
+                            {Mobile_DIMENSIONS.width} × {Mobile_DIMENSIONS.height} px
+                          </span>
+                        </div>
+                        <ImageUpload
+                          files={mobileFile ? [mobileFile] : []}
+                          setFiles={(files: FileWithPreview[]) =>
+                            setMobileFile(files[0] || null)
+                          }
+                          label="Mobile"
+                        />
+                      </div>
+                    </div>
+                  ) : key === "isActive" ? (
+                    <div className="flex items-center gap-2.5 pt-1">
+                      <Switch
+                        checked={Boolean(editedData[key])}
+                        onCheckedChange={(value) =>
+                          setEditedData((prev) => ({ ...prev, [key]: value }))
+                        }
+                        className="data-[state=checked]:bg-[#101E4E] data-[state=unchecked]:bg-slate-200 focus-visible:ring-[#101E4E] cursor-pointer"
+                      />
+                      <span
+                        className={cn(
+                          "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide transition-all select-none border",
+                          editedData[key]
+                            ? "bg-[#101E4E]/10 text-[#101E4E] border-[#101E4E]/25 shadow-2xs"
+                            : "bg-slate-50 text-slate-500 border-slate-200/80"
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            "w-1.5 h-1.5 rounded-full shrink-0",
+                            editedData[key] ? "bg-[#101E4E]" : "bg-slate-400"
+                          )}
+                        />
+                        {editedData[key] ? "Active" : "Inactive"}
+                      </span>
+                    </div>
+                  ) : key === "detailDescription" ? (
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                        Detail Description
+                      </label>
+                      <TextEditor
+                        value={editedData.detailDescription || ""}
+                        onChange={(value: string) =>
+                          setEditedData((prev) => ({
+                            ...prev,
+                            detailDescription: value,
+                          }))
+                        }
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 capitalize mb-1.5">
+                        {key}
+                      </label>
+                      <Input
+                        name={key}
+                        value={editedData[key] || ""}
+                        onChange={onInputChange}
+                        className="w-full text-xs h-10 border-slate-200 rounded-lg focus-visible:ring-1 focus-visible:ring-[#FF6B4A]"
+                      />
+                    </div>
+                  )}
+                </div>
+              ) : null
+            )}
+          </div>
         </div>
 
-        <div className="mt-4 flex justify-end gap-2">
-          <Button variant="outline" onClick={handleClose}>
+        {/* Footer Actions */}
+        <div className="pt-4 mt-6 border-t border-slate-100 flex items-center justify-end gap-2.5">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleClose}
+            className="h-9 px-4 text-xs font-medium rounded-lg border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer"
+          >
             Cancel
           </Button>
-          <Button onClick={handleUpdate}>Save Changes</Button>
+          <Button
+            type="button"
+            onClick={handleUpdate}
+            disabled={isSubmitting}
+            className="h-9 px-4 text-xs font-semibold rounded-lg bg-[#FF6B4A] hover:bg-[#E65A38] text-white shadow-sm cursor-pointer flex items-center gap-1.5 active:scale-95"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span>Updating...</span>
+              </>
+            ) : (
+              <span>Save Changes</span>
+            )}
+          </Button>
         </div>
       </div>
     </>

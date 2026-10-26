@@ -34,7 +34,7 @@ const DashboardPage = () => {
                     title={t("growth_chart_title")}
                     total="+5.0%"
                     className="bg-primary/10 border-none shadow-none"
-                    chartColor="#2563eb"
+                    chartColor="#FF6B4A"
                   />
                 </div>
               </CardContent>

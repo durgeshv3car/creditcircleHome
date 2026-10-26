@@ -17,6 +17,8 @@ interface DecodedToken {
 }
 
 
+import { Icon } from "@/components/ui/icon";
+
 const DashCodeHeader = async() => {
 
    const session = await auth();
@@ -34,11 +36,11 @@ const DashCodeHeader = async() => {
         <HeaderLogo />
         <SidebarToggle />
         <HeaderGreet admin={name} />
-       
       </div>
-      <div className="nav-tools flex items-center md:gap-4 gap-3">
+
+      <div className="nav-tools flex items-center md:gap-3 gap-2">
         <HeaderDateRangeWrapper />
-        <ThemeSwitcher />
+
         <ProfileInfo />
         <SheetMenu />
       </div>

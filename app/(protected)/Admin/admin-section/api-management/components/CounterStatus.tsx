@@ -107,10 +107,10 @@ function CounterStatus({
   return (
     <div className="space-y-6">
       {/* Summary Card */}
-      <div className="bg-gradient-to-br from-slate-50 to-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm">
+      <div className="bg-gradient-to-br from-slate-50 to-gray-50 rounded-lg p-6 border border-gray-200 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-blue-600" />
+            <TrendingUp className="h-5 w-5 text-[#FF6B4A]" />
             Overview
           </h3>
           <div className="text-right">
@@ -151,7 +151,7 @@ function CounterStatus({
           return (
             <div
               key={item.label}
-              className={`${item.bgColor} ${item.borderColor} border rounded-xl p-4 transition-all duration-200 hover:shadow-md hover:scale-[1.02] group cursor-pointer`}
+              className={`${item.bgColor} ${item.borderColor} border rounded-lg p-4 transition-all duration-200 hover:shadow-md hover:scale-[1.02] group cursor-pointer`}
               style={{
                 animationDelay: `${index * 100}ms`,
                 animation: "fadeInUp 0.5s ease-out forwards",
@@ -160,7 +160,7 @@ function CounterStatus({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div
-                    className={`p-2 rounded-lg bg-white/70 group-hover:bg-white transition-colors duration-200`}
+                    className={`p-2 rounded-md bg-white/70 group-hover:bg-white transition-colors duration-200`}
                   >
                     <Icon className={`h-5 w-5 ${item.iconColor}`} />
                   </div>
@@ -201,16 +201,16 @@ export function CounterStatusModal({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium flex items-center gap-2 group">
-          <Calendar className="h-4 w-4 group-hover:rotate-12 transition-transform duration-200" />
-          View Status
+        <button className="h-8 px-3 bg-[#FFF1ED] hover:bg-[#FFE8E0] text-[#EA580C] border border-[#FFD7CC] rounded-md text-xs font-medium transition-colors inline-flex items-center gap-1.5 cursor-pointer shadow-2xs">
+          <Calendar className="h-3.5 w-3.5 text-[#FF6B4A]" />
+          <span>View Status</span>
         </button>
       </DialogTrigger>
-      <DialogContent className="max-w-lg rounded-3xl border-0 shadow-2xl bg-white">
+      <DialogContent className="max-w-lg rounded-lg border-0 shadow-2xl bg-white">
         <DialogHeader className="pb-4 border-b border-gray-100">
           <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-xl">
-              <TrendingUp className="h-6 w-6 text-blue-600" />
+            <div className="p-2 bg-[#FFF1ED] rounded-md">
+              <TrendingUp className="h-6 w-6 text-[#FF6B4A]" />
             </div>
             Status Report
           </DialogTitle>

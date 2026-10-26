@@ -5,6 +5,7 @@ import ExampleTwo from "./table";
 import { columns } from "./table/columns";
 import { fetchNotifications } from "../../../services/notifications/app/api";
 import { DataProps } from "./table/columns";
+import Loader from "@/components/loader";
 
 export type SelectedValues = {
   title: string | null;
@@ -83,18 +84,19 @@ const NotificationCenterPage = () => {
         return;
       }
 
-      setData(result.data);
-      setTotalPages(result.totalPages);
-      setRecordsCount(result.totalRecords);
+      setData(Array.isArray(result?.data) ? result.data : []);
+      setTotalPages(result?.totalPages || 0);
+      setRecordsCount(result?.totalRecords || 0);
 
       // ✅ Reset page size back to 20 when "All" is selected
       if (selectedValues.title === "" || selectedValues.status === "" || selectedValues.counter==="") {
         setPageSize(20);
       } else {
-        setPageSize(result.totalRecords >= 20 ? pageSize : result.totalRecords);
+        setPageSize(result?.totalRecords >= 20 ? pageSize : result?.totalRecords || 20);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
+      setData([]);
     } finally {
       setLoading(false);
     }
@@ -107,12 +109,15 @@ useEffect(() => {
 }, [refresh, currentPage, pageSize, startDate, endDate, selectedValues, datesLoaded]);
 
 
-  const filteredData = data.filter((item) => {
+  const safeData = Array.isArray(data) ? data : [];
+  const filteredData = safeData.filter((item) => {
+    if (!item) return false;
     return (
       (!selectedValues.title ||
-        item.title
-          .toLowerCase()
-          .includes(selectedValues.title.toLowerCase())) &&
+        (item.title &&
+          item.title
+            .toLowerCase()
+            .includes(selectedValues.title.toLowerCase()))) &&
       (!selectedValues.category ||
         (item.offer?.category &&
           item.offer.category
@@ -127,29 +132,31 @@ useEffect(() => {
     );
   });
 
+  if (loading) return <Loader className="min-h-[50vh] h-auto" />;
+
   return (
-    <>
-      <div className="mt-6 space-y-6">
-        <ExampleTwo
-          selectedValues={selectedValues}
-          setSelectedValues={setSelectedValues}
-          tableData={filteredData}
-          tableColumns={columns({
-            pageSize,
-            totalPages,
-            currentPage,
-            recordsCount,
-          })}
-          setRefresh={setRefresh}
-          pageSize={pageSize}
-          setPageSize={setPageSize}
-          totalPages={totalPages}
-          setTotalPages={setTotalPages}
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-        />
-      </div>
-    </>
+    <div className="w-full space-y-6">
+      <ExampleTwo
+        selectedValues={selectedValues}
+        setSelectedValues={setSelectedValues}
+        tableData={filteredData}
+        tableColumns={columns({
+          pageSize,
+          totalPages,
+          currentPage,
+          recordsCount,
+        })}
+        setRefresh={setRefresh}
+        pageSize={pageSize}
+        setPageSize={setPageSize}
+        totalPages={totalPages}
+        setTotalPages={setTotalPages}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        recordsCount={recordsCount}
+        isLoading={loading}
+      />
+    </div>
   );
 };
 

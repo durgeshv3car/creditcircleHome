@@ -25,9 +25,10 @@ const LeadPage = ({ token }: { token: string }) => {
   const [data, setData] = useState<DataProps[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refresh, setRefresh] = useState<boolean>(false);
-  const [pageSize, setPageSize] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState<number>(20);
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [recordsCount, setRecordsCount] = useState<number>(0);
 
   // New state for filter options
   const [allFilterOptions, setAllFilterOptions] = useState<{
@@ -37,14 +38,6 @@ const LeadPage = ({ token }: { token: string }) => {
     phoneNumber: [],
     brand: [],
   });
-
-  useEffect(() => {
-    const loadColumns = async () => {
-      const mod = await import("../table/columns");
-      setColumns(mod.columns(fetchData));
-    };
-    loadColumns();
-  }, []);
 
   const fetchData = async () => {
     try {
@@ -57,18 +50,20 @@ const LeadPage = ({ token }: { token: string }) => {
       };
 
       const result = await fetchDevices(activeFilters);
-      setData(result.data);
-      setTotalPages(result.pagination.totalPages);
+      setData(result.data || []);
+      setTotalPages(result.pagination?.totalPages || 0);
+      setRecordsCount(result.pagination?.totalRecords || 0);
       setPageSize(
-        result.pagination.totalRecords >= 20 ? 20 : result.pagination.totalRecords
+        result.pagination?.totalRecords >= 20 ? 20 : result.pagination?.totalRecords || 20
       );
       setAllFilterOptions({
-        phoneNumber: result.filters.phoneNumbers,
-        brand: result.filters.brands,
+        phoneNumber: result.filters?.phoneNumbers || [],
+        brand: result.filters?.brands || [],
       });
     } catch (error) {
       console.error("Error fetching data:", error);
       setData([]);
+      setRecordsCount(0);
       setAllFilterOptions({ phoneNumber: [], brand: [] });
     } finally {
       setLoading(false);
@@ -76,17 +71,28 @@ const LeadPage = ({ token }: { token: string }) => {
   };
 
   useEffect(() => {
+    const loadColumns = async () => {
+      const mod = await import("../table/columns");
+      setColumns(
+        mod.columns({
+          fetchData,
+          pageSize,
+          totalPages,
+          currentPage,
+          recordsCount,
+        })
+      );
+    };
+    loadColumns();
+  }, [pageSize, totalPages, currentPage, recordsCount]);
+
+  useEffect(() => {
     fetchData();
-  }, [refresh, currentPage, pageSize,JSON.stringify(selectedValues)]);
-
- 
-
-  // Filter data based on selectedValues
+  }, [refresh, currentPage, pageSize, JSON.stringify(selectedValues)]);
 
   return (
     <div>
       <ExampleTwo
-     
         selectedValues={selectedValues}
         setSelectedValues={setSelectedValues}
         tableData={data}
@@ -99,6 +105,8 @@ const LeadPage = ({ token }: { token: string }) => {
         setTotalPages={setTotalPages}
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
+        recordsCount={recordsCount}
+        isLoading={loading}
       />
     </div>
   );

@@ -82,19 +82,19 @@ function AnalyticsPage() {
 
       {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white shadow-sm rounded-xl p-6 border border-gray-200">
+        <div className="bg-white shadow-sm rounded-lg p-6 border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-700">
             {data.offerTitle ? data.offerTitle : "Total Notifications"}
           </h3>
           <p className="text-4xl font-bold mt-3">{data.total}</p>
         </div>
 
-        <div className="bg-white shadow-sm rounded-xl p-6 border border-gray-200">
+        <div className="bg-white shadow-sm rounded-lg p-6 border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-700">Sent</h3>
           <p className="text-4xl font-bold mt-3 text-green-600">{data.sent}</p>
         </div>
 
-        <div className="bg-white shadow-sm rounded-xl p-6 border border-gray-200">
+        <div className="bg-white shadow-sm rounded-lg p-6 border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-700">Failed</h3>
           <p className="text-4xl font-bold mt-3 text-red-600">{data.failed}</p>
         </div>

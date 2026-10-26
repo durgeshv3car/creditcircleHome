@@ -13,6 +13,7 @@ import {
   FileSpreadsheet,
   ChevronDown,
   Loader2,
+  Plus,
 } from "lucide-react";
 import { addcsv, createOtp } from "@/app/(protected)/services/csv/api";
 import { toast } from "@/components/ui/use-toast";
@@ -21,16 +22,16 @@ import { DataProps } from "../table/columns";
 import { SelectedValues } from "../components/Leads";
 import OtpModal from "./OtpModal";
 
-export interface ImportExportButtonsProps<TData> {
+export interface ImportExportButtonsProps<TData = any> {
   setRefresh: React.Dispatch<React.SetStateAction<boolean>>;
   filteredData: TData[];
-  columns: ColumnDef<TData>[];
+  columns: ColumnDef<any, any>[];
   selectedRowsData: DataProps[];
   selected: string;
   selectedValues: SelectedValues;
 }
 
-const ImportExportButtons = <TData extends Record<string, any>>({
+const ImportExportButtons = <TData extends Record<string, any> = any>({
   setRefresh,
   filteredData,
   columns,
@@ -260,47 +261,73 @@ const handleExportXLSX = async () => {
 
 
   return (
-    <div className="flex space-x-4">
+    <div className="flex items-center gap-2">
+      {/* Export Dropdown */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button className="flex items-center gap-2" disabled={isLoading}>
-            {isLoading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <FileUp size={16} />
-            )}
-            Add
-            <ChevronDown size={16} className="ml-1" />
+          <Button
+            variant="outline"
+            className="flex items-center gap-1.5 h-9 px-3 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium rounded-md border border-slate-200 shadow-2xs hover:border-slate-300 transition-colors cursor-pointer"
+          >
+            <FileDown className="w-3.5 h-3.5 text-slate-500" />
+            <span>Export</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem onClick={handleImportCSV} disabled={isLoading}>
-            <FileSpreadsheet className="mr-2 h-4 w-4" />
-            <span>Import CSV</span>
+        <DropdownMenuContent
+          className="w-44 p-1 rounded-lg bg-white border border-slate-200 shadow-lg"
+          align="end"
+        >
+          <DropdownMenuItem
+            onClick={handleExportCSV}
+            className="rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:text-[#EA580C] hover:bg-[#FFF1ED] cursor-pointer transition-colors"
+          >
+            <FileSpreadsheet className="mr-2 h-4 w-4 text-emerald-600" />
+            <span>Export CSV</span>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleImportXLSX} disabled={isLoading}>
-            <FileSpreadsheet className="mr-2 h-4 w-4" />
-            <span>Import XLSX</span>
+          <DropdownMenuItem
+            onClick={handleExportXLSX}
+            className="rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:text-[#EA580C] hover:bg-[#FFF1ED] cursor-pointer transition-colors"
+          >
+            <FileSpreadsheet className="mr-2 h-4 w-4 text-[#EA580C]" />
+            <span>Export XLSX</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
+      {/* Add Lead Dropdown */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button className="flex items-center gap-2">
-            <FileDown size={16} />
-            Download
-            <ChevronDown size={16} className="ml-1" />
+          <Button
+            className="flex items-center gap-1.5 h-9 px-3.5 bg-[#FF6B4A] hover:bg-[#E65A38] text-white text-xs font-semibold rounded-md shadow-sm shadow-orange-500/20 transition-colors cursor-pointer"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Plus className="w-3.5 h-3.5 text-white" />
+            )}
+            <span>Add lead</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem onClick={handleExportCSV}>
-            <FileSpreadsheet className="mr-2 h-4 w-4" />
-            <span >Export CSV</span>
+        <DropdownMenuContent
+          className="w-44 p-1 rounded-lg bg-white border border-slate-200 shadow-lg"
+          align="end"
+        >
+          <DropdownMenuItem
+            onClick={handleImportCSV}
+            disabled={isLoading}
+            className="rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:text-[#EA580C] hover:bg-[#FFF1ED] cursor-pointer transition-colors"
+          >
+            <FileSpreadsheet className="mr-2 h-4 w-4 text-emerald-600" />
+            <span>Import CSV</span>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleExportXLSX}>
-            <FileSpreadsheet className="mr-2 h-4 w-4" />
-            <span >Export XLSX</span>
+          <DropdownMenuItem
+            onClick={handleImportXLSX}
+            disabled={isLoading}
+            className="rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:text-[#EA580C] hover:bg-[#FFF1ED] cursor-pointer transition-colors"
+          >
+            <FileSpreadsheet className="mr-2 h-4 w-4 text-emerald-600" />
+            <span>Import XLSX</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

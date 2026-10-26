@@ -7,7 +7,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import { SquarePen, Trash2, CalendarClock, Timer } from "lucide-react";
+import { SquarePen, Trash2, CalendarClock, Timer, ExternalLink } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -66,15 +66,17 @@ export const columnsRecommend = (
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
+          className="rounded border-slate-300 data-[state=checked]:bg-[#FF6B4A] data-[state=checked]:border-[#FF6B4A] transition-colors"
         />
       </div>
     ),
     cell: ({ row }: { row: any }) => (
-      <div className="flex items-center gap-2 xl:w-16">
+      <div className="flex items-center gap-2">
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
+          className="rounded border-slate-300 data-[state=checked]:bg-[#FF6B4A] data-[state=checked]:border-[#FF6B4A] transition-colors"
         />
       </div>
     ),
@@ -84,43 +86,50 @@ export const columnsRecommend = (
   {
     id: "serialNumber",
     header: "ID",
-    cell: ({ row }: { row: any }) => <span>{row.index + 1}</span>,
+    cell: ({ row }: { row: any }) => (
+      <span className="font-normal text-slate-500 font-mono text-xs whitespace-nowrap">
+        #{row.index + 1}
+      </span>
+    ),
     enableSorting: false,
   },
   {
     accessorKey: "category name",
     header: "Category Name",
     cell: ({ row }: { row: { original: RowData } }) => (
-      <div className="flex gap-3 items-center">
-        <span className="text-sm">{row.original.category}</span>
-      </div>
+      <span className="text-xs font-normal text-slate-800 whitespace-nowrap">
+        {row.original.category}
+      </span>
     ),
   },
   {
     accessorKey: "brand name",
     header: "Brand Name",
     cell: ({ row }: { row: { original: RowData } }) => (
-      <div className="flex gap-3 items-center">
-        <span className="text-sm">{row.original.brandName}</span>
-      </div>
+      <span className="text-xs font-normal text-slate-800 whitespace-nowrap">
+        {row.original.brandName}
+      </span>
     ),
   },
   {
     accessorKey: "title",
     header: "Title",
     cell: ({ row }: { row: { original: RowData } }) => (
-      <div className="flex gap-3 items-center">
-        <span className="text-sm">{row.original.title}</span>
-      </div>
+      <span className="text-xs font-normal text-slate-800 whitespace-nowrap">
+        {row.original.title}
+      </span>
     ),
   },
   {
     accessorKey: "description",
     header: "Description",
     cell: ({ row }: { row: { original: RowData } }) => (
-      <div className="flex gap-3 items-center">
-        <span className="text-sm">{row.original?.description}</span>
-      </div>
+      <span
+        className="text-xs font-normal text-slate-500 max-w-[200px] truncate block"
+        title={row.original?.description}
+      >
+        {row.original?.description || "—"}
+      </span>
     ),
   },
   {
@@ -128,21 +137,36 @@ export const columnsRecommend = (
     header: "Banner",
     cell: ({ row }: { row: { original: RowData } }) => {
       const BannerData = row.original.offerBanner;
-
-      const imageUrls =
-        BannerData && typeof BannerData === "string"
-          ? JSON.parse(BannerData)
-          : BannerData;
+      let imageUrls: any = BannerData;
+      if (BannerData && typeof BannerData === "string") {
+        try {
+          imageUrls = JSON.parse(BannerData);
+        } catch {
+          imageUrls = { banner: BannerData };
+        }
+      }
 
       return (
-        <div className="flex gap-3 items-center">
-          <Avatar className="w-8 h-8 rounded-none bg-transparent shadow-none border-none">
-            {imageUrls?.banner ? (
-              <AvatarImage src={imageUrls.banner} className="rounded-none" />
-            ) : (
-              <AvatarFallback className="rounded-none">NA</AvatarFallback>
-            )}
-          </Avatar>
+        <div className="flex items-center">
+          {imageUrls?.banner ? (
+            <a
+              href={imageUrls.banner}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group block overflow-hidden rounded-md border border-slate-200 bg-slate-100 shadow-2xs hover:shadow-xs transition-all"
+              title="Click to view full banner"
+            >
+              <img
+                src={imageUrls.banner}
+                alt="Banner"
+                className="w-14 h-8 object-cover group-hover:scale-105 transition-transform duration-200"
+              />
+            </a>
+          ) : (
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono text-slate-400 bg-slate-50 border border-slate-200/60 select-none">
+              None
+            </span>
+          )}
         </div>
       );
     },
@@ -152,46 +176,75 @@ export const columnsRecommend = (
     header: "Web",
     cell: ({ row }: { row: { original: RowData } }) => {
       const thumbnailData = row.original.thumbnail;
-
-      const imageUrls =
-        thumbnailData && typeof thumbnailData === "string"
-          ? JSON.parse(thumbnailData)
-          : thumbnailData;
+      let imageUrls: any = thumbnailData;
+      if (thumbnailData && typeof thumbnailData === "string") {
+        try {
+          imageUrls = JSON.parse(thumbnailData);
+        } catch {
+          imageUrls = { web: thumbnailData };
+        }
+      }
 
       return (
-        <div className="flex gap-3 items-center">
-          <Avatar className="w-8 h-8 rounded-none bg-transparent shadow-none border-none">
-            {imageUrls?.web ? (
-              <AvatarImage src={imageUrls.web} className="rounded-none" />
-            ) : (
-              <AvatarFallback className="rounded-none">NA</AvatarFallback>
-            )}
-          </Avatar>
+        <div className="flex items-center">
+          {imageUrls?.web ? (
+            <a
+              href={imageUrls.web}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group block overflow-hidden rounded-md border border-slate-200 bg-slate-100 shadow-2xs hover:shadow-xs transition-all"
+              title="Click to view web creative"
+            >
+              <img
+                src={imageUrls.web}
+                alt="Web creative"
+                className="w-14 h-8 object-cover group-hover:scale-105 transition-transform duration-200"
+              />
+            </a>
+          ) : (
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono text-slate-400 bg-slate-50 border border-slate-200/60 select-none">
+              None
+            </span>
+          )}
         </div>
       );
     },
   },
-
   {
     accessorKey: "thumbnail.mobile",
     header: "Mobile",
     cell: ({ row }: { row: { original: RowData } }) => {
       const thumbnailData = row.original.thumbnail;
-
-      const imageUrls =
-        thumbnailData && typeof thumbnailData === "string"
-          ? JSON.parse(thumbnailData)
-          : thumbnailData;
+      let imageUrls: any = thumbnailData;
+      if (thumbnailData && typeof thumbnailData === "string") {
+        try {
+          imageUrls = JSON.parse(thumbnailData);
+        } catch {
+          imageUrls = { mobile: thumbnailData };
+        }
+      }
 
       return (
-        <div className="flex gap-3 items-center">
-          <Avatar className="w-8 h-8 rounded-none bg-transparent shadow-none border-none">
-            {imageUrls?.mobile ? (
-              <AvatarImage src={imageUrls.mobile} className="rounded-none" />
-            ) : (
-              <AvatarFallback className="rounded-none">NA</AvatarFallback>
-            )}
-          </Avatar>
+        <div className="flex items-center">
+          {imageUrls?.mobile ? (
+            <a
+              href={imageUrls.mobile}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group block overflow-hidden rounded-md border border-slate-200 bg-slate-100 shadow-2xs hover:shadow-xs transition-all"
+              title="Click to view mobile creative"
+            >
+              <img
+                src={imageUrls.mobile}
+                alt="Mobile creative"
+                className="w-14 h-8 object-cover group-hover:scale-105 transition-transform duration-200"
+              />
+            </a>
+          ) : (
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono text-slate-400 bg-slate-50 border border-slate-200/60 select-none">
+              None
+            </span>
+          )}
         </div>
       );
     },
@@ -201,21 +254,36 @@ export const columnsRecommend = (
     header: "Brand Logo",
     cell: ({ row }: { row: { original: RowData } }) => {
       const brandThumbnailData = row.original.brandLogo;
-
-      const imageUrls =
-        brandThumbnailData && typeof brandThumbnailData === "string"
-          ? JSON.parse(brandThumbnailData)
-          : brandThumbnailData;
+      let imageUrls: any = brandThumbnailData;
+      if (brandThumbnailData && typeof brandThumbnailData === "string") {
+        try {
+          imageUrls = JSON.parse(brandThumbnailData);
+        } catch {
+          imageUrls = { logo: brandThumbnailData };
+        }
+      }
 
       return (
-        <div className="flex gap-3 items-center">
-          <Avatar className="w-8 h-8 rounded-none bg-transparent shadow-none border-none">
-            {imageUrls?.logo ? (
-              <AvatarImage src={imageUrls.logo} className="rounded-none" />
-            ) : (
-              <AvatarFallback className="rounded-none">NA</AvatarFallback>
-            )}
-          </Avatar>
+        <div className="flex items-center">
+          {imageUrls?.logo ? (
+            <a
+              href={imageUrls.logo}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group block overflow-hidden rounded-md border border-slate-200 bg-white shadow-2xs hover:shadow-xs p-1"
+              title="Click to view brand logo"
+            >
+              <img
+                src={imageUrls.logo}
+                alt="Brand logo"
+                className="w-8 h-8 object-contain"
+              />
+            </a>
+          ) : (
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono text-slate-400 bg-slate-50 border border-slate-200/60 select-none">
+              None
+            </span>
+          )}
         </div>
       );
     },
@@ -224,26 +292,35 @@ export const columnsRecommend = (
     accessorKey: "button name",
     header: "Button Name",
     cell: ({ row }: { row: { original: RowData } }) => (
-      <div className="flex gap-3 items-center">
-        <span className="text-sm">{row.original.buttonType}</span>
-      </div>
+      <span className="text-xs font-normal text-slate-700 px-2 py-0.5 rounded bg-slate-100 border border-slate-200/60 whitespace-nowrap">
+        {row.original.buttonType}
+      </span>
     ),
   },
   {
     accessorKey: "companyUrl",
     header: "Company URL",
-    cell: ({ row }: { row: { original: RowData } }) => (
-      <div className="flex gap-3 items-center">
-        <a
-          href={row.original.redirectUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm text-blue-500 hover:underline cursor-pointer"
-        >
-          {row.original.redirectUrl}
-        </a>
-      </div>
-    ),
+    cell: ({ row }: { row: { original: RowData } }) => {
+      const url = row.original.redirectUrl;
+      return (
+        <div className="flex items-center">
+          {url ? (
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-700 font-mono font-normal hover:underline max-w-[220px] truncate group"
+              title={url}
+            >
+              <ExternalLink className="w-3.5 h-3.5 text-blue-400 group-hover:text-blue-600 shrink-0" />
+              <span className="truncate">{url}</span>
+            </a>
+          ) : (
+            <span className="text-xs text-slate-400 font-mono">—</span>
+          )}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "active",
@@ -269,7 +346,7 @@ export const columnsRecommend = (
           const result = await deleteOffer(id);
           if (result.success) {
             toast.success("Offer data deleted");
-            setRefresh((prev) => !prev); // Trigger refresh
+            setRefresh((prev) => !prev);
           } else {
             toast.error("Offer data not deleted");
           }
@@ -278,45 +355,44 @@ export const columnsRecommend = (
         }
       };
       return (
-        <div className="flex items-center gap-2">
-          <TooltipProvider>
+        <div className="flex items-center gap-1">
+          <TooltipProvider delayDuration={150}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="w-7 h-7 border-default-200 dark:border-default-300 text-default-400"
+                <button
+                  type="button"
+                  className="w-8 h-8 rounded-lg text-slate-400 hover:text-[#EA580C] hover:bg-[#FFF1ED] border border-transparent hover:border-orange-200 flex items-center justify-center transition-colors cursor-pointer"
                   onClick={() =>
                     router.push(
                       `/Advertisement/home-section/offer?id=${row.original.id}`
                     )
                   }
                 >
-                  <SquarePen className="w-3 h-3" />
-                </Button>
+                  <SquarePen className="w-3.5 h-3.5" />
+                </button>
               </TooltipTrigger>
               <TooltipContent side="top">
-                <p>Edit</p>
+                <p>Edit Offer</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <TooltipProvider>
+
+          <TooltipProvider delayDuration={150}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="w-7 h-7 border-default-200 dark:border-default-300 text-default-400"
+                <button
+                  type="button"
+                  className="w-8 h-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 flex items-center justify-center transition-colors cursor-pointer"
                   onClick={() => handleDelete(row.original.id)}
                 >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
               </TooltipTrigger>
               <TooltipContent
                 side="top"
-                className="bg-destructive text-destructive-foreground"
+                className="bg-rose-600 text-white border-rose-700"
               >
-                <p>Delete</p>
+                <p>Delete Offer</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -331,18 +407,12 @@ export const columnsRecommend = (
     cell: ({ row }: { row: { original: RowData } }) => {
       const handleDateSelect = (date: Date | undefined) => {
         setSelectedDate(date);
-        console.log("Selected Deletion Date:", date);
       };
-      
+
       const handleScheduleDelete = async () => {
-        if (!selectedDate) {
-          console.log("❌ No date selected");
-          return;
-        }
-        console.log(offerId, "expireid set");
+        if (!selectedDate) return;
 
         const result = await scheduleExpireOffer(offerId, selectedDate);
-
         if (result.success) {
           setRefresh((prev) => !prev);
           setOpen(false);
@@ -351,36 +421,34 @@ export const columnsRecommend = (
 
       const handleChange = (id: string) => {
         setOpen(true);
-        setOfferId(id)
+        setOfferId(id);
       };
 
       return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Dialog
             open={open}
             onOpenChange={() => handleChange(row.original.id)}
           >
-            <TooltipProvider>
+            <TooltipProvider delayDuration={150}>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <DialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="w-7 h-7 border-default-200 dark:border-default-300 text-default-400"
+                    <button
+                      type="button"
+                      className="w-8 h-8 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 border border-transparent hover:border-amber-100 flex items-center justify-center transition-colors cursor-pointer"
                       onClick={() => setOpen(true)}
                     >
-                      <CalendarClock className="w-3 h-3" />
-                    </Button>
+                      <CalendarClock className="w-3.5 h-3.5" />
+                    </button>
                   </DialogTrigger>
                 </TooltipTrigger>
                 <TooltipContent side="top">
-                  <p>Auto Delete Calendar</p>
+                  <p>Schedule Expiry</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
 
-            {/* Calendar Dialog */}
             <DialogContent
               className="p-4"
               onOpenAutoFocus={(e) => {
@@ -388,21 +456,21 @@ export const columnsRecommend = (
                 document.getElementById("schedule-delete-btn")?.focus();
               }}
             >
-              <DialogTitle className="text-lg font-semibold">
-                Select Expire Date
+              <DialogTitle className="text-base font-semibold text-slate-900">
+                Select Expiration Date
               </DialogTitle>
-              <DialogDescription>
-                Pick a date from the calendar below to automatically expire this
-                offer.
+              <DialogDescription className="text-xs text-slate-500">
+                Pick a date from the calendar below to automatically expire this offer.
               </DialogDescription>
               <Calendar
                 mode="single"
                 selected={selectedDate}
                 onSelect={handleDateSelect}
-                className="border rounded-md p-2"
+                className="border border-slate-200 rounded-lg p-2"
               />
               <Button
-                className="mt-4 w-full"
+                id="schedule-delete-btn"
+                className="mt-4 w-full bg-[#FF6B4A] hover:bg-[#E65A38] text-white text-xs font-medium h-9 rounded-lg"
                 onClick={() => handleScheduleDelete()}
               >
                 Schedule Expire

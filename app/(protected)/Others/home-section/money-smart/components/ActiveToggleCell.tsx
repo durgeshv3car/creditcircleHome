@@ -3,6 +3,7 @@ import React from "react";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { updateMoney } from "@/app/(protected)/services/moneySmart/api";
+import { cn } from "@/lib/utils";
 
 const ActiveToggleCell = ({
   row,
@@ -59,12 +60,31 @@ const ActiveToggleCell = ({
   };
 
   return (
-    <Switch
-      checked={isActive}
-      onCheckedChange={handleToggle}
-      disabled={isUpdating}
-      aria-label={`Toggle MoneySmart ${isActive ? "off" : "on"}`}
-    />
+    <div className="flex items-center gap-2">
+      <Switch
+        checked={isActive}
+        onCheckedChange={handleToggle}
+        disabled={isUpdating}
+        aria-label={`Toggle MoneySmart ${isActive ? "off" : "on"}`}
+        className="data-[state=checked]:bg-[#101E4E] data-[state=unchecked]:bg-slate-200 focus-visible:ring-[#101E4E] cursor-pointer"
+      />
+      <span
+        className={cn(
+          "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide transition-all select-none border",
+          isActive
+            ? "bg-[#101E4E]/10 text-[#101E4E] border-[#101E4E]/25 shadow-2xs"
+            : "bg-slate-50 text-slate-500 border-slate-200/80"
+        )}
+      >
+        <span
+          className={cn(
+            "w-1.5 h-1.5 rounded-full shrink-0",
+            isActive ? "bg-[#101E4E]" : "bg-slate-400"
+          )}
+        />
+        {isActive ? "Active" : "Inactive"}
+      </span>
+    </div>
   );
 };
 

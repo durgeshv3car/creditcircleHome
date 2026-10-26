@@ -66,6 +66,7 @@ export function getMenuList(
         id: "dashboard",
         href: "/dashboard",
         label: "dashboard",
+        active: pathname === "/dashboard" || pathname === "/",
         icon: "heroicons-outline:home",
         submenus: [],
       },
@@ -77,7 +78,7 @@ export function getMenuList(
       id: "admin",
       href: "",
       label: "admin",
-      active: pathname.includes("/admin"),
+      active: pathname.toLowerCase().includes("/admin"),
       icon: "heroicons-outline:academic-cap",
       submenus: [
         {
@@ -118,26 +119,26 @@ export function getMenuList(
       id: "lms",
       href: "",
       label: "Lms",
-      active: pathname.includes("/lms"),
+      active: pathname.toLowerCase().includes("/lms"),
       icon: "heroicons-outline:user-group",
       submenus: [
         {
           href: "/Lms/lms-section/leads",
-          label: "leads",
+          label: "Leads",
           active: pathname === "/Lms/lms-section/leads",
           icon: "heroicons-outline:user-group", // leads icon
           children: [],
         },
         {
           href: "/Lms/lms-section/loanapplications",
-          label: "loanapplications",
+          label: "Loan Applications",
           active: pathname === "/Lms/lms-section/loanapplications",
           icon: "heroicons-outline:user-group", // leads icon
           children: [],
         },
         {
           href: "/Lms/lms-section/deviceInfo",
-          label: "DeviceInfo",
+          label: "Device Info",
           active: pathname === "/Lms/lms-section/deviceInfo",
           icon: "heroicons-outline:gift", 
           children: [],
@@ -160,7 +161,7 @@ export function getMenuList(
       id: "advertisment",
       href: "",
       label: "Advertisment",
-      active: pathname.includes("/Advertisment"),
+      active: pathname.toLowerCase().includes("/advertis"),
       icon: "heroicons-outline:megaphone",
       submenus: [
         {
@@ -258,7 +259,7 @@ export function getMenuList(
       id: "tools",
       href: "",
       label: "tools",
-      active: pathname.includes("/tools"),
+      active: pathname.toLowerCase().includes("/tools"),
       icon: "heroicons-outline:wrench",
       submenus: [
         {
@@ -327,7 +328,7 @@ export function getMenuList(
       id: "others",
       href: "",
       label: "others",
-      active: pathname.includes("/others"),
+      active: pathname.toLowerCase().includes("/others"),
       icon: "heroicons-outline:exclamation-circle",
       submenus: [
         {
@@ -397,7 +398,7 @@ export function getMenuList(
       id: "createAccount",
       href: "",
       label: "Account",
-      active: pathname.includes("/auth"),
+      active: pathname.toLowerCase().includes("/auth") || pathname.toLowerCase().includes("/template"),
       icon: "heroicons-outline:user",
       submenus: [
         {

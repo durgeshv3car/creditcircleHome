@@ -5,16 +5,12 @@ import { cn } from "@/lib/utils"
 import { useConfig } from "@/hooks/use-config"
 
 const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => {
-  const [config] = useConfig();
   return (
     <div
       ref={ref}
       className={cn(
-        "rounded-lg  bg-card text-card-foreground ",
-        className, {
-        'border': config?.skin === 'bordered',
-        'shadow-base': config?.skin === 'default'
-      }
+        "rounded-sm bg-white text-slate-900 border border-slate-200/80 shadow-sm transition-all duration-200",
+        className
       )}
       {...props}
     />

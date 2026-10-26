@@ -9,6 +9,7 @@ import { RowData } from "./columnsRecommend";
 
 import { columnsRecommend } from "./columnsRecommend";
 import { fetchOffers } from "@/app/(protected)/services/offers/api";
+import Loader from "@/components/loader";
 
 function Users() {
   const router = useRouter();
@@ -36,7 +37,7 @@ function Users() {
     fetchData();
   }, [refresh]);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <Loader className="min-h-[50vh] h-auto" />;
   return (
     <>
       <div className="space-y-6">

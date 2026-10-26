@@ -10,6 +10,7 @@ import { useRouter } from "@/i18n/routing";
 
 import { columnsCategory } from "./columnsCategory";
 import { fetchCategories } from "@/app/(protected)/services/categorys/api";
+import Loader from "@/components/loader";
 interface DataProps {
   id: string;
   title: string;
@@ -44,7 +45,7 @@ function Category() {
     fetchData();
   }, [refresh]);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <Loader className="min-h-[50vh] h-auto" />;
   return (
     <>
       <div className="space-y-6">

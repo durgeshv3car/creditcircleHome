@@ -2,31 +2,51 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
-import { Command, CommandList, CommandItem } from "@/components/ui/command";
-import { Check, ChevronsUpDown } from "lucide-react";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandList,
+  CommandInput,
+  CommandItem,
+  CommandEmpty,
+} from "@/components/ui/command";
+import {
+  Check,
+  ChevronsUpDown,
+  SlidersHorizontal,
+  RotateCcw,
+  X,
+  Filter as FilterIcon,
+} from "lucide-react";
 import { SelectedValues } from "../page";
 import { fetchNotificationsFilters } from "@/app/(protected)/services/notifications/app/api";
+import { cn } from "@/lib/utils";
 
 interface FilterProps {
   selectedValues: SelectedValues;
   setSelectedValues: React.Dispatch<React.SetStateAction<SelectedValues>>;
 }
 
-export default function Filter({ selectedValues, setSelectedValues }: FilterProps) {
+export default function Filter({
+  selectedValues,
+  setSelectedValues,
+}: FilterProps) {
   const [titles, setTitles] = React.useState<string[]>([]);
   const [statuses, setStatuses] = React.useState<string[]>([]);
   const [counteres, setCounteres] = React.useState<string[]>([]);
   const [openFilter, setOpenFilter] = React.useState<string | null>(null);
 
-  // ✅ Fetch unique filter options from API
+  // Fetch unique filter options from API
   const fetchFilterOptions = async () => {
     try {
       const response = await fetchNotificationsFilters("application");
-      console.log(response)
-      setTitles(response.titles || []);
-      setStatuses(response.statuses || []);
-      setCounteres(response.counter || [])
+      setTitles(response?.titles || []);
+      setStatuses(response?.statuses || []);
+      setCounteres(response?.counter || []);
     } catch (error) {
       console.error("❌ Error fetching filter options:", error);
     }
@@ -36,11 +56,10 @@ export default function Filter({ selectedValues, setSelectedValues }: FilterProp
     fetchFilterOptions();
   }, []);
 
-  // ✅ Handle value selection
   const handleChange = (field: keyof SelectedValues, value: string) => {
     setSelectedValues((prev) => ({
       ...prev,
-      [field]: value === "All" ? "" : value, // Store empty string for "All"
+      [field]: value === "All" ? "" : value,
     }));
     setOpenFilter(null);
   };
@@ -49,60 +68,232 @@ export default function Filter({ selectedValues, setSelectedValues }: FilterProp
     setOpenFilter(isOpen ? field : null);
   };
 
-  // ✅ Define fields and map data correctly
-  const fields: (keyof SelectedValues)[] = ["title", "status","counter"];
+  const handleReset = () => {
+    setSelectedValues((prev) => ({
+      ...prev,
+      title: null,
+      status: null,
+      counter: null,
+    }));
+  };
+
+  const removeSingleFilter = (field: keyof SelectedValues) => {
+    setSelectedValues((prev) => ({
+      ...prev,
+      [field]: null,
+    }));
+  };
+
+  const fields: { key: keyof SelectedValues; label: string }[] = [
+    { key: "title", label: "Title" },
+    { key: "status", label: "Delivery Status" },
+    { key: "counter", label: "Counter Type" },
+  ];
+
   const options: Record<string, string[]> = {
     title: titles,
     status: statuses,
-    counter:counteres
+    counter: counteres,
   };
 
+  const activeFiltersCount = fields.filter((f) => {
+    const val = selectedValues[f.key];
+    return val !== null && val !== undefined && val !== "" && val !== "All";
+  }).length;
+
   return (
-    <div className="flex flex-wrap gap-4">
-      {fields.map((field) => (
-        <Popover
-          key={field}
-          open={openFilter === field}
-          onOpenChange={(isOpen) => handleOpenChange(field, isOpen)}
-        >
-          <PopoverTrigger asChild>
-         <Button variant="outline" className="w-[200px] justify-between">
-  {selectedValues[field]
-    ? selectedValues[field].length > 30
-      ? `${selectedValues[field].slice(0, 24)}...`
-      : selectedValues[field]
-    : `All ${field}s`}
-  <ChevronsUpDown className="opacity-50" />
-</Button>
+    <div className="w-full space-y-4">
+      {/* Filter Section Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-[#0B1740] text-white flex items-center justify-center shrink-0 shadow-2xs">
+            <SlidersHorizontal className="w-4 h-4 text-white" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-bold text-slate-900 tracking-tight">
+                Filter Notifications
+              </h3>
+              {activeFiltersCount > 0 && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-[#FFF1ED] text-[#EA580C] border border-orange-200/80 shadow-2xs">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#FF6B4A]" />
+                  </span>
+                  {activeFiltersCount} active
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-slate-400 font-normal">
+              Filter by notification title, delivery status, and counter type
+            </p>
+          </div>
+        </div>
 
-          </PopoverTrigger>
-          <PopoverContent className="w-[200px] p-0">
-            <Command>
-              <CommandList>
-                <CommandItem key="all" onSelect={() => handleChange(field, "All")}>
-                  All
-                  <Check
-                    className={`ml-auto ${
-                      selectedValues[field] === "" ? "opacity-100" : "opacity-0"
-                    }`}
-                  />
-                </CommandItem>
+        {activeFiltersCount > 0 && (
+          <button
+            type="button"
+            onClick={handleReset}
+            className="text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50/80 px-2.5 py-1.5 rounded-md border border-rose-100 transition-all flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            Clear all filters
+          </button>
+        )}
+      </div>
 
-                {options[field]?.map((option) => (
-                  <CommandItem key={option} onSelect={() => handleChange(field, option)}>
-                    {option}
-                    <Check
-                      className={`ml-auto ${
-                        selectedValues[field] === option ? "opacity-100" : "opacity-0"
-                      }`}
+      {/* Filter Buttons Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {fields.map(({ key, label }) => {
+          const currentVal = selectedValues[key];
+          const isActive =
+            currentVal !== null &&
+            currentVal !== undefined &&
+            currentVal !== "" &&
+            currentVal !== "All";
+
+          return (
+            <Popover
+              key={key}
+              open={openFilter === key}
+              onOpenChange={(isOpen) => handleOpenChange(key, isOpen)}
+            >
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full h-9 px-3 justify-between text-xs rounded-md transition-colors cursor-pointer select-none",
+                    isActive
+                      ? "bg-[#FFF1ED] border-orange-200 text-[#EA580C] font-semibold hover:bg-[#FFE6DF] hover:border-orange-300"
+                      : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 font-medium"
+                  )}
+                >
+                  <span className="truncate mr-1.5 text-left">
+                    {isActive ? currentVal : `All ${label}s`}
+                  </span>
+                  <ChevronsUpDown className="w-3.5 h-3.5 opacity-50 shrink-0 ml-auto" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                align="start"
+                sideOffset={4}
+                className="w-[var(--radix-popover-trigger-width)] min-w-[220px] p-0 rounded-lg border border-slate-200 bg-white shadow-xl overflow-hidden z-50"
+              >
+                {/* Popup Header */}
+                <div className="px-3 py-2 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-slate-800 truncate">
+                    {label}
+                  </span>
+                  {isActive && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleChange(key, "All");
+                      }}
+                      className="text-[11px] font-medium text-rose-600 hover:text-rose-700 hover:underline cursor-pointer"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+
+                <Command className="w-full">
+                  <div className="border-b border-slate-100">
+                    <CommandInput
+                      placeholder={`Search ${label}...`}
+                      className="text-xs h-9 py-1.5 border-0 focus:ring-0 outline-none w-full placeholder:text-slate-400"
                     />
-                  </CommandItem>
-                ))}
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
-      ))}
+                  </div>
+                  <CommandList className="max-h-56 overflow-y-auto p-1 clean-scrollbar">
+                    <CommandEmpty className="py-4 text-center text-xs text-slate-400">
+                      No options found.
+                    </CommandEmpty>
+
+                    <CommandItem
+                      value="all"
+                      onSelect={() => handleChange(key, "All")}
+                      className={cn(
+                        "text-xs rounded-md cursor-pointer py-1.5 px-2 flex items-center justify-between transition-colors",
+                        !isActive
+                          ? "bg-[#FFF1ED] text-[#EA580C] font-semibold"
+                          : "hover:bg-slate-50 text-slate-700"
+                      )}
+                    >
+                      <span>All {label}s</span>
+                      {!isActive && (
+                        <Check className="w-3 h-3 text-[#FF6B4A]" />
+                      )}
+                    </CommandItem>
+
+                    {options[key]?.map((option) => {
+                      const isSelected = currentVal === option;
+                      return (
+                        <CommandItem
+                          key={option}
+                          value={option}
+                          onSelect={() => handleChange(key, option)}
+                          className={cn(
+                            "text-xs rounded-md cursor-pointer py-1.5 px-2 flex items-center justify-between transition-colors",
+                            isSelected
+                              ? "bg-[#FFF1ED] text-[#EA580C] font-semibold"
+                              : "hover:bg-slate-50 text-slate-700"
+                          )}
+                        >
+                          <span className="truncate">{option}</span>
+                          {isSelected && (
+                            <Check className="w-3 h-3 text-[#FF6B4A]" />
+                          )}
+                        </CommandItem>
+                      );
+                    })}
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          );
+        })}
+      </div>
+
+      {/* Active Filter Chips Ribbon */}
+      {activeFiltersCount > 0 && (
+        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100/90">
+          <span className="text-[11px] font-semibold text-slate-400 flex items-center gap-1">
+            <FilterIcon className="w-3 h-3" /> Active:
+          </span>
+          {fields.map(({ key, label }) => {
+            const val = selectedValues[key];
+            if (
+              val === null ||
+              val === undefined ||
+              val === "" ||
+              val === "All"
+            )
+              return null;
+
+            return (
+              <span
+                key={key}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 hover:bg-[#FFF1ED] text-slate-700 hover:text-[#EA580C] border border-slate-200/80 hover:border-orange-200 transition-all shadow-2xs"
+              >
+                <span className="text-slate-400 text-[10px] uppercase font-bold">
+                  {label}:
+                </span>
+                <span className="font-semibold truncate max-w-[150px]">
+                  {val}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => removeSingleFilter(key)}
+                  className="text-slate-400 hover:text-rose-600 ml-0.5 transition-colors cursor-pointer"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

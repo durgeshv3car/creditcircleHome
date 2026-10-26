@@ -13,9 +13,11 @@ import {
   CommandList,
   CommandInput,
   CommandItem,
+  CommandEmpty,
 } from "@/components/ui/command";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, SlidersHorizontal, RotateCcw, X, Filter as FilterIcon } from "lucide-react";
 import { SelectedValues } from "./LoanApplications";
+import { cn } from "@/lib/utils";
 
 interface FilterProps {
   selectedValues: SelectedValues;
@@ -108,21 +110,84 @@ export default function Filter({
         newDropdowns[key] = ["All", ...Array.from(years).sort((a, b) => b.localeCompare(a))]; // Sort years in descending order
       }
       else {
-        newDropdowns[key] = ["All", ...Array.from(new Set(values)).sort()];
+        const strValues = values
+          .map((v) => {
+            if (v === null || v === undefined) return "";
+            if (typeof v === "object") return String(v?.name ?? v?.label ?? "");
+            return String(v);
+          })
+          .filter(Boolean);
+        newDropdowns[key] = ["All", ...Array.from(new Set(strValues)).sort()];
       }
     }
     setDropdownOptions(newDropdowns);
   }, [fieldPaths, selectedValues, data]);
 
+const FIELD_LABELS: Record<string, string> = {
+  phoneNumber: "Phone Number",
+  desiredLoanAmount: "Desired Loan Amount",
+  loanTenure: "Loan Tenure",
+  loanType: "Loan Type",
+  employmentStatus: "Employment Status",
+  netMonthlyIncome: "Net Monthly Income",
+  hasCreditCard: "Has Credit Card",
+  employmentLevel: "Employment Level",
+  loanPurpose: "Loan Purpose",
+  hasGST: "Has GST",
+  businessType: "Business Type",
+  natureOfBusiness: "Nature of Business",
+  yearsInBusiness: "Years in Business",
+  businessTurnover: "Business Turnover",
+  businessIncome: "Business Income",
+  profession: "Profession",
+  yearRegistration: "Year of Registration",
+  studentIncome: "Student Income",
+};
+
+const formatFieldLabel = (field: any): string => {
+  if (field === null || field === undefined) return "";
+  const str = String(field);
+  if (FIELD_LABELS[str]) return FIELD_LABELS[str];
+  return str
+    .replace(/([A-Z])/g, " $1")
+    .replace(/[_-]+/g, " ")
+    .replace(/^\w/, (c) => c.toUpperCase())
+    .trim();
+};
+
+const formatOptionLabel = (option: any): string => {
+  if (option === null || option === undefined) return "";
+  const str = typeof option === "object" ? String(option?.name ?? option?.label ?? "") : String(option);
+  if (!str || str === "All") return str;
+  if (str === "PersonalLoan") return "Personal Loan";
+  if (str === "HomeLoan") return "Home Loan";
+  if (str === "BusinessLoan") return "Business Loan";
+  if (str === "EducationLoan") return "Education Loan";
+  if (str === "SelfEmployedBusiness") return "Self Employed Business";
+  if (str === "SelfEmployedProfessional") return "Self Employed Professional";
+  if (str === "Salaried") return "Salaried";
+  return str
+    .replace(/([A-Z])/g, " $1")
+    .replace(/[_-]+/g, " ")
+    .trim();
+};
+
   const getDisplayLabel = (field: keyof SelectedValues): string => {
-    const value = selectedValues[field];
-    if (!value || value.length === 0) {
-      return field.replace(/([A-Z])/g, ' $1').trim();
+    const value: any = selectedValues[field];
+    if (!value || (Array.isArray(value) && value.length === 0) || value === "") {
+      return formatFieldLabel(field);
     }
     if (Array.isArray(value)) {
-      return value.length > 0 ? String(value[0]) : field.replace(/([A-Z])/g, ' $1').trim();
+      return value.length > 0 ? formatOptionLabel(String(value[0])) : formatFieldLabel(field);
     }
-    return String(value);
+    return formatOptionLabel(String(value));
+  };
+
+  const isFieldActive = (field: keyof SelectedValues): boolean => {
+    const val: any = selectedValues[field];
+    if (val === null || val === undefined || val === "") return false;
+    if (Array.isArray(val)) return val.length > 0;
+    return true;
   };
 
   const handleChange = (field: keyof SelectedValues, value: string) => {
@@ -137,47 +202,164 @@ export default function Filter({
     setOpenFilter(isOpen ? field : null);
   };
 
+  const handleReset = () => {
+    const resetValues: any = {};
+    (Object.keys(selectedValues) as (keyof SelectedValues)[]).forEach((key) => {
+      resetValues[key] = null;
+    });
+    setSelectedValues(resetValues);
+  };
+
+  const activeFiltersCount = (Object.keys(selectedValues) as (keyof SelectedValues)[]).filter(
+    (field) => isFieldActive(field)
+  ).length;
+
   return (
-    <div className="flex flex-wrap gap-4">
-      {(Object.keys(selectedValues) as (keyof SelectedValues)[]).map((field) => (
-        <Popover
-          key={field}
-          open={openFilter === field}
-          onOpenChange={(isOpen) => handleOpenChange(field, isOpen)}
-        >
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className="w-[200px] justify-between capitalize"
+    <div className="w-full space-y-4">
+      {/* Section Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-[#0B1740] text-white flex items-center justify-center shrink-0 shadow-2xs">
+            <SlidersHorizontal className="w-4 h-4 text-white" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-bold text-slate-900 tracking-tight">
+                Filter Loan Applications
+              </h3>
+              {activeFiltersCount > 0 && (
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-bold bg-[#FFF1ED] text-[#EA580C] border border-orange-200/80">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#FF6B4A]" />
+                  </span>
+                  {activeFiltersCount} active
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-slate-400 font-normal">
+              Filter by applicant profile, employment, income and business details
+            </p>
+          </div>
+        </div>
+
+        {activeFiltersCount > 0 && (
+          <button
+            type="button"
+            onClick={handleReset}
+            className="text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50/80 px-2.5 py-1.5 rounded-md border border-rose-100 transition-all flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            Clear all filters
+          </button>
+        )}
+      </div>
+
+      {/* Filter Buttons Grid: Equal column width on every row */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
+        {(Object.keys(selectedValues) as (keyof SelectedValues)[]).map((field) => {
+          const active = isFieldActive(field);
+          return (
+            <Popover
+              key={field}
+              open={openFilter === field}
+              onOpenChange={(isOpen) => handleOpenChange(field, isOpen)}
             >
-              {getDisplayLabel(field)}
-              <ChevronsUpDown className="opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[200px] p-0">
-            <Command>
-              <CommandInput placeholder={`Search ${field}`} />
-              <CommandList>
-                {dropdownOptions[field]?.map((option) => (
-                  <CommandItem
-                    key={option}
-                    onSelect={() => handleChange(field, option)}
-                  >
-                    {option}
-                    <Check
-                      className={`ml-auto ${
-                        selectedValues[field]?.toString() === option
-                          ? "opacity-100"
-                          : "opacity-0"
-                      }`}
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full h-9 px-2.5 justify-between text-xs rounded-md transition-colors cursor-pointer select-none",
+                    active
+                      ? "bg-[#FFF1ED] border-orange-200 text-[#EA580C] font-semibold hover:bg-[#FFE6DF] hover:border-orange-300"
+                      : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 font-medium"
+                  )}
+                  title={getDisplayLabel(field)}
+                >
+                  <span className="truncate mr-1.5 text-left">{getDisplayLabel(field)}</span>
+                  <ChevronsUpDown className="w-3.5 h-3.5 opacity-50 shrink-0 ml-auto" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                align="start"
+                sideOffset={4}
+                collisionPadding={12}
+                className="w-[var(--radix-popover-trigger-width)] min-w-[220px] p-0 rounded-lg border border-slate-200 bg-white shadow-xl overflow-hidden z-50"
+              >
+                {/* Popup Header */}
+                <div className="px-3 py-2 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-slate-800 truncate">
+                    {formatFieldLabel(field)}
+                  </span>
+                  {active && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleChange(field, "All");
+                      }}
+                      className="text-[11px] font-medium text-rose-600 hover:text-rose-700 hover:underline cursor-pointer ml-2"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+
+                <Command className="w-full">
+                  <div className="border-b border-slate-100">
+                    <CommandInput
+                      placeholder={`Search ${formatFieldLabel(field)}...`}
+                      className="text-xs h-9 py-1.5 border-0 focus:ring-0 outline-none w-full placeholder:text-slate-400"
                     />
-                  </CommandItem>
-                ))}
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
-      ))}
+                  </div>
+                  <CommandList className="max-h-56 overflow-y-auto p-1 clean-scrollbar">
+                    <CommandEmpty className="py-4 text-center text-xs text-slate-400">
+                      No options found.
+                    </CommandEmpty>
+                    {dropdownOptions[field]?.map((option) => {
+                      const isSelected =
+                        option === "All"
+                          ? !active
+                          : selectedValues[field]?.toString() === option;
+                      return (
+                        <CommandItem
+                          key={option}
+                          value={`${option} ${formatOptionLabel(option)}`}
+                          onSelect={() => handleChange(field, option)}
+                          className={cn(
+                            "text-xs rounded-md cursor-pointer py-1.5 px-2 flex items-center justify-between transition-colors",
+                            isSelected
+                              ? "bg-[#FFF1ED] text-[#EA580C] font-semibold"
+                              : "hover:bg-slate-50 text-slate-700"
+                          )}
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div
+                              className={cn(
+                                "w-3.5 h-3.5 rounded-[3px] border flex items-center justify-center transition-colors shrink-0",
+                                isSelected
+                                  ? "bg-[#FF6B4A] border-[#FF6B4A] text-white"
+                                  : "border-slate-300 bg-white"
+                              )}
+                            >
+                              {isSelected && (
+                                <Check className="w-2.5 h-2.5 stroke-[2.5]" />
+                              )}
+                            </div>
+                            <span className="truncate">
+                              {formatOptionLabel(option)}
+                            </span>
+                          </div>
+                        </CommandItem>
+                      );
+                    })}
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          );
+        })}
+      </div>
     </div>
   );
 }

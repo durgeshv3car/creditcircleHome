@@ -9,8 +9,9 @@ import { useRouter } from "next/navigation";
 import { columnsCategory } from "./columnsCategory";
 import { fetchfaq } from "@/app/(protected)/services/faqs/api";
 import type { Category } from "./columnsCategory";
+import Loader from "@/components/loader";
 
-function Category() {
+function FaqPage() {
   const allowed = ["superadmin", "admin"];
   const role = "admin";
   if (!allowed.includes(role)) {
@@ -25,14 +26,21 @@ function Category() {
   const fetchData = async () => {
     try {
       const result = await fetchfaq();
-      if (result.status == 404) {
+      if (!result || result.status === 404) {
         setData([]);
         return;
       }
 
-      setData(result);
+      setData(
+        Array.isArray(result)
+          ? result
+          : Array.isArray(result?.data)
+          ? result.data
+          : []
+      );
     } catch (error) {
       console.error("Error fetching data:", error);
+      setData([]);
     } finally {
       setLoading(false);
     }
@@ -42,20 +50,20 @@ function Category() {
     fetchData();
   }, [refresh]);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <Loader className="min-h-[50vh] h-auto" />;
+
   return (
-    <>
-      <div className="space-y-6">
-        <ExampleTwo<Category>
-          tableHeading="Faq List"
-          tableData={data}
-          tableColumns={columnsCategory(fetchData, router)}
-          setRefresh={setRefresh}
-          type={type}
-        />
-      </div>
-    </>
+    <div className="space-y-6">
+      <ExampleTwo<Category>
+        tableHeading="FAQ List"
+        tableData={data}
+        tableColumns={columnsCategory(fetchData, router)}
+        setRefresh={setRefresh}
+        type={type}
+        isLoading={loading}
+      />
+    </div>
   );
 }
 
-export default Category;
+export default FaqPage;
